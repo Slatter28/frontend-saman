@@ -1,0 +1,157 @@
+:host {
+  display: block;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.layout-container {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-ground);
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: 0.5rem 0.5rem 0 0;
+
+  .layout-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    height: 4rem;
+    box-sizing: border-box;
+  }
+
+  .layout-content {
+    display: flex;
+    height: calc(100vh - 4rem);
+    margin-top: 4rem;
+    overflow: hidden;
+
+    .layout-sidebar {
+      position: fixed;
+      left: 0;
+      top: 4rem;
+      height: calc(100vh - 4rem);
+      z-index: 999;
+      box-sizing: border-box;
+    }
+
+    .layout-main {
+      flex: 1;
+      margin-left: 17rem; // Adjusted for card effect spacing
+      width: calc(100vw - 17rem);
+      height: calc(100vh - 4rem);
+      overflow: hidden;
+      transition: margin-left 0.3s ease, width 0.3s ease;
+      box-sizing: border-box;
+
+      .content-wrapper {
+        height: 100%;
+        width: 100%;
+        padding: 1.5rem;
+        background: var(--surface-ground);
+        overflow-y: auto;
+        overflow-x: hidden;
+        box-sizing: border-box;
+        border-radius: 12px 0 0 0;
+        margin-top: 0.5rem;
+      }
+    }
+  }
+}
+
+// Sidebar collapsed state
+.layout-container {
+  .layout-content {
+    .layout-main {
+      &.sidebar-collapsed {
+        margin-left: 5rem; // Adjusted collapsed sidebar width for card effect
+        width: calc(100vw - 5rem);
+      }
+    }
+  }
+}
+
+// Mobile responsiveness
+@media (max-width: 768px) {
+  .layout-container {
+    .layout-content {
+      .layout-sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        
+        &.mobile-open {
+          transform: translateX(0);
+        }
+      }
+
+      .layout-main {
+        margin-left: 0;
+        width: 100vw;
+
+        .content-wrapper {
+          padding: 1rem;
+        }
+
+        &.sidebar-collapsed {
+          margin-left: 0;
+          width: 100vw;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .layout-container {
+    .layout-content {
+      .layout-main {
+        .content-wrapper {
+          padding: 0.75rem;
+        }
+      }
+    }
+  }
+}
+
+// Dark theme adjustments
+:host-context(.my-app-dark) {
+  .layout-container {
+    background: var(--surface-ground);
+    
+    .layout-content {
+      .layout-main {
+        .content-wrapper {
+          background: var(--surface-ground);
+        }
+      }
+    }
+  }
+}
+
+// Smooth transitions for theme changes
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+// Scrollbar styling for main content
+.content-wrapper::-webkit-scrollbar {
+  width: 6px;
+}
+
+.content-wrapper::-webkit-scrollbar-track {
+  background: var(--surface-100);
+}
+
+.content-wrapper::-webkit-scrollbar-thumb {
+  background: var(--surface-300);
+  border-radius: 3px;
+}
+
+.content-wrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--surface-400);
+}

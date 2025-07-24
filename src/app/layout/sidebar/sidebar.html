@@ -1,0 +1,26 @@
+<div class="sidebar-container" [class.collapsed]="isCollapsed">
+  <!-- Navigation Menu -->
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      <li 
+        *ngFor="let item of menuItems" 
+        class="nav-item"
+        [class.active]="isActiveRoute(item.route || '')">
+        <a 
+          class="nav-link"
+          (click)="navigateTo(item.route || '')"
+          [title]="item.label">
+          <i [class]="item.icon" class="nav-icon"></i>
+          <span class="nav-text" *ngIf="!isCollapsed">{{ item.label }}</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Sidebar Footer -->
+  <div class="sidebar-footer" *ngIf="!isCollapsed">
+    <div class="version-info">
+      <small>SAMAN v1.0.0</small>
+    </div>
+  </div>
+</div>

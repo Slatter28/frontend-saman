@@ -1,0 +1,21 @@
+<div class="layout-container">
+  <!-- Header -->
+  <header class="layout-header">
+    <app-header (sidebarToggle)="onHeaderSidebarToggle()"></app-header>
+  </header>
+
+  <!-- Main Content Area -->
+  <div class="layout-content">
+    <!-- Sidebar -->
+    <aside class="layout-sidebar">
+      <app-sidebar (sidebarToggle)="onSidebarToggle($event)"></app-sidebar>
+    </aside>
+
+    <!-- Page Content -->
+    <main class="layout-main" [class.sidebar-collapsed]="isSidebarCollapsed">
+      <div class="content-wrapper">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+</div>

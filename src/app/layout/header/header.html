@@ -1,0 +1,68 @@
+<div class="header-container">
+  <!-- Left side - Menu Toggle and Company Name -->
+  <div class="header-left">
+    <!-- Sidebar Toggle Button -->
+    <button 
+      type="button" 
+      pButton 
+      pRipple 
+      class="sidebar-toggle-btn p-button-rounded p-button-text"
+      icon="pi pi-bars"
+      (click)="toggleSidebar()"
+      title="Toggle menu">
+    </button>
+
+    <div class="company-brand">
+      <div class="logo-icon">
+        <i class="pi pi-building"></i>
+      </div>
+      <span class="company-name">SAMAN</span>
+    </div>
+  </div>
+
+  <!-- Right side - User Info and Actions -->
+  <div class="header-right">
+    <!-- Theme Toggle -->
+    <button 
+      type="button" 
+      pButton 
+      pRipple 
+      class="theme-toggle-btn p-button-rounded p-button-text"
+      [icon]="isDarkTheme ? 'pi pi-sun' : 'pi pi-moon'"
+      (click)="toggleTheme()"
+      [title]="isDarkTheme ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'">
+    </button>
+
+    <!-- User Info and Menu -->
+    <div class="user-section">
+      <div class="user-info" (click)="toggleUserMenu($event)">
+        <span class="user-name">{{ currentUser?.nombre || 'Usuario' }}</span>
+        <p-avatar 
+          [label]="getUserInitials()"
+          styleClass="user-avatar"
+          size="normal">
+        </p-avatar>
+        <i class="pi pi-chevron-down user-menu-icon"></i>
+      </div>
+
+      <!-- User Menu -->
+      <div class="user-menu-dropdown" *ngIf="isUserMenuOpen">
+        <div class="user-menu-content">
+          <div class="menu-item" (click)="navigateToProfile()">
+            <i class="pi pi-user"></i>
+            <span>Perfil</span>
+          </div>
+          <div class="menu-item" (click)="navigateToSettings()">
+            <i class="pi pi-cog"></i>
+            <span>Configuración</span>
+          </div>
+          <div class="menu-separator"></div>
+          <div class="menu-item logout" (click)="logout()">
+            <i class="pi pi-sign-out"></i>
+            <span>Cerrar Sesión</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

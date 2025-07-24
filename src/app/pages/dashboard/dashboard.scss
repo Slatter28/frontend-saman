@@ -1,0 +1,427 @@
+.dashboard-container {
+  padding: 0;
+  
+  .dashboard-header {
+    margin-bottom: 2rem;
+    
+    h1 {
+      margin: 0 0 0.5rem 0;
+      color: var(--text-color);
+      font-size: 2rem;
+      font-weight: 600;
+    }
+    
+    p {
+      margin: 0;
+      color: var(--text-color-secondary);
+      font-size: 1rem;
+    }
+  }
+
+  // Stats Cards Grid
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+
+    ::ng-deep .stats-card {
+      .p-card-header {
+        padding: 1rem 1rem 0.5rem 1rem;
+        font-weight: 600;
+        color: var(--text-color);
+      }
+
+      .p-card-body {
+        padding: 0.5rem 1rem 1rem 1rem;
+      }
+    }
+
+    .stat-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-color);
+      }
+
+      .stat-change {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+
+        &.positive {
+          color: var(--green-500);
+        }
+
+        &.negative {
+          color: var(--red-500);
+        }
+
+        i {
+          font-size: 0.8rem;
+        }
+      }
+    }
+  }
+
+  // Main Content Grid
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+
+    .chart-section,
+    .table-section {
+      grid-column: 1 / -1;
+    }
+
+    .form-section,
+    .progress-section,
+    .actions-section {
+      grid-column: span 1;
+    }
+  }
+
+  // Form Styles
+  .form-section {
+    .form-field {
+      margin-bottom: 1.5rem;
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--text-color);
+        font-weight: 500;
+        font-size: 0.9rem;
+      }
+
+      input,
+      textarea,
+      ::ng-deep .p-select,
+      ::ng-deep .p-multiselect,
+      ::ng-deep .p-datepicker,
+      ::ng-deep .p-inputnumber {
+        width: 100%;
+      }
+
+      ::ng-deep .p-inputtext,
+      ::ng-deep .p-select,
+      ::ng-deep .p-multiselect,
+      ::ng-deep .p-datepicker input,
+      ::ng-deep .p-textarea,
+      ::ng-deep .p-inputnumber input {
+        padding: 0.75rem;
+        border: 1px solid var(--surface-border);
+        border-radius: 6px;
+        background: var(--surface-0);
+        color: var(--text-color);
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+
+        &:focus {
+          outline: none;
+          border-color: var(--primary-color);
+          box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb), 0.2);
+        }
+      }
+
+      .checkbox-group,
+      .radio-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        label {
+          margin: 0;
+          cursor: pointer;
+          font-size: 0.9rem;
+        }
+      }
+
+      .radio-group {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+
+        .radio-item {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+      }
+
+      ::ng-deep .p-rating {
+        .p-rating-icon {
+          color: var(--yellow-500);
+          font-size: 1.25rem;
+        }
+      }
+
+      ::ng-deep .p-slider {
+        margin: 1rem 0;
+      }
+
+      ::ng-deep .p-togglebutton {
+        min-width: 120px;
+      }
+    }
+
+    .form-actions {
+      padding-top: 1rem;
+      border-top: 1px solid var(--surface-border);
+      margin-top: 1.5rem;
+    }
+  }
+
+  // Table Styles
+  .table-section {
+    ::ng-deep .p-table {
+      .p-table-header {
+        background: var(--surface-section);
+        border: 1px solid var(--surface-border);
+      }
+
+      .p-datatable-thead > tr > th {
+        background: var(--surface-section);
+        color: var(--text-color);
+        font-weight: 600;
+        padding: 1rem;
+        border: 1px solid var(--surface-border);
+      }
+
+      .p-datatable-tbody > tr > td {
+        padding: 1rem;
+        border: 1px solid var(--surface-border);
+      }
+
+      .p-datatable-tbody > tr:nth-child(even) {
+        background: var(--surface-50);
+      }
+
+      .p-datatable-tbody > tr:hover {
+        background: var(--surface-hover);
+      }
+    }
+
+    ::ng-deep .p-paginator {
+      background: var(--surface-section);
+      border: 1px solid var(--surface-border);
+      border-top: none;
+      padding: 0.75rem;
+    }
+  }
+
+  // Progress Section
+  .progress-section {
+    .progress-item {
+      margin-bottom: 1.5rem;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--text-color);
+        font-weight: 500;
+        font-size: 0.9rem;
+      }
+
+      ::ng-deep .p-progressbar {
+        height: 1.5rem;
+        border-radius: 8px;
+        overflow: hidden;
+
+        .p-progressbar-value {
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.8rem;
+          font-weight: 600;
+          color: white;
+        }
+      }
+    }
+  }
+
+  // Actions Section
+  .actions-section {
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+
+      ::ng-deep .p-button {
+        justify-content: center;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+      }
+    }
+  }
+
+  // Chart Section
+  .chart-section {
+    ::ng-deep .p-chart {
+      canvas {
+        max-height: 300px;
+      }
+    }
+  }
+
+  // Card Styles
+  ::ng-deep .p-card {
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--surface-border);
+    background: var(--surface-card);
+
+    .p-card-header {
+      background: var(--surface-section);
+      border-bottom: 1px solid var(--surface-border);
+      padding: 1.25rem 1.5rem;
+      font-weight: 600;
+      color: var(--text-color);
+      border-radius: 12px 12px 0 0;
+    }
+
+    .p-card-body {
+      padding: 1.5rem;
+    }
+
+    .p-card-content {
+      padding: 0;
+    }
+  }
+}
+
+// Dark Theme Adjustments
+:host-context(.my-app-dark) {
+  .dashboard-container {
+    ::ng-deep .p-card {
+      background: var(--surface-card);
+      border-color: var(--surface-border);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+      .p-card-header {
+        background: var(--surface-section);
+        border-bottom-color: var(--surface-border);
+      }
+    }
+
+    ::ng-deep .p-table {
+      .p-datatable-thead > tr > th {
+        background: var(--surface-section);
+        border-color: var(--surface-border);
+      }
+
+      .p-datatable-tbody > tr > td {
+        border-color: var(--surface-border);
+      }
+
+      .p-datatable-tbody > tr:nth-child(even) {
+        background: var(--surface-100);
+      }
+    }
+
+    ::ng-deep .p-paginator {
+      background: var(--surface-section);
+      border-color: var(--surface-border);
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 1200px) {
+  .dashboard-container {
+    .content-grid {
+      grid-template-columns: 1fr;
+
+      .chart-section,
+      .table-section,
+      .form-section,
+      .progress-section,
+      .actions-section {
+        grid-column: span 1;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    .stats-grid {
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .dashboard-header {
+      h1 {
+        font-size: 1.75rem;
+      }
+    }
+
+    .actions-section {
+      .button-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 0.75rem;
+      }
+    }
+
+    ::ng-deep .p-card {
+      .p-card-header {
+        padding: 1rem;
+      }
+
+      .p-card-body {
+        padding: 1rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-container {
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .dashboard-header {
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
+
+    .actions-section {
+      .button-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-section {
+      .form-field {
+        .radio-group {
+          .radio-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.25rem;
+          }
+        }
+      }
+    }
+  }
+}
