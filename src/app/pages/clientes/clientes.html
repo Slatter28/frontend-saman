@@ -1,0 +1,559 @@
+<div class="clientes-container">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Gestión de Clientes</h1>
+      <p>Administra clientes, proveedores y su información de contacto</p>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="stats-grid" *ngIf="stats">
+      <p-card header="Total Clientes" styleClass="stats-card">
+        <div class="stat-content">
+          <div class="stat-value">{{ stats.total }}</div>
+          <div class="stat-icon">
+            <i class="pi pi-users"></i>
+          </div>
+        </div>
+      </p-card>
+
+      <p-card header="Solo Clientes" styleClass="stats-card">
+        <div class="stat-content">
+          <div class="stat-value">{{ stats.totalClientes }}</div>
+          <div class="stat-icon info">
+            <i class="pi pi-user"></i>
+          </div>
+        </div>
+      </p-card>
+
+      <p-card header="Solo Proveedores" styleClass="stats-card">
+        <div class="stat-content">
+          <div class="stat-value">{{ stats.totalProveedores }}</div>
+          <div class="stat-icon success">
+            <i class="pi pi-building"></i>
+          </div>
+        </div>
+      </p-card>
+
+      <p-card header="Ambos" styleClass="stats-card">
+        <div class="stat-content">
+          <div class="stat-value">{{ stats.totalAmbos }}</div>
+          <div class="stat-icon secondary">
+            <i class="pi pi-briefcase"></i>
+          </div>
+        </div>
+      </p-card>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content-grid">
+    
+    <!-- Filter and Actions Section -->
+    <div class="filters-section">
+      <p-card header="Filtros y Acciones">
+        <div class="filters-content">
+          
+          <!-- Search Filters -->
+          <form [formGroup]="filtroForm" (ngSubmit)="onFilter()" class="filter-form">
+            <div class="filter-row">
+              <div class="filter-field">
+                <label for="filtro-nombre">Buscar por nombre</label>
+                <p-iconField iconPosition="left">
+                  <p-inputIcon styleClass="pi pi-search"></p-inputIcon>
+                  <input 
+                    id="filtro-nombre"
+                    type="text" 
+                    pInputText 
+                    placeholder="Nombre del cliente..."
+                    formControlName="nombre"
+                    (keyup.enter)="onFilter()">
+                </p-iconField>
+              </div>
+
+              <div class="filter-field">
+                <label for="filtro-email">Buscar por email</label>
+                <p-iconField iconPosition="left">
+                  <p-inputIcon styleClass="pi pi-envelope"></p-inputIcon>
+                  <input 
+                    id="filtro-email"
+                    type="text" 
+                    pInputText 
+                    placeholder="Email del cliente..."
+                    formControlName="email"
+                    (keyup.enter)="onFilter()">
+                </p-iconField>
+              </div>
+
+              <div class="filter-field">
+                <label for="filtro-tipo">Filtrar por tipo</label>
+                <p-select 
+                  id="filtro-tipo"
+                  [options]="tipoOptions"
+                  formControlName="tipo"
+                  placeholder="Seleccionar tipo"
+                  optionLabel="label"
+                  optionValue="value">
+                </p-select>
+              </div>
+              
+              <div class="filter-actions">
+                <p-button 
+                  type="submit"
+                  label="Buscar"
+                  icon="pi pi-search"
+                  size="small">
+                </p-button>
+                
+                <p-button 
+                  type="button"
+                  label="Limpiar"
+                  icon="pi pi-times"
+                  severity="secondary"
+                  size="small"
+                  (click)="clearFilters()">
+                </p-button>
+              </div>
+            </div>
+          </form>
+
+          <p-divider></p-divider>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <div class="actions-right">
+              <p-button 
+                label="Nuevo Cliente"
+                icon="pi pi-plus"
+                (click)="openNew()">
+              </p-button>
+
+              <p-menu #menu [model]="menuItems" [popup]="true"></p-menu>
+              <p-button 
+                icon="pi pi-ellipsis-v"
+                severity="secondary"
+                (click)="menu.toggle($event)"
+                pTooltip="Más acciones">
+              </p-button>
+            </div>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-section">
+      <p-card header="Lista de Clientes">
+        <div class="table-wrapper">
+          <p-table 
+            [value]="clientes" 
+            [paginator]="true" 
+            [rows]="rows"
+            [totalRecords]="totalRecords"
+            [lazy]="true"
+            [loading]="loading"
+            [first]="first"
+            (onLazyLoad)="onPageChange($event)"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} clientes"
+            [tableStyle]="{'min-width': '1100px'}"
+            dataKey="id"
+            [scrollable]="true"
+            scrollHeight="flex">
+
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 80px; min-width: 80px;" pSortableColumn="id">
+                  ID
+                  <p-sortIcon field="id"></p-sortIcon>
+                </th>
+                <th style="width: 200px; min-width: 200px;" pSortableColumn="nombre">
+                  Nombre
+                  <p-sortIcon field="nombre"></p-sortIcon>
+                </th>
+                <th style="width: 120px; min-width: 120px; text-align: center;">Tipo</th>
+                <th style="width: 220px; min-width: 220px;">Contacto</th>
+                <th style="width: 200px; min-width: 200px;">Dirección</th>
+                <th style="width: 140px; min-width: 140px;" pSortableColumn="creadoEn">
+                  Fecha Registro
+                  <p-sortIcon field="creadoEn"></p-sortIcon>
+                </th>
+                <th style="width: 180px; min-width: 180px; text-align: center;">Acciones</th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-cliente>
+              <tr>
+                <td>
+                  <span class="id-badge">{{ cliente.id }}</span>
+                </td>
+                <td>
+                  <div class="nombre-cell">
+                    <i [class]="'pi ' + getIconForTipo(cliente.tipo) + ' cliente-icon'"></i>
+                    <span class="nombre">{{ cliente.nombre }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="tipo-cell">
+                    <p-tag 
+                      [value]="getLabelForTipo(cliente.tipo)"
+                      [severity]="getSeverityForTipo(cliente.tipo)">
+                    </p-tag>
+                  </div>
+                </td>
+                <td>
+                  <div class="contacto-cell">
+                    <span class="contacto-info" [title]="getContactInfo(cliente)">
+                      {{ getContactInfo(cliente) }}
+                    </span>
+                  </div>
+                </td>
+                <td>
+                  <div class="direccion-cell">
+                    <span class="direccion" [title]="cliente.direccion">
+                      {{ getDireccionDisplay(cliente.direccion) }}
+                    </span>
+                  </div>
+                </td>
+                <td>
+                  <span class="fecha">
+                    {{ cliente.creadoEn | date:'dd/MM/yyyy' }}
+                  </span>
+                </td>
+                <td>
+                  <div class="table-actions">
+                    <p-button 
+                      icon="pi pi-history"
+                      size="small"
+                      severity="info"
+                      [text]="true"
+                      [rounded]="true"
+                      (click)="verMovimientos(cliente)"
+                      pTooltip="Ver movimientos"
+                      tooltipPosition="top">
+                    </p-button>
+
+                    <p-button 
+                      icon="pi pi-pencil"
+                      size="small"
+                      severity="warn"
+                      [text]="true"
+                      [rounded]="true"
+                      (click)="editCliente(cliente)"
+                      pTooltip="Editar cliente"
+                      tooltipPosition="top">
+                    </p-button>
+                    
+                    <p-button 
+                      icon="pi pi-trash"
+                      size="small"
+                      severity="danger"
+                      [text]="true"
+                      [rounded]="true"
+                      (click)="deleteCliente(cliente)"
+                      pTooltip="Eliminar cliente"
+                      tooltipPosition="top">
+                    </p-button>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="7" class="empty-message">
+                  <div class="empty-content">
+                    <i class="pi pi-users empty-icon"></i>
+                    <h3>No hay clientes registrados</h3>
+                    <p>Comience registrando su primer cliente</p>
+                    <p-button 
+                      label="Crear Cliente"
+                      icon="pi pi-plus"
+                      (click)="openNew()">
+                    </p-button>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </p-card>
+    </div>
+  </div>
+
+  <!-- Create/Edit Dialog -->
+  <p-dialog 
+    [(visible)]="displayDialog" 
+    [header]="modoFormulario === 'crear' ? 'Nuevo Cliente' : 'Editar Cliente'"
+    [modal]="true"
+    [style]="{width: '600px'}"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="false">
+
+    <form [formGroup]="clienteForm" (ngSubmit)="saveCliente()">
+      
+      <!-- Nombre Field -->
+      <div class="form-field">
+        <label for="nombre">
+          Nombre del Cliente <span class="required">*</span>
+        </label>
+        <input 
+          id="nombre"
+          type="text" 
+          pInputText 
+          formControlName="nombre"
+          placeholder="Ej: Empresa ABC S.A., Juan Pérez"
+          [class.ng-invalid]="clienteForm.get('nombre')?.invalid && clienteForm.get('nombre')?.touched"
+          autocomplete="off">
+        
+        <small 
+          class="p-error" 
+          *ngIf="clienteForm.get('nombre')?.invalid && clienteForm.get('nombre')?.touched">
+          {{ getFieldError('nombre') }}
+        </small>
+        
+        <small class="p-help">
+          Nombre completo de la persona o empresa
+        </small>
+      </div>
+
+      <!-- Tipo Field -->
+      <div class="form-field">
+        <label for="tipo">
+          Tipo de Cliente <span class="required">*</span>
+        </label>
+        <p-select 
+          id="tipo"
+          [options]="tipoFormOptions"
+          formControlName="tipo"
+          placeholder="Seleccionar tipo"
+          optionLabel="label"
+          optionValue="value"
+          [class.ng-invalid]="clienteForm.get('tipo')?.invalid && clienteForm.get('tipo')?.touched">
+        </p-select>
+        
+        <small class="p-help">
+          Define si es cliente, proveedor, o ambos
+        </small>
+      </div>
+
+      <!-- Contact Fields Row -->
+      <div class="form-row">
+        <!-- Teléfono Field -->
+        <div class="form-field">
+          <label for="telefono">Teléfono</label>
+          <input 
+            id="telefono"
+            type="tel" 
+            pInputText 
+            formControlName="telefono"
+            placeholder="Ej: +57 300 123 4567"
+            [class.ng-invalid]="clienteForm.get('telefono')?.invalid && clienteForm.get('telefono')?.touched"
+            autocomplete="tel">
+          
+          <small 
+            class="p-error" 
+            *ngIf="clienteForm.get('telefono')?.invalid && clienteForm.get('telefono')?.touched">
+            {{ getFieldError('telefono') }}
+          </small>
+        </div>
+
+        <!-- Email Field -->
+        <div class="form-field">
+          <label for="email">Email</label>
+          <input 
+            id="email"
+            type="email" 
+            pInputText 
+            formControlName="email"
+            placeholder="Ej: contacto@empresa.com"
+            [class.ng-invalid]="clienteForm.get('email')?.invalid && clienteForm.get('email')?.touched"
+            autocomplete="email">
+          
+          <small 
+            class="p-error" 
+            *ngIf="clienteForm.get('email')?.invalid && clienteForm.get('email')?.touched">
+            {{ getFieldError('email') }}
+          </small>
+        </div>
+      </div>
+
+      <!-- Dirección Field -->
+      <div class="form-field">
+        <label for="direccion">Dirección</label>
+        <textarea 
+          id="direccion"
+          pTextarea 
+          formControlName="direccion"
+          placeholder="Ej: Calle 123 #45-67, Barrio Centro, Ciudad"
+          rows="3"
+          [autoResize]="true">
+        </textarea>
+        
+        <small 
+          class="p-error" 
+          *ngIf="clienteForm.get('direccion')?.invalid && clienteForm.get('direccion')?.touched">
+          La dirección es muy larga
+        </small>
+        
+        <small class="p-help">
+          Dirección completa para envíos y facturación (opcional)
+        </small>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <p-button 
+          type="button"
+          label="Cancelar"
+          icon="pi pi-times"
+          severity="secondary"
+          (click)="hideDialog()">
+        </p-button>
+        
+        <p-button 
+          type="submit"
+          [label]="modoFormulario === 'crear' ? 'Crear' : 'Actualizar'"
+          [icon]="modoFormulario === 'crear' ? 'pi pi-plus' : 'pi pi-check'"
+          [disabled]="clienteForm.invalid">
+        </p-button>
+      </div>
+    </form>
+  </p-dialog>
+
+  <!-- Movements Dialog -->
+  <p-dialog 
+    [(visible)]="displayMovimientos" 
+    [header]="'Movimientos - ' + (selectedCliente?.nombre || '')"
+    [modal]="true"
+    [style]="{width: '900px', maxHeight: '80vh'}"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="true">
+
+    <div class="movimientos-content" *ngIf="!loadingMovimientos && movimientosData">
+      
+      <!-- Client Summary -->
+      <div class="cliente-summary">
+        <div class="summary-card">
+          <div class="cliente-header">
+            <div class="cliente-info">
+              <h4>
+                <i [class]="'pi ' + getIconForTipo(movimientosData.cliente.tipo) + ' cliente-main-icon'"></i>
+                {{ movimientosData.cliente.nombre }}
+              </h4>
+              <p-tag 
+                [value]="getLabelForTipo(movimientosData.cliente.tipo)"
+                [severity]="getSeverityForTipo(movimientosData.cliente.tipo)">
+              </p-tag>
+            </div>
+          </div>
+          
+          <div class="summary-stats">
+            <div class="stat-item">
+              <span class="stat-label">Total movimientos:</span>
+              <span class="stat-value">{{ movimientosData.totalMovimientos }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Valor total:</span>
+              <span class="stat-value">{{ formatCurrency(getTotalMovimientosValue()) }}</span>
+            </div>
+            <div class="stat-item" *ngIf="movimientosData.cliente.email">
+              <span class="stat-label">Email:</span>
+              <span class="stat-value">{{ movimientosData.cliente.email }}</span>
+            </div>
+            <div class="stat-item" *ngIf="movimientosData.cliente.telefono">
+              <span class="stat-label">Teléfono:</span>
+              <span class="stat-value">{{ movimientosData.cliente.telefono }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p-divider></p-divider>
+
+      <!-- Movements Table -->
+      <div class="movimientos-table" *ngIf="movimientosData.movimientos.length > 0">
+        <h4>Historial de movimientos:</h4>
+        <p-table 
+          [value]="movimientosData.movimientos"
+          [paginator]="true"
+          [rows]="5"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} movimientos"
+          [tableStyle]="{'min-width': '800px'}">
+
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Fecha</th>
+              <th>Tipo</th>
+              <th>Producto</th>
+              <th>Bodega</th>
+              <th style="text-align: center;">Cantidad</th>
+              <th style="text-align: right;">Valor Total</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-movimiento>
+            <tr>
+              <td>
+                <span class="fecha-movimiento">{{ formatDate(movimiento.fecha) }}</span>
+              </td>
+              <td>
+                <p-tag 
+                  [value]="movimiento.tipo === 'entrada' ? 'Entrada' : 'Salida'"
+                  [severity]="getSeverityForMovimiento(movimiento.tipo)">
+                </p-tag>
+              </td>
+              <td>
+                <div class="producto-info">
+                  <span class="codigo-producto">{{ movimiento.producto.codigo }}</span>
+                  <span class="nombre-producto">{{ movimiento.producto.descripcion }}</span>
+                </div>
+              </td>
+              <td>
+                <span class="bodega-nombre">{{ movimiento.bodega.nombre }}</span>
+              </td>
+              <td style="text-align: center;">
+                <span class="cantidad">{{ movimiento.cantidad }}</span>
+              </td>
+              <td style="text-align: right;">
+                <span class="valor-total">{{ formatCurrency(movimiento.precio_total) }}</span>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+
+      <!-- Empty Movements -->
+      <div class="movimientos-empty" *ngIf="movimientosData.movimientos.length === 0">
+        <div class="empty-movimientos-content">
+          <i class="pi pi-history empty-movimientos-icon"></i>
+          <h4>Sin movimientos</h4>
+          <p>Este cliente no tiene movimientos registrados.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading Movements -->
+    <div class="movimientos-loading" *ngIf="loadingMovimientos">
+      <div class="loading-content">
+        <p-progressSpinner strokeWidth="4" animationDuration="1s"></p-progressSpinner>
+        <p>Cargando movimientos...</p>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-button 
+        label="Cerrar"
+        icon="pi pi-times"
+        severity="secondary"
+        (click)="hideMovimientosDialog()">
+      </p-button>
+    </ng-template>
+  </p-dialog>
+</div>

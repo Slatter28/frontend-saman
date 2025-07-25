@@ -1,0 +1,444 @@
+<div class="bodegas-container">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Gestión de Bodegas</h1>
+      <p>Administra las bodegas y ubicaciones de almacenamiento</p>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <p-card header="Total Bodegas" styleClass="stats-card">
+        <div class="stat-content">
+          <div class="stat-value">{{ statsData.totalBodegas }}</div>
+          <div class="stat-icon">
+            <i class="pi pi-building"></i>
+          </div>
+        </div>
+      </p-card>
+
+      <p-card header="Con Inventario" styleClass="stats-card">
+        <div class="stat-content">
+          <div class="stat-value">{{ statsData.bodegasConInventario }}</div>
+          <div class="stat-icon success">
+            <i class="pi pi-box"></i>
+          </div>
+        </div>
+      </p-card>
+
+      <p-card header="Vacías" styleClass="stats-card">
+        <div class="stat-content">
+          <div class="stat-value">{{ statsData.bodegasVacias }}</div>
+          <div class="stat-icon warning">
+            <i class="pi pi-exclamation-circle"></i>
+          </div>
+        </div>
+      </p-card>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content-grid">
+    
+    <!-- Filter and Actions Section -->
+    <div class="filters-section">
+      <p-card header="Filtros y Acciones">
+        <div class="filters-content">
+          
+          <!-- Search Filters -->
+          <form [formGroup]="filtroForm" (ngSubmit)="onFilter()" class="filter-form">
+            <div class="filter-row">
+              <div class="filter-field">
+                <label for="filtro-nombre">Buscar por nombre</label>
+                <p-iconField iconPosition="left">
+                  <p-inputIcon styleClass="pi pi-search"></p-inputIcon>
+                  <input 
+                    id="filtro-nombre"
+                    type="text" 
+                    pInputText 
+                    placeholder="Nombre de la bodega..."
+                    formControlName="nombre"
+                    (keyup.enter)="onFilter()">
+                </p-iconField>
+              </div>
+
+              <div class="filter-field">
+                <label for="filtro-ubicacion">Buscar por ubicación</label>
+                <p-iconField iconPosition="left">
+                  <p-inputIcon styleClass="pi pi-map-marker"></p-inputIcon>
+                  <input 
+                    id="filtro-ubicacion"
+                    type="text" 
+                    pInputText 
+                    placeholder="Ubicación de la bodega..."
+                    formControlName="ubicacion"
+                    (keyup.enter)="onFilter()">
+                </p-iconField>
+              </div>
+              
+              <div class="filter-actions">
+                <p-button 
+                  type="submit"
+                  label="Buscar"
+                  icon="pi pi-search"
+                  size="small">
+                </p-button>
+                
+                <p-button 
+                  type="button"
+                  label="Limpiar"
+                  icon="pi pi-times"
+                  severity="secondary"
+                  size="small"
+                  (click)="clearFilters()">
+                </p-button>
+              </div>
+            </div>
+          </form>
+
+          <p-divider></p-divider>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <div class="actions-right">
+              <p-button 
+                label="Nueva Bodega"
+                icon="pi pi-plus"
+                (click)="openNew()">
+              </p-button>
+
+              <p-menu #menu [model]="menuItems" [popup]="true"></p-menu>
+              <p-button 
+                icon="pi pi-ellipsis-v"
+                severity="secondary"
+                (click)="menu.toggle($event)"
+                pTooltip="Más acciones">
+              </p-button>
+            </div>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-section">
+      <p-card header="Lista de Bodegas">
+        <div class="table-wrapper">
+          <p-table 
+            [value]="bodegas" 
+            [paginator]="true" 
+            [rows]="rows"
+            [totalRecords]="totalRecords"
+            [lazy]="true"
+            [loading]="loading"
+            [first]="first"
+            (onLazyLoad)="onPageChange($event)"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} bodegas"
+            [tableStyle]="{'min-width': '900px'}"
+            dataKey="id"
+            [scrollable]="true"
+            scrollHeight="flex">
+
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 80px; min-width: 80px;" pSortableColumn="id">
+                  ID
+                  <p-sortIcon field="id"></p-sortIcon>
+                </th>
+                <th style="width: 200px; min-width: 200px;" pSortableColumn="nombre">
+                  Nombre
+                  <p-sortIcon field="nombre"></p-sortIcon>
+                </th>
+                <th style="width: 250px; min-width: 250px;">Ubicación</th>
+                <th style="width: 140px; min-width: 140px; text-align: center;">Estado</th>
+                <th style="width: 140px; min-width: 140px;" pSortableColumn="creadoEn">
+                  Fecha Creación
+                  <p-sortIcon field="creadoEn"></p-sortIcon>
+                </th>
+                <th style="width: 180px; min-width: 180px; text-align: center;">Acciones</th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-bodega>
+              <tr>
+                <td>
+                  <span class="id-badge">{{ bodega.id }}</span>
+                </td>
+                <td>
+                  <div class="nombre-cell">
+                    <i class="pi pi-building bodega-icon"></i>
+                    <span class="nombre">{{ bodega.nombre }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="ubicacion-cell">
+                    <i class="pi pi-map-marker ubicacion-icon"></i>
+                    <span class="ubicacion" [title]="bodega.ubicacion">
+                      {{ getUbicacionDisplay(bodega.ubicacion) }}
+                    </span>
+                  </div>
+                </td>
+                <td>
+                  <div class="estado-cell">
+                    <p-tag 
+                      [value]="formatMovimientosCount(bodega.movimientos)"
+                      [severity]="bodega.movimientos?.length ? 'success' : 'secondary'">
+                    </p-tag>
+                  </div>
+                </td>
+                <td>
+                  <span class="fecha">
+                    {{ bodega.creadoEn | date:'dd/MM/yyyy' }}
+                  </span>
+                </td>
+                <td>
+                  <div class="table-actions">
+                    <p-button 
+                      icon="pi pi-box"
+                      size="small"
+                      severity="info"
+                      [text]="true"
+                      [rounded]="true"
+                      (click)="verInventario(bodega)"
+                      pTooltip="Ver inventario"
+                      tooltipPosition="top">
+                    </p-button>
+
+                    <p-button 
+                      icon="pi pi-pencil"
+                      size="small"
+                      severity="help"
+                      [text]="true"
+                      [rounded]="true"
+                      (click)="editBodega(bodega)"
+                      pTooltip="Editar bodega"
+                      tooltipPosition="top">
+                    </p-button>
+                    
+                    <p-button 
+                      icon="pi pi-trash"
+                      size="small"
+                      severity="danger"
+                      [text]="true"
+                      [rounded]="true"
+                      (click)="deleteBodega(bodega)"
+                      pTooltip="Eliminar bodega"
+                      tooltipPosition="top">
+                    </p-button>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="6" class="empty-message">
+                  <div class="empty-content">
+                    <i class="pi pi-building empty-icon"></i>
+                    <h3>No hay bodegas registradas</h3>
+                    <p>Comience creando su primera bodega</p>
+                    <p-button 
+                      label="Crear Bodega"
+                      icon="pi pi-plus"
+                      (click)="openNew()">
+                    </p-button>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </p-card>
+    </div>
+  </div>
+
+  <!-- Create/Edit Dialog -->
+  <p-dialog 
+    [(visible)]="displayDialog" 
+    [header]="modoFormulario === 'crear' ? 'Nueva Bodega' : 'Editar Bodega'"
+    [modal]="true"
+    [style]="{width: '500px'}"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="false">
+
+    <form [formGroup]="bodegaForm" (ngSubmit)="saveBodega()">
+      
+      <!-- Nombre Field -->
+      <div class="form-field">
+        <label for="nombre">
+          Nombre de la Bodega <span class="required">*</span>
+        </label>
+        <input 
+          id="nombre"
+          type="text" 
+          pInputText 
+          formControlName="nombre"
+          placeholder="Ej: Bodega Principal, Almacén Norte"
+          [class.ng-invalid]="bodegaForm.get('nombre')?.invalid && bodegaForm.get('nombre')?.touched"
+          autocomplete="off">
+        
+        <small 
+          class="p-error" 
+          *ngIf="bodegaForm.get('nombre')?.invalid && bodegaForm.get('nombre')?.touched">
+          {{ getFieldError('nombre') }}
+        </small>
+        
+        <small class="p-help">
+          Solo letras, números, espacios y los caracteres: - _ .
+        </small>
+      </div>
+
+      <!-- Ubicación Field -->
+      <div class="form-field">
+        <label for="ubicacion">Ubicación</label>
+        <textarea 
+          id="ubicacion"
+          pTextarea 
+          formControlName="ubicacion"
+          placeholder="Ej: Primer piso, Sector A - Junto a la entrada principal"
+          rows="3"
+          [autoResize]="true">
+        </textarea>
+        
+        <small 
+          class="p-error" 
+          *ngIf="bodegaForm.get('ubicacion')?.invalid && bodegaForm.get('ubicacion')?.touched">
+          La ubicación es muy larga
+        </small>
+        
+        <small class="p-help">
+          Describe la ubicación física de la bodega (opcional)
+        </small>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <p-button 
+          type="button"
+          label="Cancelar"
+          icon="pi pi-times"
+          severity="secondary"
+          (click)="hideDialog()">
+        </p-button>
+        
+        <p-button 
+          type="submit"
+          [label]="modoFormulario === 'crear' ? 'Crear' : 'Actualizar'"
+          [icon]="modoFormulario === 'crear' ? 'pi pi-plus' : 'pi pi-check'"
+          [disabled]="bodegaForm.invalid">
+        </p-button>
+      </div>
+    </form>
+  </p-dialog>
+
+  <!-- Inventory Dialog -->
+  <p-dialog 
+    [(visible)]="displayInventario" 
+    [header]="'Inventario - ' + (selectedBodega?.nombre || '')"
+    [modal]="true"
+    [style]="{width: '800px', maxHeight: '80vh'}"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="true">
+
+    <div class="inventario-content" *ngIf="!loadingInventario && inventarioData">
+      
+      <!-- Inventory Summary -->
+      <div class="inventario-summary">
+        <div class="summary-card">
+          <div class="summary-item">
+            <span class="summary-label">Bodega:</span>
+            <span class="summary-value">{{ inventarioData.bodega.nombre }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Ubicación:</span>
+            <span class="summary-value">{{ getUbicacionDisplay(inventarioData.bodega.ubicacion) }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Productos diferentes:</span>
+            <span class="summary-value">{{ inventarioData.totalProductos }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Stock total:</span>
+            <span class="summary-value">{{ getTotalInventarioValue() }} unidades</span>
+          </div>
+        </div>
+      </div>
+
+      <p-divider></p-divider>
+
+      <!-- Inventory Table -->
+      <div class="inventario-table" *ngIf="inventarioData.inventario.length > 0">
+        <h4>Productos en inventario:</h4>
+        <p-table 
+          [value]="inventarioData.inventario"
+          [paginator]="true"
+          [rows]="5"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} productos"
+          [tableStyle]="{'min-width': '600px'}">
+
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Código</th>
+              <th>Producto</th>
+              <th>Unidad</th>
+              <th style="text-align: center;">Stock</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-item>
+            <tr>
+              <td>
+                <span class="codigo-producto">{{ item.producto.codigo }}</span>
+              </td>
+              <td>
+                <span class="nombre-producto">{{ item.producto.descripcion }}</span>
+              </td>
+              <td>
+                <span class="unidad-medida">{{ item.producto.unidadMedida }}</span>
+              </td>
+              <td style="text-align: center;">
+                <p-badge 
+                  [value]="item.stock.toString()"
+                  [severity]="getSeverityForStock(item.stock)">
+                </p-badge>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+
+      <!-- Empty Inventory -->
+      <div class="inventario-empty" *ngIf="inventarioData.inventario.length === 0">
+        <div class="empty-inventory-content">
+          <i class="pi pi-box empty-inventory-icon"></i>
+          <h4>Bodega vacía</h4>
+          <p>Esta bodega no tiene productos en inventario.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading Inventory -->
+    <div class="inventario-loading" *ngIf="loadingInventario">
+      <div class="loading-content">
+        <p-progressSpinner strokeWidth="4" animationDuration="1s"></p-progressSpinner>
+        <p>Cargando inventario...</p>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-button 
+        label="Cerrar"
+        icon="pi pi-times"
+        severity="secondary"
+        (click)="hideInventarioDialog()">
+      </p-button>
+    </ng-template>
+  </p-dialog>
+</div>

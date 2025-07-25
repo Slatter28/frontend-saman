@@ -1,0 +1,493 @@
+<div class="unidades-medida-container">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Unidades de Medida</h1>
+      <p>Gestión de unidades de medida para productos</p>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="stats-grid" *ngIf="stats">
+      <p-card header="Total Unidades" styleClass="stats-card">
+        <div class="stat-content">
+          <div class="stat-value">{{ stats.totalUnidades }}</div>
+          <div class="stat-icon">
+            <i class="pi pi-bookmark"></i>
+          </div>
+        </div>
+      </p-card>
+
+      <p-card header="Sin Productos" styleClass="stats-card">
+        <div class="stat-content">
+          <div class="stat-value">{{ stats.unidadesSinUso }}</div>
+          <div class="stat-icon warning">
+            <i class="pi pi-exclamation-triangle"></i>
+          </div>
+        </div>
+      </p-card>
+
+      <p-card header="Más Usada" styleClass="stats-card" *ngIf="stats.unidadesMasUsadas.length > 0">
+        <div class="stat-content">
+          <div class="stat-info">
+            <div class="stat-label">{{ stats.unidadesMasUsadas[0].unidad.nombre }}</div>
+            <div class="stat-value small">{{ stats.unidadesMasUsadas[0].cantidadProductos }} productos</div>
+          </div>
+          <div class="stat-icon success">
+            <i class="pi pi-star"></i>
+          </div>
+        </div>
+      </p-card>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content-grid">
+    
+    <!-- Filter and Actions Section -->
+    <div class="filters-section">
+      <p-card header="Filtros y Acciones">
+        <div class="filters-content">
+          
+          <!-- Search Filters -->
+          <form [formGroup]="filtroForm" (ngSubmit)="onFilter()" class="filter-form">
+            <div class="filter-row">
+              <div class="filter-field">
+                <label for="filtro-nombre">Buscar por nombre</label>
+                <p-iconField iconPosition="left">
+                  <p-inputIcon styleClass="pi pi-search"></p-inputIcon>
+                  <input 
+                    id="filtro-nombre"
+                    type="text" 
+                    pInputText 
+                    placeholder="Escriba para buscar..."
+                    formControlName="nombre"
+                    (keyup.enter)="onFilter()">
+                </p-iconField>
+              </div>
+              
+              <div class="filter-actions">
+                <p-button 
+                  type="submit"
+                  label="Buscar"
+                  icon="pi pi-search"
+                  size="small">
+                </p-button>
+                
+                <p-button 
+                  type="button"
+                  label="Limpiar"
+                  icon="pi pi-times"
+                  severity="secondary"
+                  size="small"
+                  (click)="clearFilters()">
+                </p-button>
+              </div>
+            </div>
+          </form>
+
+          <p-divider></p-divider>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <div class="actions-right">
+              <p-button 
+                label="Nueva Unidad"
+                icon="pi pi-plus"
+                (click)="openNew()">
+              </p-button>
+
+              <p-menu #menu [model]="menuItems" [popup]="true"></p-menu>
+              <p-button 
+                icon="pi pi-ellipsis-v"
+                severity="secondary"
+                (click)="menu.toggle($event)"
+                pTooltip="Más acciones">
+              </p-button>
+            </div>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-section">
+      <p-card header="Lista de Unidades de Medida">
+        <div class="table-wrapper">
+          <p-table 
+            [value]="unidades" 
+            [paginator]="true" 
+            [rows]="rows"
+            [totalRecords]="totalRecords"
+            [lazy]="true"
+            [loading]="loading"
+            [first]="first"
+            (onLazyLoad)="onPageChange($event)"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} unidades"
+            [tableStyle]="{'min-width': '800px'}"
+            dataKey="id"
+            [scrollable]="true"
+            scrollHeight="flex">
+
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 80px; min-width: 80px;" pSortableColumn="id">
+                  ID
+                  <p-sortIcon field="id"></p-sortIcon>
+                </th>
+                <th style="width: 120px; min-width: 120px;" pSortableColumn="nombre">
+                  Nombre
+                  <p-sortIcon field="nombre"></p-sortIcon>
+                </th>
+                <th style="width: 200px; min-width: 200px;">Descripción</th>
+                <th style="width: 140px; min-width: 140px; text-align: center;">Productos</th>
+                <th style="width: 140px; min-width: 140px;" pSortableColumn="creadoEn">
+                  Fecha
+                  <p-sortIcon field="creadoEn"></p-sortIcon>
+                </th>
+                <th style="width: 120px; min-width: 120px; text-align: center;">Acciones</th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-unidad>
+              <tr>
+                <td>
+                  <span class="id-badge">{{ unidad.id }}</span>
+                </td>
+                <td>
+                  <div class="nombre-cell">
+                    <span class="nombre">{{ unidad.nombre }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="descripcion" [title]="unidad.descripcion">
+                    {{ unidad.descripcion || 'Sin descripción' }}
+                  </span>
+                </td>
+                <td>
+                  <div class="productos-count">
+                    <p-badge 
+                      [value]="'0'"
+                      severity="secondary">
+                    </p-badge>
+                  </div>
+                </td>
+                <td>
+                  <span class="fecha">
+                    {{ unidad.creadoEn | date:'dd/MM/yyyy' }}
+                  </span>
+                </td>
+                <td>
+                  <div class="table-actions">
+                    <p-button 
+                      icon="pi pi-pencil"
+                      size="small"
+                      severity="info"
+                      [text]="true"
+                      [rounded]="true"
+                      (click)="editUnidad(unidad)"
+                      pTooltip="Editar unidad"
+                      tooltipPosition="top">
+                    </p-button>
+                    
+                    <p-button 
+                      icon="pi pi-trash"
+                      size="small"
+                      severity="danger"
+                      [text]="true"
+                      [rounded]="true"
+                      (click)="deleteUnidad(unidad)"
+                      pTooltip="Eliminar unidad"
+                      tooltipPosition="top">
+                    </p-button>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="6" class="empty-message">
+                  <div class="empty-content">
+                    <i class="pi pi-bookmark empty-icon"></i>
+                    <h3>No hay unidades de medida</h3>
+                    <p>Comience creando su primera unidad de medida</p>
+                    <p-button 
+                      label="Crear Unidad"
+                      icon="pi pi-plus"
+                      (click)="openNew()">
+                    </p-button>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </p-card>
+    </div>
+  </div>
+
+  <!-- Create/Edit Dialog -->
+  <p-dialog 
+    [(visible)]="displayDialog" 
+    [header]="modoFormulario === 'crear' ? 'Nueva Unidad de Medida' : 'Editar Unidad de Medida'"
+    [modal]="true"
+    [style]="{width: '500px'}"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="false">
+
+    <form [formGroup]="unidadForm" (ngSubmit)="saveUnidad()">
+      
+      <!-- Nombre Field -->
+      <div class="form-field">
+        <label for="nombre">
+          Nombre <span class="required">*</span>
+        </label>
+        <input 
+          id="nombre"
+          type="text" 
+          pInputText 
+          formControlName="nombre"
+          placeholder="Ej: kg, lt, und"
+          [class.ng-invalid]="unidadForm.get('nombre')?.invalid && unidadForm.get('nombre')?.touched"
+          autocomplete="off">
+        
+        <small 
+          class="p-error" 
+          *ngIf="unidadForm.get('nombre')?.invalid && unidadForm.get('nombre')?.touched">
+          {{ getFieldError('nombre') }}
+        </small>
+        
+        <small class="p-help">
+          Solo letras, números y los caracteres: - _ .
+        </small>
+      </div>
+
+      <!-- Descripción Field -->
+      <div class="form-field">
+        <label for="descripcion">Descripción</label>
+        <textarea 
+          id="descripcion"
+          pTextarea 
+          formControlName="descripcion"
+          placeholder="Descripción de la unidad de medida"
+          rows="3"
+          [autoResize]="true">
+        </textarea>
+        
+        <small 
+          class="p-error" 
+          *ngIf="unidadForm.get('descripcion')?.invalid && unidadForm.get('descripcion')?.touched">
+          La descripción es muy larga
+        </small>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <p-button 
+          type="button"
+          label="Cancelar"
+          icon="pi pi-times"
+          severity="secondary"
+          (click)="hideDialog()">
+        </p-button>
+        
+        <p-button 
+          type="submit"
+          [label]="modoFormulario === 'crear' ? 'Crear' : 'Actualizar'"
+          [icon]="modoFormulario === 'crear' ? 'pi pi-plus' : 'pi pi-check'"
+          [disabled]="unidadForm.invalid">
+        </p-button>
+      </div>
+    </form>
+  </p-dialog>
+
+  <!-- Predefined Units Dialog -->
+  <p-dialog 
+    [(visible)]="displayPredefinidas" 
+    header="Unidades Predefinidas"
+    [modal]="true"
+    [style]="{width: '800px', maxHeight: '80vh'}"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="true">
+
+    <div class="predefinidas-content">
+      <p class="help-text">
+        Seleccione las unidades predefinidas que desea agregar a su sistema.
+        Están organizadas por categorías para facilitar su gestión.
+      </p>
+
+      <!-- Category Actions -->
+      <div class="category-actions">
+        <p-button 
+          label="Todas las Generales"
+          icon="pi pi-bookmark"
+          size="small"
+          severity="secondary"
+          (click)="createMultiplePredefinidas('general')">
+        </p-button>
+        
+        <p-button 
+          label="Todas las de Peso"
+          icon="pi pi-circle"
+          size="small"
+          severity="success"
+          (click)="createMultiplePredefinidas('peso')">
+        </p-button>
+        
+        <p-button 
+          label="Todas las de Volumen"
+          icon="pi pi-box"
+          size="small"
+          severity="info"
+          (click)="createMultiplePredefinidas('volumen')">
+        </p-button>
+      </div>
+
+      <p-divider></p-divider>
+
+      <!-- Predefined Units by Category -->
+      <div class="categorias-grid">
+        
+        <!-- General Category -->
+        <div class="categoria-section">
+          <h4>
+            <i class="pi pi-bookmark"></i>
+            General
+          </h4>
+          <div class="unidades-list">
+            <div 
+              *ngFor="let unidad of getPredefinadasByCategoria('general')"
+              class="unidad-item">
+              <div class="unidad-info">
+                <span class="unidad-nombre">{{ unidad.nombre }}</span>
+                <span class="unidad-descripcion">{{ unidad.descripcion }}</span>
+              </div>
+              <p-button 
+                icon="pi pi-plus"
+                size="small"
+                [severity]="getSeverityForCategoria(unidad.categoria)"
+                (click)="createFromPredefinida(unidad)"
+                pTooltip="Agregar esta unidad">
+              </p-button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Weight Category -->
+        <div class="categoria-section">
+          <h4>
+            <i class="pi pi-circle"></i>
+            Peso
+          </h4>
+          <div class="unidades-list">
+            <div 
+              *ngFor="let unidad of getPredefinadasByCategoria('peso')"
+              class="unidad-item">
+              <div class="unidad-info">
+                <span class="unidad-nombre">{{ unidad.nombre }}</span>
+                <span class="unidad-descripcion">{{ unidad.descripcion }}</span>
+              </div>
+              <p-button 
+                icon="pi pi-plus"
+                size="small"
+                [severity]="getSeverityForCategoria(unidad.categoria)"
+                (click)="createFromPredefinida(unidad)"
+                pTooltip="Agregar esta unidad">
+              </p-button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Volume Category -->
+        <div class="categoria-section">
+          <h4>
+            <i class="pi pi-box"></i>
+            Volumen
+          </h4>
+          <div class="unidades-list">
+            <div 
+              *ngFor="let unidad of getPredefinadasByCategoria('volumen')"
+              class="unidad-item">
+              <div class="unidad-info">
+                <span class="unidad-nombre">{{ unidad.nombre }}</span>
+                <span class="unidad-descripcion">{{ unidad.descripcion }}</span>
+              </div>
+              <p-button 
+                icon="pi pi-plus"
+                size="small"
+                [severity]="getSeverityForCategoria(unidad.categoria)"
+                (click)="createFromPredefinida(unidad)"
+                pTooltip="Agregar esta unidad">
+              </p-button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Length Category -->
+        <div class="categoria-section">
+          <h4>
+            <i class="pi pi-arrows-h"></i>
+            Longitud
+          </h4>
+          <div class="unidades-list">
+            <div 
+              *ngFor="let unidad of getPredefinadasByCategoria('longitud')"
+              class="unidad-item">
+              <div class="unidad-info">
+                <span class="unidad-nombre">{{ unidad.nombre }}</span>
+                <span class="unidad-descripcion">{{ unidad.descripcion }}</span>
+              </div>
+              <p-button 
+                icon="pi pi-plus"
+                size="small"
+                [severity]="getSeverityForCategoria(unidad.categoria)"
+                (click)="createFromPredefinida(unidad)"
+                pTooltip="Agregar esta unidad">
+              </p-button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Package Category -->
+        <div class="categoria-section">
+          <h4>
+            <i class="pi pi-box"></i>
+            Empaque
+          </h4>
+          <div class="unidades-list">
+            <div 
+              *ngFor="let unidad of getPredefinadasByCategoria('empaque')"
+              class="unidad-item">
+              <div class="unidad-info">
+                <span class="unidad-nombre">{{ unidad.nombre }}</span>
+                <span class="unidad-descripcion">{{ unidad.descripcion }}</span>
+              </div>
+              <p-button 
+                icon="pi pi-plus"
+                size="small"
+                [severity]="getSeverityForCategoria(unidad.categoria)"
+                (click)="createFromPredefinida(unidad)"
+                pTooltip="Agregar esta unidad">
+              </p-button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-button 
+        label="Cerrar"
+        icon="pi pi-times"
+        severity="secondary"
+        (click)="displayPredefinidas = false">
+      </p-button>
+    </ng-template>
+  </p-dialog>
+</div>

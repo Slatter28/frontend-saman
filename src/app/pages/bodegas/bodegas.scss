@@ -1,4 +1,4 @@
-.unidades-medida-container {
+.bodegas-container {
   padding: 0;
 
   // Header Section
@@ -50,22 +50,6 @@
           font-size: 2rem;
           font-weight: 700;
           color: var(--primary-color);
-
-          &.small {
-            font-size: 1.2rem;
-            font-weight: 600;
-          }
-        }
-
-        .stat-info {
-          display: flex;
-          flex-direction: column;
-          
-          .stat-label {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--text-color);
-          }
         }
 
         .stat-icon {
@@ -123,7 +107,7 @@
       .filter-form {
         .filter-row {
           display: grid;
-          grid-template-columns: 1fr auto;
+          grid-template-columns: 1fr 1fr auto;
           gap: 1rem;
           align-items: end;
 
@@ -265,40 +249,52 @@
       }
 
       .nombre-cell {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        .bodega-icon {
+          color: var(--primary-color);
+          font-size: 1rem;
+        }
+
         .nombre {
           font-weight: 600;
           color: var(--text-color);
         }
       }
 
-      .descripcion {
-        color: var(--text-color-secondary);
-        font-size: 0.9rem;
-        max-width: 180px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        display: inline-block;
+      .ubicacion-cell {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        .ubicacion-icon {
+          color: var(--orange-500);
+          font-size: 0.9rem;
+        }
+
+        .ubicacion {
+          color: var(--text-color-secondary);
+          font-size: 0.9rem;
+          max-width: 220px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          display: inline-block;
+        }
+      }
+
+      .estado-cell {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
       }
 
       .fecha {
         color: var(--text-color-secondary);
         font-size: 0.85rem;
-      }
-
-      .productos-count {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        min-height: 3rem;
-
-        ::ng-deep .p-badge {
-          font-size: 0.8rem;
-          font-weight: 600;
-          padding: 0.3rem 0.6rem;
-          border-radius: 12px;
-        }
       }
 
       .table-actions {
@@ -331,6 +327,16 @@
             &:hover {
               background: var(--blue-50);
               color: var(--blue-600);
+            }
+          }
+
+          &.p-button-text.p-button-warn {
+            color: var(--orange-500);
+            background: transparent;
+
+            &:hover {
+              background: var(--orange-50);
+              color: var(--orange-600);
             }
           }
 
@@ -492,96 +498,112 @@
     margin-top: 1.5rem;
   }
 
-  // Predefined Units Dialog
-  .predefinidas-content {
-    .help-text {
-      color: var(--text-color-secondary);
-      font-size: 0.9rem;
-      margin-bottom: 1.5rem;
-      line-height: 1.5;
-    }
+  // Inventory Dialog Styles
+  .inventario-content {
+    .inventario-summary {
+      .summary-card {
+        background: var(--surface-100);
+        border-radius: 8px;
+        padding: 1rem;
+        border: 1px solid var(--surface-border);
 
-    .category-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      margin-bottom: 1rem;
+        .summary-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.5rem 0;
+          border-bottom: 1px solid var(--surface-border);
 
-      ::ng-deep .p-button {
-        font-size: 0.8rem;
-        padding: 0.5rem 0.75rem;
+          &:last-child {
+            border-bottom: none;
+          }
+
+          .summary-label {
+            font-weight: 500;
+            color: var(--text-color-secondary);
+            font-size: 0.9rem;
+          }
+
+          .summary-value {
+            font-weight: 600;
+            color: var(--text-color);
+          }
+        }
       }
     }
 
-    .categorias-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.5rem;
-      max-height: 50vh;
-      overflow-y: auto;
-      padding: 0.5rem;
+    .inventario-table {
+      h4 {
+        margin-bottom: 1rem;
+        color: var(--text-color);
+        font-weight: 600;
+      }
 
-      .categoria-section {
-        border: 1px solid var(--surface-border);
-        border-radius: 8px;
-        overflow: hidden;
+      ::ng-deep .p-table {
+        .codigo-producto {
+          font-family: 'Courier New', monospace;
+          background: var(--surface-100);
+          padding: 0.2rem 0.4rem;
+          border-radius: 4px;
+          font-size: 0.8rem;
+          font-weight: 600;
+        }
+
+        .nombre-producto {
+          color: var(--text-color);
+          font-weight: 500;
+        }
+
+        .unidad-medida {
+          color: var(--text-color-secondary);
+          font-size: 0.9rem;
+          font-style: italic;
+        }
+      }
+    }
+
+    .inventario-empty {
+      text-align: center;
+      padding: 2rem;
+
+      .empty-inventory-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+
+        .empty-inventory-icon {
+          font-size: 3rem;
+          color: var(--surface-400);
+        }
 
         h4 {
           margin: 0;
-          padding: 0.75rem 1rem;
-          background: var(--surface-section);
           color: var(--text-color);
-          font-size: 1rem;
           font-weight: 600;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-
-          i {
-            font-size: 0.9rem;
-          }
         }
 
-        .unidades-list {
-          padding: 0.5rem;
-
-          .unidad-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.75rem;
-            border-radius: 6px;
-            transition: background-color 0.2s ease;
-
-            &:hover {
-              background: var(--surface-hover);
-            }
-
-            .unidad-info {
-              display: flex;
-              flex-direction: column;
-              flex: 1;
-
-              .unidad-nombre {
-                font-weight: 600;
-                color: var(--text-color);
-                font-size: 0.9rem;
-              }
-
-              .unidad-descripcion {
-                color: var(--text-color-secondary);
-                font-size: 0.8rem;
-                margin-top: 0.2rem;
-              }
-            }
-
-            ::ng-deep .p-button {
-              min-width: 2rem;
-              height: 2rem;
-              padding: 0;
-            }
-          }
+        p {
+          margin: 0;
+          color: var(--text-color-secondary);
         }
+      }
+    }
+  }
+
+  .inventario-loading {
+    text-align: center;
+    padding: 3rem;
+
+    .loading-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+
+      p {
+        margin: 0;
+        color: var(--text-color-secondary);
       }
     }
   }
@@ -614,7 +636,7 @@
 
 // Dark Theme Adjustments
 :host-context(.my-app-dark) {
-  .unidades-medida-container {
+  .bodegas-container {
     ::ng-deep .p-card {
       background: var(--surface-card);
       border-color: var(--surface-border);
@@ -646,6 +668,10 @@
             background: rgba(var(--blue-500-rgb), 0.1);
           }
 
+          &.p-button-text.p-button-warn:hover {
+            background: rgba(var(--orange-500-rgb), 0.1);
+          }
+
           &.p-button-text.p-button-danger:hover {
             background: rgba(var(--red-500-rgb), 0.1);
           }
@@ -669,12 +695,17 @@
         background: var(--surface-card);
       }
     }
+
+    .inventario-content .inventario-summary .summary-card {
+      background: var(--surface-200);
+      border-color: var(--surface-border);
+    }
   }
 }
 
 // Responsive Design
 @media (max-width: 1200px) {
-  .unidades-medida-container {
+  .bodegas-container {
     .content-grid {
       grid-template-columns: 1fr;
     }
@@ -682,11 +713,21 @@
     .page-header .stats-grid {
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     }
+
+    .filters-section .filters-content .filter-form .filter-row {
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+
+      .filter-actions {
+        grid-column: 1 / -1;
+        justify-content: flex-start;
+      }
+    }
   }
 }
 
 @media (max-width: 768px) {
-  .unidades-medida-container {
+  .bodegas-container {
     .page-header {
       .header-content h1 {
         font-size: 1.75rem;
@@ -738,7 +779,7 @@
       ::ng-deep .p-table {
         // Ensure minimum table width on mobile
         .p-datatable-wrapper {
-          min-width: 800px;
+          min-width: 900px;
         }
 
         .p-datatable-thead > tr > th,
@@ -747,8 +788,8 @@
           font-size: 0.8rem;
         }
 
-        .descripcion {
-          max-width: 150px;
+        .ubicacion-cell .ubicacion {
+          max-width: 180px;
         }
 
         .table-actions {
@@ -763,26 +804,6 @@
             }
           }
         }
-
-        .productos-count {
-          min-height: 2.5rem;
-
-          ::ng-deep .p-badge {
-            font-size: 0.7rem;
-            padding: 0.2rem 0.4rem;
-          }
-        }
-      }
-    }
-
-    .predefinidas-content {
-      .categorias-grid {
-        grid-template-columns: 1fr;
-        max-height: 60vh;
-      }
-
-      .category-actions {
-        justify-content: flex-start;
       }
     }
 
@@ -806,11 +827,21 @@
         padding: 1rem;
       }
     }
+
+    .inventario-content .inventario-summary .summary-card .summary-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+
+      .summary-value {
+        font-size: 0.9rem;
+      }
+    }
   }
 }
 
 @media (max-width: 480px) {
-  .unidades-medida-container {
+  .bodegas-container {
     .page-header {
       .header-content h1 {
         font-size: 1.5rem;
@@ -866,7 +897,7 @@
 
       ::ng-deep .p-table {
         .p-datatable-wrapper {
-          min-width: 800px; // Ensure table doesn't compress
+          min-width: 900px; // Ensure table doesn't compress
         }
 
         .p-datatable-thead > tr > th,
@@ -875,8 +906,8 @@
           font-size: 0.75rem;
         }
 
-        .descripcion {
-          max-width: 120px;
+        .ubicacion-cell .ubicacion {
+          max-width: 150px;
           font-size: 0.7rem;
         }
 
@@ -899,15 +930,6 @@
             .p-button-icon {
               font-size: 0.75rem;
             }
-          }
-        }
-
-        .productos-count {
-          min-height: 2rem;
-
-          ::ng-deep .p-badge {
-            font-size: 0.65rem;
-            padding: 0.15rem 0.3rem;
           }
         }
       }

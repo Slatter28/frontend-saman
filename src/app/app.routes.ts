@@ -16,6 +16,16 @@ export const routes: Routes = [
     children: [
        { path: 'dashboard', component: Dashboard },
        { path: 'unidades-medida', component: UnidadesMedida },
+         {
+    path: 'bodegas',
+    loadComponent: () => import('./pages/bodegas/bodegas').then(m => m.Bodegas),
+    title: 'Bodegas - SAMAN'
+  },
+  {
+    path: 'clientes',
+    loadComponent: () => import('./pages/clientes/clientes').then(m => m.Clientes),
+    title: 'Clientes - SAMAN'
+  },
     ]
   },
   { path: '**', redirectTo: '/login' }
