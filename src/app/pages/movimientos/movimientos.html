@@ -1,0 +1,918 @@
+<div class="movimientos-container">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+  
+  <!-- Header Section -->
+  <div class="page-header">
+    <h1>Movimientos de Inventario</h1>
+    <p>Gestión de entradas y salidas de productos</p>
+  </div>
+
+  <!-- Main Content Card -->
+  <p-card styleClass="main-card">
+    
+    <!-- Toolbar -->
+    <p-toolbar styleClass="toolbar-custom">
+      <ng-template pTemplate="start">
+        <div class="toolbar-start">
+          <p-button 
+            icon="pi pi-arrow-up" 
+            label="Nueva Entrada" 
+            severity="success"
+            (onClick)="openEntradaDialog()"
+            pTooltip="Registrar entrada de productos"
+            tooltipPosition="bottom">
+          </p-button>
+          
+          <p-button 
+            icon="pi pi-arrow-down" 
+            label="Nueva Salida" 
+            severity="info"
+            (onClick)="openSalidaDialog()"
+            pTooltip="Registrar salida de productos"
+            tooltipPosition="bottom">
+          </p-button>
+          
+        <p-button 
+  icon="pi pi-chart-bar" 
+  label="Inventario" 
+  severity="secondary"
+  (onClick)="openInventarioDialog()"
+  pTooltip="Ver inventario actual"
+  tooltipPosition="bottom">
+</p-button>
+        </div>
+      </ng-template>
+      
+      <ng-template pTemplate="end">
+        <div class="toolbar-end">
+          <p-button 
+            icon="pi pi-file-excel" 
+            label="Excel" 
+            severity="success"
+            pTooltip="Exportar a Excel"
+            tooltipPosition="bottom">
+          </p-button>
+          
+          <p-button 
+            icon="pi pi-file-pdf" 
+            label="PDF" 
+            severity="danger"
+            pTooltip="Exportar a PDF"
+            tooltipPosition="bottom">
+          </p-button>
+        </div>
+      </ng-template>
+    </p-toolbar>
+
+    <!-- Filters Section -->
+    <div class="filters-section">
+      <p-card header="Filtros de Búsqueda" styleClass="filters-card">
+        <form [formGroup]="filtroForm">
+          <div class="filters-grid">
+            
+            <!-- Tipo Filter -->
+            <div class="filter-field">
+              <label for="tipo">Tipo de Movimiento</label>
+              <p-select 
+                id="tipo"
+                formControlName="tipo"
+                [options]="tipoOptions"
+                placeholder="Todos los tipos"
+                optionLabel="label"
+                optionValue="value">
+              </p-select>
+            </div>
+            
+            <!-- Producto Filter -->
+            <div class="filter-field">
+              <label for="producto">Producto</label>
+              <p-select 
+                id="producto"
+                formControlName="productoId"
+                [options]="productos"
+                placeholder="Todos los productos"
+                optionLabel="descripcion"
+                optionValue="id"
+                [filter]="true"
+                filterBy="descripcion,codigo"
+                [showClear]="true">
+                <ng-template pTemplate="selectedItem" let-producto>
+                  <span *ngIf="producto">{{ producto.codigo }} - {{ producto.descripcion }}</span>
+                </ng-template>
+                <ng-template pTemplate="item" let-producto>
+                  <div class="producto-option">
+                    <span class="codigo">{{ producto.codigo }}</span>
+                    <span class="descripcion">{{ producto.descripcion }}</span>
+                  </div>
+                </ng-template>
+              </p-select>
+            </div>
+            
+            <!-- Bodega Filter -->
+            <div class="filter-field">
+              <label for="bodega">Bodega</label>
+              <p-select 
+                id="bodega"
+                formControlName="bodegaId"
+                [options]="bodegas"
+                placeholder="Todas las bodegas"
+                optionLabel="nombre"
+                optionValue="id"
+                [showClear]="true">
+              </p-select>
+            </div>
+            
+            <!-- Cliente Filter -->
+            <div class="filter-field">
+              <label for="cliente">Cliente</label>
+              <p-select 
+                id="cliente"
+                formControlName="clienteId"
+                [options]="clientes"
+                placeholder="Todos los clientes"
+                optionLabel="nombre"
+                optionValue="id"
+                [filter]="true"
+                filterBy="nombre"
+                [showClear]="true">
+              </p-select>
+            </div>
+            
+            <!-- Fecha Desde -->
+            <div class="filter-field">
+              <label for="fechaDesde">Fecha Desde</label>
+              <p-datepicker  
+                id="fechaDesde"
+                formControlName="fechaDesde"
+                dateFormat="dd/mm/yy"
+                [showIcon]="true"
+                iconDisplay="input"
+                [showButtonBar]="true">
+              </p-datepicker >
+            </div>
+            
+            <!-- Fecha Hasta -->
+            <div class="filter-field">
+              <label for="fechaHasta">Fecha Hasta</label>
+              <p-datepicker  
+                id="fechaHasta"
+                formControlName="fechaHasta"
+                dateFormat="dd/mm/yy"
+                [showIcon]="true"
+                iconDisplay="input"
+                [showButtonBar]="true">
+              </p-datepicker >
+            </div>
+          </div>
+          
+          <!-- Filter Actions -->
+          <div class="filter-actions">
+            <p-button 
+              type="button"
+              icon="pi pi-filter" 
+              label="Filtrar" 
+              severity="primary"
+              (onClick)="onFilter()">
+            </p-button>
+            
+            <p-button 
+              type="button"
+              icon="pi pi-filter-slash" 
+              label="Limpiar" 
+              severity="secondary"
+              (onClick)="clearFilters()">
+            </p-button>
+          </div>
+        </form>
+      </p-card>
+    </div>
+
+    <!-- Table -->
+    <p-table 
+      [value]="movimientos"
+      [loading]="loading"
+      [paginator]="true"
+      [rows]="rows"
+      [totalRecords]="totalRecords"
+      [lazy]="true"
+      (onLazyLoad)="onPageChange($event)"
+      [first]="first"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} movimientos"
+      [tableStyle]="{'min-width': '80rem'}"
+      styleClass="p-datatable-sm">
+      
+      <!-- Table Header -->
+      <ng-template pTemplate="header">
+        <tr>
+          <th *ngFor="let col of columns" 
+              [style.width]="col.width">
+            {{ col.header }}
+          </th>
+          <th style="width: 120px">Acciones</th>
+        </tr>
+      </ng-template>
+      
+      <!-- Table Body -->
+      <ng-template pTemplate="body" let-movimiento>
+        <tr>
+          <td>
+            <span class="fecha-text">
+              {{ formatDate(movimiento.fecha) }}
+            </span>
+          </td>
+          <td>
+            <p-tag 
+              [value]="movimiento.tipo === 'entrada' ? 'Entrada' : 'Salida'"
+              [severity]="getSeverityForTipo(movimiento.tipo)"
+              [icon]="movimiento.tipo === 'entrada' ? 'pi pi-arrow-up' : 'pi pi-arrow-down'">
+            </p-tag>
+          </td>
+          <td>
+            <span class="codigo-badge">{{ movimiento.producto.codigo }}</span>
+          </td>
+          <td>
+            <div class="producto-cell">
+              <strong>{{ movimiento.producto.descripcion }}</strong>
+              <small class="unidad-medida">{{ movimiento.producto.unidadMedida.nombre }}</small>
+            </div>
+          </td>
+          <td>
+            <span class="bodega-text">{{ movimiento.bodega.nombre }}</span>
+            <small class="ubicacion-text" *ngIf="movimiento.bodega.ubicacion">
+              {{ movimiento.bodega.ubicacion }}
+            </small>
+          </td>
+          <td>
+            <p-tag 
+              [value]="movimiento.cantidad.toString()"
+              severity="secondary"
+              [rounded]="true">
+            </p-tag>
+          </td>
+          <td>
+            <span *ngIf="movimiento.cliente">{{ movimiento.cliente.nombre }}</span>
+            <span *ngIf="!movimiento.cliente" class="no-client">Sin cliente</span>
+          </td>
+          <td>
+            <span class="usuario-text">{{ movimiento.usuario.nombre }}</span>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <p-button 
+                icon="pi pi-eye" 
+                severity="info"
+                size="small"
+                pTooltip="Ver detalles"
+                tooltipPosition="top">
+              </p-button>
+              
+              <!-- Solo admin puede editar/eliminar -->
+              <p-button 
+                icon="pi pi-pencil" 
+                severity="secondary"
+                size="small"
+                pTooltip="Editar movimiento"
+                tooltipPosition="top">
+              </p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      
+      <!-- Empty State -->
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td [attr.colspan]="columns.length + 1" class="text-center">
+            <div class="empty-state">
+              <i class="pi pi-history empty-icon"></i>
+              <h4>No hay movimientos</h4>
+              <p>No se encontraron movimientos con los filtros aplicados</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <!-- Entrada Dialog -->
+  <p-dialog 
+    [(visible)]="displayEntradaDialog" 
+    header="Nueva Entrada de Inventario"
+    [modal]="true"
+    [style]="{width: '600px'}"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="false">
+
+    <form [formGroup]="entradaForm" (ngSubmit)="saveEntrada()">
+      
+      <!-- Producto Field -->
+      <div class="form-field">
+        <label for="producto-entrada">
+          Producto <span class="required">*</span>
+        </label>
+        <p-select 
+          id="producto-entrada"
+          formControlName="productoId"
+          [options]="productos"
+          placeholder="Seleccionar producto"
+          optionLabel="descripcion"
+          optionValue="id"
+          [filter]="true"
+          filterBy="descripcion,codigo"
+          [class.ng-invalid]="entradaForm.get('productoId')?.invalid && entradaForm.get('productoId')?.touched">
+          <ng-template pTemplate="selectedItem" let-producto>
+            <span *ngIf="producto">{{ producto.codigo }} - {{ producto.descripcion }}</span>
+          </ng-template>
+          <ng-template pTemplate="item" let-producto>
+            <div class="producto-option">
+              <span class="codigo">{{ producto.codigo }}</span>
+              <span class="descripcion">{{ producto.descripcion }}</span>
+            </div>
+          </ng-template>
+        </p-select>
+        
+        <small 
+          class="p-error" 
+          *ngIf="entradaForm.get('productoId')?.invalid && entradaForm.get('productoId')?.touched">
+          Producto es requerido
+        </small>
+      </div>
+
+      <!-- Bodega Field -->
+      <div class="form-field">
+        <label for="bodega-entrada">
+          Bodega <span class="required">*</span>
+        </label>
+        <p-select 
+          id="bodega-entrada"
+          formControlName="bodegaId"
+          [options]="bodegas"
+          placeholder="Seleccionar bodega"
+          optionLabel="nombre"
+          optionValue="id"
+          [class.ng-invalid]="entradaForm.get('bodegaId')?.invalid && entradaForm.get('bodegaId')?.touched">
+        </p-select>
+        
+        <small 
+          class="p-error" 
+          *ngIf="entradaForm.get('bodegaId')?.invalid && entradaForm.get('bodegaId')?.touched">
+          Bodega es requerida
+        </small>
+      </div>
+
+      <!-- Cliente Field -->
+      <div class="form-field">
+        <label for="cliente-entrada">Cliente/Proveedor</label>
+        <p-select 
+          id="cliente-entrada"
+          formControlName="clienteId"
+          [options]="clientes"
+          placeholder="Seleccionar cliente (opcional)"
+          optionLabel="nombre"
+          optionValue="id"
+          [filter]="true"
+          filterBy="nombre"
+          [showClear]="true">
+        </p-select>
+        
+        <small class="p-help">
+          Cliente o proveedor asociado a la entrada (opcional)
+        </small>
+      </div>
+
+      <!-- Cantidad Field -->
+      <div class="form-field">
+        <label for="cantidad-entrada">
+          Cantidad <span class="required">*</span>
+        </label>
+        <p-inputNumber 
+          id="cantidad-entrada"
+          formControlName="cantidad"
+          mode="decimal"
+          [minFractionDigits]="0"
+          [maxFractionDigits]="2"
+          [min]="0.01"
+          placeholder="0.00"
+          [class.ng-invalid]="entradaForm.get('cantidad')?.invalid && entradaForm.get('cantidad')?.touched">
+        </p-inputNumber>
+        
+        <small 
+          class="p-error" 
+          *ngIf="entradaForm.get('cantidad')?.invalid && entradaForm.get('cantidad')?.touched">
+          Cantidad debe ser mayor a 0
+        </small>
+      </div>
+
+      <!-- Observación Field -->
+      <div class="form-field">
+        <label for="observacion-entrada">Observaciones</label>
+        <textarea 
+          id="observacion-entrada"
+          pTextarea 
+          formControlName="observacion"
+          placeholder="Notas adicionales sobre la entrada..."
+          rows="3"
+          [autoResize]="true">
+        </textarea>
+        
+        <small class="p-help">
+          Información adicional sobre el movimiento (opcional)
+        </small>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <p-button 
+          type="button"
+          label="Cancelar"
+          icon="pi pi-times"
+          severity="secondary"
+          (click)="displayEntradaDialog = false">
+        </p-button>
+        
+        <p-button 
+          type="submit"
+          label="Registrar Entrada"
+          icon="pi pi-check"
+          severity="success"
+          [disabled]="entradaForm.invalid">
+        </p-button>
+      </div>
+    </form>
+  </p-dialog>
+
+  <!-- Salida Dialog -->
+  <p-dialog 
+    [(visible)]="displaySalidaDialog" 
+    header="Nueva Salida de Inventario"
+    [modal]="true"
+    [style]="{width: '600px'}"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="false">
+
+    <form [formGroup]="salidaForm" (ngSubmit)="saveSalida()">
+      
+      <!-- Producto Field -->
+      <div class="form-field">
+        <label for="producto-salida">
+          Producto <span class="required">*</span>
+        </label>
+        <p-select 
+          id="producto-salida"
+          formControlName="productoId"
+          [options]="productos"
+          placeholder="Seleccionar producto"
+          optionLabel="descripcion"
+          optionValue="id"
+          [filter]="true"
+          filterBy="descripcion,codigo"
+          [class.ng-invalid]="salidaForm.get('productoId')?.invalid && salidaForm.get('productoId')?.touched">
+          <ng-template pTemplate="selectedItem" let-producto>
+            <span *ngIf="producto">{{ producto.codigo }} - {{ producto.descripcion }}</span>
+          </ng-template>
+          <ng-template pTemplate="item" let-producto>
+            <div class="producto-option">
+              <span class="codigo">{{ producto.codigo }}</span>
+              <span class="descripcion">{{ producto.descripcion }}</span>
+            </div>
+          </ng-template>
+        </p-select>
+        
+        <small 
+          class="p-error" 
+          *ngIf="salidaForm.get('productoId')?.invalid && salidaForm.get('productoId')?.touched">
+          Producto es requerido
+        </small>
+      </div>
+
+      <!-- Bodega Field -->
+      <div class="form-field">
+        <label for="bodega-salida">
+          Bodega <span class="required">*</span>
+        </label>
+        <p-select 
+          id="bodega-salida"
+          formControlName="bodegaId"
+          [options]="bodegas"
+          placeholder="Seleccionar bodega"
+          optionLabel="nombre"
+          optionValue="id"
+          [class.ng-invalid]="salidaForm.get('bodegaId')?.invalid && salidaForm.get('bodegaId')?.touched">
+        </p-select>
+        
+        <small 
+          class="p-error" 
+          *ngIf="salidaForm.get('bodegaId')?.invalid && salidaForm.get('bodegaId')?.touched">
+          Bodega es requerida
+        </small>
+      </div>
+
+      <!-- Cliente Field -->
+      <div class="form-field">
+        <label for="cliente-salida">Cliente</label>
+        <p-select 
+          id="cliente-salida"
+          formControlName="clienteId"
+          [options]="clientes"
+          placeholder="Seleccionar cliente (opcional)"
+          optionLabel="nombre"
+          optionValue="id"
+          [filter]="true"
+          filterBy="nombre"
+          [showClear]="true">
+        </p-select>
+        
+        <small class="p-help">
+          Cliente asociado a la salida (opcional)
+        </small>
+      </div>
+
+      <!-- Cantidad Field -->
+      <div class="form-field">
+        <label for="cantidad-salida">
+          Cantidad <span class="required">*</span>
+        </label>
+        <p-inputNumber 
+          id="cantidad-salida"
+          formControlName="cantidad"
+          mode="decimal"
+          [minFractionDigits]="0"
+          [maxFractionDigits]="2"
+          [min]="0.01"
+          placeholder="0.00"
+          [class.ng-invalid]="salidaForm.get('cantidad')?.invalid && salidaForm.get('cantidad')?.touched">
+        </p-inputNumber>
+        
+        <small 
+          class="p-error" 
+          *ngIf="salidaForm.get('cantidad')?.invalid && salidaForm.get('cantidad')?.touched">
+          Cantidad debe ser mayor a 0
+        </small>
+      </div>
+
+      <!-- Observación Field -->
+      <div class="form-field">
+        <label for="observacion-salida">Observaciones</label>
+        <textarea 
+          id="observacion-salida"
+          pTextarea 
+          formControlName="observacion"
+          placeholder="Notas adicionales sobre la salida..."
+          rows="3"
+          [autoResize]="true">
+        </textarea>
+        
+        <small class="p-help">
+          Información adicional sobre el movimiento (opcional)
+        </small>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <p-button 
+          type="button"
+          label="Cancelar"
+          icon="pi pi-times"
+          severity="secondary"
+          (click)="displaySalidaDialog = false">
+        </p-button>
+        
+        <p-button 
+          type="submit"
+          label="Registrar Salida"
+          icon="pi pi-check"
+          severity="info"
+          [disabled]="salidaForm.invalid">
+        </p-button>
+      </div>
+    </form>
+  </p-dialog>
+</div>
+
+
+<p-dialog 
+  [(visible)]="displayInventarioDialog" 
+  header="Inventario General del Sistema"
+  [modal]="true"
+  [style]="{width: '95vw', maxWidth: '1200px', height: '85vh'}"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="true"
+  styleClass="inventario-dialog">
+
+  <!-- Loading State -->
+  <div class="inventario-loading" *ngIf="loadingInventario">
+    <div class="loading-content">
+      <p-progressSpinner strokeWidth="4" animationDuration="1s"></p-progressSpinner>
+      <p>Cargando inventario...</p>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="inventario-content" *ngIf="!loadingInventario && inventarioData">
+    
+    <!-- Statistics Summary -->
+    <div class="inventario-stats">
+      <div class="stats-grid">
+        <div class="stat-card productos">
+          <div class="stat-icon">
+            <i class="pi pi-box"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value">{{ inventarioData.estadisticas.totalProductosDiferentes }}</span>
+            <span class="stat-label">Productos Diferentes</span>
+          </div>
+        </div>
+        
+        <div class="stat-card bodegas">
+          <div class="stat-icon">
+            <i class="pi pi-building"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value">{{ inventarioData.estadisticas.totalBodegas }}</span>
+            <span class="stat-label">Bodegas Activas</span>
+          </div>
+        </div>
+        
+        <div class="stat-card stock">
+          <div class="stat-icon">
+            <i class="pi pi-database"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value">{{ inventarioData.estadisticas.stockTotalUnidades | number:'1.0-2' }}</span>
+            <span class="stat-label">Unidades en Stock</span>
+          </div>
+        </div>
+        
+        <div class="stat-card alertas">
+          <div class="stat-icon">
+            <i class="pi pi-exclamation-triangle"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value">{{ inventarioData.estadisticas.productosStockBajo }}</span>
+            <span class="stat-label">Stock Bajo</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="inventario-filters">
+      <p-card header="Filtros" styleClass="filters-card">
+        <div class="filters-row">
+          <div class="filter-group">
+            <label for="bodega-filter">Bodega</label>
+            <p-select 
+              id="bodega-filter"
+              [(ngModel)]="inventarioFiltros.bodegaId"
+              [options]="bodegas"
+              placeholder="Todas las bodegas"
+              optionLabel="nombre"
+              optionValue="id"
+              [showClear]="true">
+            </p-select>
+          </div>
+          
+          <div class="filter-group">
+            <label for="stock-filter">Stock Mínimo</label>
+            <p-inputNumber 
+              id="stock-filter"
+              [(ngModel)]="inventarioFiltros.stockMinimo"
+              [min]="0"
+              placeholder="Cualquier cantidad">
+            </p-inputNumber>
+          </div>
+          
+          <div class="filter-group checkbox-group">
+            <p-checkbox 
+              [(ngModel)]="inventarioFiltros.soloStockBajo"
+              binary="true"
+              inputId="stock-bajo">
+            </p-checkbox>
+            <label for="stock-bajo">Solo stock bajo (≤10)</label>
+          </div>
+          
+          <div class="filter-actions">
+            <p-button 
+              icon="pi pi-filter" 
+              label="Filtrar"
+              severity="primary"
+              (onClick)="onFiltrarInventario()">
+            </p-button>
+            
+            <p-button 
+              icon="pi pi-filter-slash" 
+              label="Limpiar"
+              severity="secondary"
+              (onClick)="clearInventarioFilters()">
+            </p-button>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Tabs -->
+<p-tabs value="detallado" styleClass="inventario-tabs">
+  <p-tablist>
+    <p-tab value="detallado">
+      <i class="pi pi-list"></i>
+      <span>Inventario Detallado</span>
+    </p-tab>
+    <p-tab value="productos">
+      <i class="pi pi-box"></i>
+      <span>Por Producto</span>
+    </p-tab>
+    <p-tab value="bodegas">
+      <i class="pi pi-building"></i>
+      <span>Por Bodega</span>
+    </p-tab>
+  </p-tablist>
+
+  <p-tabpanels>
+    <!-- Tab 1: Detalle por Producto-Bodega -->
+    <p-tabpanel value="detallado">
+      <div class="tab-content">
+        <p-table 
+          [value]="inventarioData.inventario"
+          [paginator]="true"
+          [rows]="15"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+          [tableStyle]="{'min-width': '100%'}"
+          styleClass="inventario-table"
+          [scrollable]="true"
+          scrollHeight="flex">
+
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Código</th>
+              <th>Producto</th>
+              <th>Bodega</th>
+              <th>Stock</th>
+              <th>Movimientos</th>
+              <th>Último Movimiento</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-item>
+            <tr>
+              <td>
+                <span class="codigo-producto">{{ item?.producto?.codigo || 'N/A' }}</span>
+              </td>
+              <td>
+                <div class="producto-info">
+                  <strong>{{ item?.producto?.descripcion || 'Sin descripción' }}</strong>
+                  <small class="unidad">{{ item?.producto?.unidadMedida || 'N/A' }}</small>
+                </div>
+              </td>
+              <td>
+                <div class="bodega-info">
+                  <span class="nombre">{{ item?.bodega?.nombre || 'Sin nombre' }}</span>
+                  @if (item?.bodega?.ubicacion) {
+                    <small class="ubicacion">{{ item.bodega.ubicacion }}</small>
+                  }
+                </div>
+              </td>
+              <td>
+                <p-tag 
+                  [value]="formatNumber(item?.stock)"
+                  [severity]="getStockSeverity(item?.stock)"
+                  [rounded]="true">
+                </p-tag>
+              </td>
+              <td>
+                <span class="movimientos-count">
+                  {{ getSafeValue(item?.totalMovimientos) }} movimientos
+                </span>
+                <div class="movimientos-detail">
+                  <small class="entradas">↗ {{ getSafeValue(item?.totalEntradas) }} entradas</small>
+                  <small class="salidas">↘ {{ getSafeValue(item?.totalSalidas) }} salidas</small>
+                </div>
+              </td>
+              <td>
+                <span class="fecha-ultimo">
+                  {{ formatearFecha(item?.ultimoMovimiento) }}
+                </span>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </p-tabpanel>
+
+    <!-- Tab 2: Resumen por Producto -->
+    <p-tabpanel value="productos">
+      <div class="tab-content">
+        <p-table 
+          [value]="inventarioData.resumenPorProducto"
+          [paginator]="true"
+          [rows]="15"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} productos"
+          styleClass="resumen-table"
+          [scrollable]="true"
+          scrollHeight="flex">
+
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Código</th>
+              <th>Producto</th>
+              <th>Stock Total</th>
+              <th>Bodegas</th>
+              <th>Último Movimiento</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-producto>
+            <tr>
+              <td>
+                <span class="codigo-producto">{{ producto?.producto?.codigo || 'N/A' }}</span>
+              </td>
+              <td>
+                <div class="producto-info">
+                  <strong>{{ producto?.producto?.descripcion || 'Sin descripción' }}</strong>
+                  <small class="unidad">{{ producto?.producto?.unidadMedida || 'N/A' }}</small>
+                </div>
+              </td>
+              <td>
+                <p-tag 
+                  [value]="formatNumber(producto?.stockTotal)"
+                  [severity]="getStockSeverity(producto?.stockTotal)"
+                  [rounded]="true"
+                  class="stock-total">
+                </p-tag>
+              </td>
+              <td>
+                <span class="bodegas-count">{{ getSafeValue(producto?.bodegas) }} bodegas</span>
+              </td>
+              <td>
+                <span class="fecha-ultimo">
+                  {{ formatearFecha(producto?.ultimoMovimiento) }}
+                </span>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </p-tabpanel>
+
+    <!-- Tab 3: Resumen por Bodega -->
+    <p-tabpanel value="bodegas">
+      <div class="bodegas-grid">
+        @for (bodega of inventarioData.resumenPorBodega; track bodega.bodega.id) {
+          <div class="bodega-card">
+            <div class="bodega-header">
+              <h4>{{ bodega.bodega.nombre }}</h4>
+              @if (bodega.bodega.ubicacion) {
+                <p class="ubicacion">
+                  <i class="pi pi-map-marker"></i>
+                  {{ bodega.bodega.ubicacion }}
+                </p>
+              }
+            </div>
+            <div class="bodega-stats">
+              <div class="stat">
+                <span class="value">{{ getSafeValue(bodega.totalProductos) }}</span>
+                <span class="label">Productos</span>
+              </div>
+              <div class="stat">
+                <span class="value">{{ formatNumber(bodega.stockTotal) }}</span>
+                <span class="label">Stock Total</span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </p-tabpanel>
+  </p-tabpanels>
+</p-tabs>
+  </div>
+
+  <!-- Footer -->
+  <ng-template pTemplate="footer">
+    <div class="inventario-footer">
+      <small class="ultima-actualizacion">
+        Última actualización: {{ formatearFecha(inventarioData?.estadisticas?.ultimaActualizacion) }}
+      </small>
+      <div class="footer-actions">
+        <p-button 
+          icon="pi pi-refresh"
+          label="Actualizar"
+          severity="secondary"
+          (onClick)="loadInventarioGeneral()">
+        </p-button>
+        
+        <p-button 
+          icon="pi pi-times"
+          label="Cerrar"
+          severity="secondary"
+          (onClick)="closeInventarioDialog()">
+        </p-button>
+      </div>
+    </div>
+  </ng-template>
+</p-dialog>

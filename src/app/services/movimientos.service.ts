@@ -97,29 +97,42 @@ export class MovimientosService {
   }
 
   // Obtener inventario general
-  getInventario(filtros?: { 
-    productoId?: number; 
-    bodegaId?: number; 
-    stockMinimo?: number;
-    search?: string;
-  }): Observable<InventarioResponse> {
-    this.setLoading(true);
-    this.clearError();
+getInventario(filtros?: { 
+  bodegaId?: number; 
+  productoId?: number; 
+  stockMinimo?: number;
+  soloStockBajo?: boolean;
+  incluirCeros?: boolean;
+}): Observable<any> {
+  this.setLoading(true);
+  this.clearError();
 
-    let params = new HttpParams();
-    if (filtros?.productoId) params = params.set('productoId', filtros.productoId.toString());
-    if (filtros?.bodegaId) params = params.set('bodegaId', filtros.bodegaId.toString());
-    if (filtros?.stockMinimo) params = params.set('stockMinimo', filtros.stockMinimo.toString());
-    if (filtros?.search) params = params.set('search', filtros.search);
-
-    return this.http.get<InventarioResponse>(`${this.apiUrl}/inventario`, { params }).pipe(
-      tap(inventario => {
-        this.inventarioCache$.next(inventario);
-        this.setLoading(false);
-      }),
-      catchError(error => this.handleError(error))
-    );
+  let params = new HttpParams();
+  
+  if (filtros?.bodegaId) {
+    params = params.set('bodegaId', filtros.bodegaId.toString());
   }
+  if (filtros?.productoId) {
+    params = params.set('productoId', filtros.productoId.toString());
+  }
+  if (filtros?.stockMinimo) {
+    params = params.set('stockMinimo', filtros.stockMinimo.toString());
+  }
+  if (filtros?.soloStockBajo) {
+    params = params.set('soloStockBajo', 'true');
+  }
+  if (filtros?.incluirCeros) {
+    params = params.set('incluirCeros', 'true');
+  }
+
+  return this.http.get<any>(`${this.apiUrl}/inventario`, { params }).pipe(
+    tap(inventario => {
+      this.inventarioCache$.next(inventario);
+      this.setLoading(false);
+    }),
+    catchError(error => this.handleError(error))
+  );
+}
 
   // Obtener movimientos por código de producto
   getMovimientosByProductoCodigo(codigo: string): Observable<Movimiento[]> {

@@ -1,3 +1,4 @@
+
 import { Routes } from '@angular/router';
 import { AuthComponent } from './pages/auth/auth';
 import { MainLayout } from './layout/main-layout/main-layout';
@@ -14,23 +15,28 @@ export const routes: Routes = [
     component: MainLayout,
     canActivate: [authGuard],
     children: [
-       { path: 'dashboard', component: Dashboard },
-       { path: 'unidades-medida', component: UnidadesMedida },
-         {
-    path: 'bodegas',
-    loadComponent: () => import('./pages/bodegas/bodegas').then(m => m.Bodegas),
-    title: 'Bodegas - SAMAN'
-  },
-  {
-    path: 'clientes',
-    loadComponent: () => import('./pages/clientes/clientes').then(m => m.Clientes),
-    title: 'Clientes - SAMAN'
-  },
-  {
-    path: 'productos',
-    loadComponent: () => import('./pages/productos/productos').then(m => m.Productos),
-    title: 'Productos - SAMAN'
-  },
+      { path: 'dashboard', component: Dashboard },
+      { path: 'unidades-medida', component: UnidadesMedida },
+      {
+        path: 'bodegas',
+        loadComponent: () => import('./pages/bodegas/bodegas').then(m => m.Bodegas),
+        title: 'Bodegas - SAMAN'
+      },
+      {
+        path: 'clientes',
+        loadComponent: () => import('./pages/clientes/clientes').then(m => m.Clientes),
+        title: 'Clientes - SAMAN'
+      },
+      {
+        path: 'productos',
+        loadComponent: () => import('./pages/productos/productos').then(m => m.Productos),
+        title: 'Productos - SAMAN'
+      },
+      {
+        path: 'movimientos',
+        loadComponent: () => import('./pages/movimientos/movimientos').then(m => m.Movimientos),
+        title: 'Movimientos - SAMAN'
+      }
     ]
   },
   { path: '**', redirectTo: '/login' }

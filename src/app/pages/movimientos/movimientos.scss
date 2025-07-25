@@ -1,0 +1,1191 @@
+.movimientos-container {
+  padding: 1rem;
+  
+  .page-header {
+    margin-bottom: 2rem;
+    
+    h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin: 0 0 0.5rem 0;
+    }
+    
+    p {
+      color: var(--text-color-secondary);
+      margin: 0;
+      font-size: 1.1rem;
+    }
+  }
+  
+  .main-card {
+    ::ng-deep .p-card-body {
+      padding: 0;
+    }
+    
+    ::ng-deep .p-card-content {
+      padding: 0;
+    }
+  }
+  
+  // Toolbar Styles
+  .toolbar-custom {
+    ::ng-deep .p-toolbar {
+      background: var(--surface-ground);
+      border: 1px solid var(--surface-border);
+      border-radius: 6px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .toolbar-start {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    
+    .toolbar-end {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+  }
+  
+  // Filters Section
+  .filters-section {
+    margin-bottom: 1.5rem;
+    
+    .filters-card {
+      ::ng-deep .p-card-header {
+        background: var(--primary-50);
+        color: var(--primary-700);
+        font-weight: 600;
+        border-bottom: 1px solid var(--primary-200);
+      }
+      
+      ::ng-deep .p-card-body {
+        padding: 1.5rem;
+      }
+    }
+    
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .filter-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      
+      label {
+        font-weight: 600;
+        color: var(--text-color);
+        font-size: 0.875rem;
+      }
+      
+      ::ng-deep .p-select,
+      ::ng-deep .p-calendar,
+      ::ng-deep .p-inputtext {
+        width: 100%;
+      }
+    }
+    
+    .filter-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+      padding-top: 1rem;
+      border-top: 1px solid var(--surface-border);
+    }
+  }
+  
+  // Table Styles
+  ::ng-deep .p-datatable {
+    .p-datatable-header {
+      background: var(--surface-50);
+      border: 1px solid var(--surface-border);
+      padding: 1rem;
+    }
+    
+    .p-datatable-thead > tr > th {
+      background: var(--surface-100);
+      color: var(--text-color);
+      font-weight: 600;
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--surface-border);
+    }
+    
+    .p-datatable-tbody > tr > td {
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--surface-border);
+    }
+    
+    .p-datatable-tbody > tr:hover {
+      background: var(--surface-hover);
+    }
+  }
+  
+  // Cell Content Styles
+  .fecha-text {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.875rem;
+    color: var(--text-color-secondary);
+  }
+  
+  .codigo-badge {
+    background: var(--primary-100);
+    color: var(--primary-700);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  
+  .producto-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    
+    strong {
+      color: var(--text-color);
+      font-size: 0.875rem;
+    }
+    
+    .unidad-medida {
+      color: var(--text-color-secondary);
+      font-size: 0.75rem;
+      background: var(--surface-100);
+      padding: 0.125rem 0.375rem;
+      border-radius: 12px;
+      align-self: flex-start;
+    }
+  }
+  
+  .bodega-text {
+    color: var(--text-color);
+    font-weight: 500;
+  }
+  
+  .ubicacion-text {
+    display: block;
+    color: var(--text-color-secondary);
+    font-size: 0.75rem;
+    margin-top: 0.125rem;
+  }
+  
+  .usuario-text {
+    color: var(--text-color-secondary);
+    font-size: 0.875rem;
+  }
+  
+  .no-client {
+    color: var(--text-color-secondary);
+    font-style: italic;
+    font-size: 0.875rem;
+  }
+  
+  // Action Buttons
+  .action-buttons {
+    display: flex;
+    gap: 0.375rem;
+    justify-content: center;
+    
+    ::ng-deep .p-button {
+      width: 2rem;
+      height: 2rem;
+      
+      .p-button-icon {
+        font-size: 0.75rem;
+      }
+    }
+  }
+  
+  // Empty State
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-color-secondary);
+    
+    .empty-icon {
+      font-size: 3rem;
+      color: var(--surface-400);
+      margin-bottom: 1rem;
+    }
+    
+    h4 {
+      margin: 0 0 0.5rem 0;
+      color: var(--text-color);
+    }
+    
+    p {
+      margin: 0;
+      font-size: 0.875rem;
+    }
+  }
+  
+  // Dialog Styles
+  ::ng-deep .p-dialog {
+    .p-dialog-header {
+      background: var(--surface-50);
+      border-bottom: 1px solid var(--surface-border);
+    }
+    
+    .p-dialog-content {
+      padding: 1.5rem;
+    }
+  }
+  
+  // Form Styles
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    
+    label {
+      font-weight: 600;
+      color: var(--text-color);
+      font-size: 0.875rem;
+      
+      .required {
+        color: var(--red-500);
+        margin-left: 0.25rem;
+      }
+    }
+    
+    ::ng-deep .p-select,
+    ::ng-deep .p-inputnumber,
+    ::ng-deep .p-inputtext,
+    ::ng-deep .p-textarea {
+      width: 100%;
+    }
+    
+    ::ng-deep .ng-invalid.ng-touched {
+      border-color: var(--red-500);
+    }
+    
+    .p-error {
+      color: var(--red-500);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+    }
+    
+    .p-help {
+      color: var(--text-color-secondary);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+    }
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--surface-border);
+    margin-top: 1.5rem;
+  }
+  
+  // Producto Option Styles
+  .producto-option {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    
+    .codigo {
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--primary-600);
+      font-weight: 600;
+    }
+    
+    .descripcion {
+      font-size: 0.875rem;
+      color: var(--text-color);
+    }
+  }
+  
+  // Responsive Design
+  @media (max-width: 768px) {
+    padding: 0.5rem;
+    
+    .page-header {
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
+    
+    .toolbar-start,
+    .toolbar-end {
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: stretch;
+      
+      ::ng-deep .p-button {
+        width: 100%;
+      }
+    }
+    
+    .filters-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .filter-actions {
+      justify-content: stretch;
+      
+      ::ng-deep .p-button {
+        flex: 1;
+      }
+    }
+    
+    ::ng-deep .p-dialog {
+      width: 95vw !important;
+      margin: 1rem;
+    }
+    
+    .form-actions {
+      flex-direction: column;
+      
+      ::ng-deep .p-button {
+        width: 100%;
+      }
+    }
+  }
+  
+  @media (max-width: 1024px) {
+    ::ng-deep .p-datatable {
+      .p-datatable-tbody > tr > td {
+        padding: 0.5rem 0.25rem;
+        font-size: 0.875rem;
+      }
+      
+      .p-datatable-thead > tr > th {
+        padding: 0.5rem 0.25rem;
+        font-size: 0.875rem;
+      }
+    }
+    
+    .action-buttons {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+  }
+}
+
+// AGREGAR estos estilos al final de movimientos.scss
+// REEMPLAZAR la sección de estilos del inventario en movimientos.scss con esta versión corregida:
+
+// Inventario Dialog Styles - COMPATIBLE CON DARK/LIGHT THEMES
+::ng-deep .inventario-dialog {
+  .p-dialog-header {
+    // ✅ CORREGIDO: Usar variables de tema en lugar de colores fijos
+    background: var(--primary-color) !important;
+    color: var(--primary-color-text) !important;
+    border-bottom: none;
+    
+    .p-dialog-title {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: var(--primary-color-text) !important; // ✅ Forzar color del texto
+    }
+    
+    .p-dialog-header-icon {
+      color: var(--primary-color-text) !important; // ✅ Iconos visibles
+    }
+  }
+  
+  .p-dialog-content {
+    padding: 0;
+    height: calc(85vh - 120px);
+    overflow: hidden;
+    background: var(--surface-ground); // ✅ Usar variable de tema
+  }
+}
+
+.inventario-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  
+  .inventario-stats {
+    flex-shrink: 0; // No se reduce
+  }
+  
+  .inventario-filters {
+    flex-shrink: 0; // No se reduce
+  }
+  
+  .inventario-tabs {
+    flex: 1; // Toma el espacio restante
+    min-height: 0; // ✅ CRÍTICO: Permite que flex funcione con overflow
+  }
+}
+
+// Loading State
+.inventario-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  
+  .loading-content {
+    text-align: center;
+    
+    p {
+      margin-top: 1rem;
+      color: var(--text-color-secondary);
+    }
+  }
+}
+
+// Statistics Cards - CORREGIDO PARA DARK/LIGHT
+.inventario-stats {
+  padding: 1rem;
+  background: var(--surface-section); // ✅ Usar variable de tema
+  border-bottom: 1px solid var(--surface-border);
+  flex-shrink: 0;
+  
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+  
+  .stat-card {
+    // ✅ CORREGIDO: Usar variables de tema en lugar de white fijo
+    background: var(--surface-card) !important;
+    color: var(--text-color) !important;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid var(--primary-color);
+    box-shadow: var(--card-shadow);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--card-hover-shadow, 0 4px 8px rgba(0,0,0,0.15));
+    }
+    
+    &.productos {
+      border-left-color: var(--blue-500);
+      
+      .stat-icon {
+        background: var(--blue-50);
+        color: var(--blue-600);
+        
+        // ✅ Soporte para dark theme
+        .my-app-dark & {
+          background: rgba(33, 150, 243, 0.1);
+          color: var(--blue-400);
+        }
+      }
+    }
+    
+    &.bodegas {
+      border-left-color: var(--green-500);
+      
+      .stat-icon {
+        background: var(--green-50);
+        color: var(--green-600);
+        
+        .my-app-dark & {
+          background: rgba(76, 175, 80, 0.1);
+          color: var(--green-400);
+        }
+      }
+    }
+    
+    &.stock {
+      border-left-color: var(--purple-500);
+      
+      .stat-icon {
+        background: var(--purple-50);
+        color: var(--purple-600);
+        
+        .my-app-dark & {
+          background: rgba(156, 39, 176, 0.1);
+          color: var(--purple-400);
+        }
+      }
+    }
+    
+    &.alertas {
+      border-left-color: var(--orange-500);
+      
+      .stat-icon {
+        background: var(--orange-50);
+        color: var(--orange-600);
+        
+        .my-app-dark & {
+          background: rgba(255, 152, 0, 0.1);
+          color: var(--orange-400);
+        }
+      }
+    }
+    
+    .stat-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      font-size: 1.5rem;
+      transition: all 0.2s;
+    }
+    
+    .stat-info {
+      display: flex;
+      flex-direction: column;
+      
+      .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--text-color);
+        line-height: 1;
+      }
+      
+      .stat-label {
+        font-size: 0.875rem;
+        color: var(--text-color-secondary);
+        margin-top: 0.25rem;
+      }
+    }
+  }
+}
+
+// Filters - CORREGIDO PARA DARK/LIGHT
+.inventario-filters {
+  padding: 1rem;
+  flex-shrink: 0;
+  background: var(--surface-ground);
+  
+  .filters-card {
+    ::ng-deep .p-card {
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      
+      .p-card-header {
+        background: var(--surface-section);
+        border-bottom: 1px solid var(--surface-border);
+        padding: 0.75rem 1rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: var(--text-color);
+      }
+      
+      .p-card-body {
+        padding: 1rem;
+        background: var(--surface-card);
+      }
+    }
+  }
+  
+  .filters-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto auto;
+    gap: 1rem;
+    align-items: end;
+    
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+  }
+  
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    
+    label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-color);
+    }
+    
+    &.checkbox-group {
+      flex-direction: row;
+      align-items: center;
+      gap: 0.5rem;
+      
+      label {
+        margin: 0;
+        cursor: pointer;
+        color: var(--text-color);
+      }
+    }
+  }
+  
+  .filter-actions {
+    display: flex;
+    gap: 0.5rem;
+    
+    @media (max-width: 768px) {
+      grid-column: 1;
+      justify-content: stretch;
+      
+      ::ng-deep .p-button {
+        flex: 1;
+      }
+    }
+  }
+}
+
+// Tabs - CORREGIDO PARA DARK/LIGHT
+// REEMPLAZAR la sección de Tabs en movimientos.scss con esta versión CORREGIDA:
+
+// Tabs - CORREGIDO PARA SCROLL
+.inventario-tabs {
+  flex: 1;
+  overflow: hidden;
+  height: 100%;
+  
+  ::ng-deep p-tabs {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    
+    p-tablist {
+      flex-shrink: 0;
+      background: var(--surface-section);
+      border-bottom: 1px solid var(--surface-border);
+      
+      .p-tabs-nav {
+        border: none;
+        background: transparent;
+      }
+      
+      p-tab {
+        .p-tabs-tab {
+          background: transparent;
+          border: none;
+          color: var(--text-color-secondary);
+          font-weight: 500;
+          padding: 1rem 1.5rem;
+          border-bottom: 3px solid transparent;
+          transition: all 0.2s;
+          
+          &:hover {
+            background: var(--surface-hover);
+            color: var(--text-color);
+          }
+          
+          &.p-highlight {
+            background: var(--surface-card);
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+          }
+          
+          i {
+            margin-right: 0.5rem;
+          }
+        }
+      }
+    }
+    
+    p-tabpanels {
+      flex: 1;
+      overflow: hidden;
+      background: var(--surface-card);
+      height: 100%;
+      
+      p-tabpanel {
+        height: 100%;
+        overflow: auto; // ✅ CRÍTICO: Permitir scroll
+        padding: 0; // ✅ CORREGIDO: Quitar padding del panel
+        background: var(--surface-card);
+        
+        &:not(.p-tabpanel-active) {
+          display: none;
+        }
+        
+        // ✅ NUEVO: Contenedor interno con padding
+        > div {
+          padding: 1rem;
+          min-height: 100%;
+        }
+      }
+    }
+  }
+}
+
+// ✅ NUEVO: Estilos específicos para las tablas con scroll
+.inventario-table,
+.resumen-table {
+  height: 100%;
+  
+  ::ng-deep .p-datatable {
+    background: var(--surface-card);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    
+    .p-datatable-wrapper {
+      flex: 1;
+      overflow: auto; // ✅ CRÍTICO: Scroll en el wrapper de la tabla
+      max-height: calc(65vh - 200px); // ✅ Altura máxima para forzar scroll
+    }
+    
+    .p-datatable-thead > tr > th {
+      background: var(--surface-section);
+      color: var(--text-color);
+      font-weight: 600;
+      font-size: 0.875rem;
+      padding: 0.75rem 0.5rem;
+      border-bottom: 2px solid var(--surface-border);
+      position: sticky; // ✅ Header fijo al hacer scroll
+      top: 0;
+      z-index: 1;
+    }
+    
+    .p-datatable-tbody > tr > td {
+      padding: 0.75rem 0.5rem;
+      border-bottom: 1px solid var(--surface-border);
+      vertical-align: top;
+      background: var(--surface-card);
+      color: var(--text-color);
+    }
+    
+    .p-datatable-tbody > tr:hover {
+      background: var(--surface-hover) !important;
+    }
+    
+    // ✅ NUEVO: Ajustar paginador
+    .p-paginator {
+      background: var(--surface-section);
+      border-top: 1px solid var(--surface-border);
+      flex-shrink: 0;
+    }
+  }
+}
+
+// ✅ NUEVO: Estilos específicos para la grilla de bodegas
+.bodegas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+  overflow-y: auto; // ✅ CRÍTICO: Scroll para la grilla
+  max-height: calc(65vh - 150px);
+  
+  .bodega-card {
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.2s, box-shadow 0.2s;
+    height: fit-content; // ✅ Altura automática
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--card-hover-shadow, 0 4px 12px rgba(0,0,0,0.15));
+    }
+    
+    .bodega-header {
+      background: var(--surface-section);
+      padding: 1rem;
+      border-bottom: 1px solid var(--surface-border);
+      
+      h4 {
+        margin: 0 0 0.5rem 0;
+        color: var(--primary-color);
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+      
+      .ubicacion {
+        margin: 0;
+        color: var(--text-color-secondary);
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        
+        i {
+          color: var(--primary-color);
+        }
+      }
+    }
+    
+    .bodega-stats {
+      padding: 1rem;
+      display: flex;
+      justify-content: space-around;
+      background: var(--surface-card);
+      
+      .stat {
+        text-align: center;
+        
+        .value {
+          display: block;
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: var(--primary-color);
+          line-height: 1;
+        }
+        
+        .label {
+          display: block;
+          font-size: 0.875rem;
+          color: var(--text-color-secondary);
+          margin-top: 0.25rem;
+        }
+      }
+    }
+  }
+}
+
+// ✅ NUEVO: Ajustes específicos para el contenedor del diálogo
+.inventario-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  
+  .inventario-stats {
+    flex-shrink: 0; // No se reduce
+  }
+  
+  .inventario-filters {
+    flex-shrink: 0; // No se reduce
+  }
+  
+  .inventario-tabs {
+    flex: 1; // Toma el espacio restante
+    min-height: 0; // ✅ CRÍTICO: Permite que flex funcione con overflow
+  }
+}
+
+// ✅ NUEVO: Responsive mejorado
+@media (max-width: 768px) {
+  .inventario-table,
+  .resumen-table {
+    ::ng-deep .p-datatable {
+      .p-datatable-wrapper {
+        max-height: calc(60vh - 150px); // Menos altura en móvil
+      }
+    }
+  }
+  
+  .bodegas-grid {
+    grid-template-columns: 1fr;
+    max-height: calc(60vh - 100px);
+    padding: 0.5rem;
+  }
+}
+
+// Tables - CORREGIDO PARA DARK/LIGHT
+.inventario-table,
+.resumen-table {
+  height: 100%;
+  
+  ::ng-deep .p-datatable {
+    background: var(--surface-card);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    
+    .p-datatable-wrapper {
+      flex: 1;
+      overflow: auto; // ✅ CRÍTICO: Scroll en el wrapper de la tabla
+      max-height: calc(65vh - 200px); // ✅ Altura máxima para forzar scroll
+    }
+    
+    .p-datatable-thead > tr > th {
+      background: var(--surface-section);
+      color: var(--text-color);
+      font-weight: 600;
+      font-size: 0.875rem;
+      padding: 0.75rem 0.5rem;
+      border-bottom: 2px solid var(--surface-border);
+      position: sticky; // ✅ Header fijo al hacer scroll
+      top: 0;
+      z-index: 1;
+    }
+    
+    .p-datatable-tbody > tr > td {
+      padding: 0.75rem 0.5rem;
+      border-bottom: 1px solid var(--surface-border);
+      vertical-align: top;
+      background: var(--surface-card);
+      color: var(--text-color);
+    }
+    
+    .p-datatable-tbody > tr:hover {
+      background: var(--surface-hover) !important;
+    }
+    
+    // ✅ NUEVO: Ajustar paginador
+    .p-paginator {
+      background: var(--surface-section);
+      border-top: 1px solid var(--surface-border);
+      flex-shrink: 0;
+    }
+  }
+}
+
+// Bodegas Grid - CORREGIDO PARA DARK/LIGHT
+.bodegas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+  overflow-y: auto; // ✅ CRÍTICO: Scroll para la grilla
+  max-height: calc(65vh - 150px);
+  
+  .bodega-card {
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.2s, box-shadow 0.2s;
+    height: fit-content; // ✅ Altura automática
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--card-hover-shadow, 0 4px 12px rgba(0,0,0,0.15));
+    }
+    
+    .bodega-header {
+      background: var(--surface-section);
+      padding: 1rem;
+      border-bottom: 1px solid var(--surface-border);
+      
+      h4 {
+        margin: 0 0 0.5rem 0;
+        color: var(--primary-color);
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+      
+      .ubicacion {
+        margin: 0;
+        color: var(--text-color-secondary);
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        
+        i {
+          color: var(--primary-color);
+        }
+      }
+    }
+    
+    .bodega-stats {
+      padding: 1rem;
+      display: flex;
+      justify-content: space-around;
+      background: var(--surface-card);
+      
+      .stat {
+        text-align: center;
+        
+        .value {
+          display: block;
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: var(--primary-color);
+          line-height: 1;
+        }
+        
+        .label {
+          display: block;
+          font-size: 0.875rem;
+          color: var(--text-color-secondary);
+          margin-top: 0.25rem;
+        }
+      }
+    }
+  }
+}
+
+
+// Footer - CORREGIDO PARA DARK/LIGHT
+.inventario-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: var(--surface-section);
+  border-top: 1px solid var(--surface-border);
+  
+  .ultima-actualizacion {
+    color: var(--text-color-secondary);
+    font-size: 0.75rem;
+  }
+  
+  .footer-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+}
+
+// Table Content - CORREGIDO PARA DARK/LIGHT
+.codigo-producto {
+  background: var(--primary-100, rgba(var(--primary-rgb), 0.1));
+  color: var(--primary-700, var(--primary-color));
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  
+  // ✅ Soporte específico para dark theme
+  .my-app-dark & {
+    background: rgba(var(--primary-rgb, 33, 150, 243), 0.2);
+    color: var(--primary-300, #90caf9);
+  }
+}
+
+.producto-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  
+  strong {
+    color: var(--text-color);
+    font-size: 0.875rem;
+    line-height: 1.2;
+  }
+  
+  .unidad {
+    color: var(--text-color-secondary);
+    font-size: 0.75rem;
+    background: var(--surface-100, var(--surface-hover));
+    padding: 0.125rem 0.375rem;
+    border-radius: 12px;
+    align-self: flex-start;
+    
+    .my-app-dark & {
+      background: var(--surface-hover);
+    }
+  }
+}
+
+.bodega-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  
+  .nombre {
+    color: var(--text-color);
+    font-weight: 500;
+    font-size: 0.875rem;
+  }
+  
+  .ubicacion {
+    color: var(--text-color-secondary);
+    font-size: 0.75rem;
+  }
+}
+
+.movimientos-count {
+  color: var(--text-color);
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.movimientos-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  margin-top: 0.25rem;
+  
+  small {
+    font-size: 0.75rem;
+    
+    &.entradas {
+      color: var(--green-600);
+      
+      .my-app-dark & {
+        color: var(--green-400);
+      }
+    }
+    
+    &.salidas {
+      color: var(--red-600);
+      
+      .my-app-dark & {
+        color: var(--red-400);
+      }
+    }
+  }
+}
+
+.fecha-ultimo {
+  color: var(--text-color-secondary);
+  font-size: 0.875rem;
+}
+
+.bodegas-count {
+  color: var(--text-color-secondary);
+  font-size: 0.875rem;
+}
+
+.stock-total {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .inventario-stats .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .bodegas-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .inventario-footer {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+    
+    .footer-actions {
+      justify-content: stretch;
+      
+      ::ng-deep .p-button {
+        flex: 1;
+      }
+    }
+  }
+}
+
+// ✅ FIXES ESPECÍFICOS PARA DARK THEME
+.my-app-dark {
+  .inventario-dialog {
+    .p-dialog-header {
+      background: var(--primary-600) !important;
+    }
+  }
+  
+  .stat-card {
+    background: var(--surface-card) !important;
+    box-shadow: 0 2px 4px rgba(255,255,255,0.05) !important;
+    
+    &:hover {
+      box-shadow: 0 4px 8px rgba(255,255,255,0.1) !important;
+    }
+  }
+  
+  .bodega-card {
+    box-shadow: 0 2px 4px rgba(255,255,255,0.05) !important;
+    
+    &:hover {
+      box-shadow: 0 4px 12px rgba(255,255,255,0.1) !important;
+    }
+  }
+}
