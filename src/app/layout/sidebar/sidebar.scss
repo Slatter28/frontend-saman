@@ -38,18 +38,50 @@
 
       .nav-item {
         margin-bottom: 0.25rem;
+        position: relative;
 
         &.active {
-          .nav-link {
+          // Active indicator bar on the left
+          &::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
             background: var(--primary-color);
-            color: white;
+            border-radius: 0 4px 4px 0;
+            z-index: 1;
+          }
+
+          .nav-link {
+            background: var(--primary-50);
+            color: var(--primary-700);
+            font-weight: 700;
+            border-left: 4px solid transparent; // Compensate for the indicator
 
             .nav-icon {
-              color: white;
+              color: var(--primary-700);
+              transform: scale(1.1);
+              font-weight: bold;
+            }
+
+            .nav-text {
+              font-weight: 700;
+              color: var(--primary-700);
             }
 
             &:hover {
-              background: var(--primary-600);
+              background: var(--primary-100);
+              color: var(--primary-800);
+              
+              .nav-icon {
+                color: var(--primary-800);
+              }
+              
+              .nav-text {
+                color: var(--primary-800);
+              }
             }
           }
         }
@@ -111,11 +143,24 @@
     .sidebar-nav {
       .nav-list {
         .nav-item {
+          &.active {
+            &::before {
+              left: 0.5rem;
+              right: 0.5rem;
+              width: auto;
+              height: 4px;
+              top: auto;
+              bottom: 0;
+              border-radius: 4px 4px 0 0;
+            }
+          }
+
           .nav-link {
             justify-content: center;
             margin-right: 0;
             border-radius: 4px;
             margin: 0 0.5rem;
+            border-left: none;
 
             .nav-text {
               display: none;
@@ -158,6 +203,41 @@
     border-top-color: var(--surface-border);
     border-bottom-color: var(--surface-border);
     box-shadow: 4px 0 12px rgba(0, 0, 0, 0.2);
+
+    .sidebar-nav {
+      .nav-list {
+        .nav-item {
+          &.active {
+            .nav-link {
+              background: rgba(var(--primary-color-rgb), 0.2);
+              color: var(--primary-300);
+              
+              .nav-icon {
+                color: var(--primary-300);
+              }
+              
+              .nav-text {
+                color: var(--primary-300);
+                font-weight: 700;
+              }
+              
+              &:hover {
+                background: rgba(var(--primary-color-rgb), 0.3);
+                color: var(--primary-200);
+                
+                .nav-icon {
+                  color: var(--primary-200);
+                }
+                
+                .nav-text {
+                  color: var(--primary-200);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
 

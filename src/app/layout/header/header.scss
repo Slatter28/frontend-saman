@@ -26,7 +26,7 @@
     .sidebar-toggle-btn {
       width: 2.5rem;
       height: 2.5rem;
-      color: var(--text-color-secondary);
+      color: var(--text-color);
 
       &:hover {
         color: var(--primary-color);
@@ -42,7 +42,7 @@
       .logo-icon {
         width: 2.5rem;
         height: 2.5rem;
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-600) 100%);
+        background: var(--primary-color);
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -51,17 +51,14 @@
 
         i {
           font-size: 1.25rem;
-          color: white;
+          color: var(--primary-color-text);
         }
       }
 
       .company-name {
         font-size: 1.5rem;
         font-weight: 700;
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-600) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: var(--primary-color);
         letter-spacing: 0.05em;
       }
     }
@@ -75,7 +72,7 @@
     .theme-toggle-btn {
       width: 2.5rem;
       height: 2.5rem;
-      color: var(--text-color-secondary);
+      color: var(--text-color);
 
       &:hover {
         color: var(--primary-color);
@@ -215,12 +212,28 @@
     border-right-color: var(--surface-border);
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
     
+    
     .header-right {
       .user-section {
         .user-menu-dropdown {
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
           background: var(--surface-card);
           border-color: var(--surface-border);
+        }
+        
+        .user-menu-content {
+          .menu-item {
+            &.logout {
+              &:hover {
+                background: rgba(var(--red-500-rgb), 0.1);
+                color: var(--red-400);
+              }
+
+              &:hover i {
+                color: var(--red-400);
+              }
+            }
+          }
         }
       }
     }

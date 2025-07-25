@@ -176,223 +176,152 @@
 
   // Table Section
   .table-section {
-    .table-wrapper {
-      width: 100%;
+    overflow-x: auto;
+    
+    ::ng-deep .p-card {
       overflow-x: auto;
-      overflow-y: hidden;
-      
-      // Scroll styling
-      &::-webkit-scrollbar {
-        height: 8px;
-      }
-      
-      &::-webkit-scrollbar-track {
-        background: var(--surface-100);
-        border-radius: 4px;
-      }
-      
-      &::-webkit-scrollbar-thumb {
-        background: var(--surface-400);
-        border-radius: 4px;
-        
-        &:hover {
-          background: var(--surface-500);
-        }
-      }
     }
-
-    ::ng-deep .p-table {
-      .p-table-wrapper {
-        overflow-x: auto;
-      }
-
+    
+    ::ng-deep .p-datatable {
       .p-datatable-thead > tr > th {
-        background: var(--surface-section);
+        background: var(--surface-100);
         color: var(--text-color);
         font-weight: 600;
-        padding: 0.75rem;
-        border: 1px solid var(--surface-border);
+        padding: 1rem;
+        border-bottom: 2px solid var(--surface-border);
         font-size: 0.9rem;
-        white-space: nowrap;
-        
-        &[style*="text-align: center"] {
-          text-align: center;
-        }
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
       }
-
+      
       .p-datatable-tbody > tr > td {
-        padding: 0.75rem;
-        border: 1px solid var(--surface-border);
+        padding: 1rem;
+        border-bottom: 1px solid var(--surface-border);
         vertical-align: middle;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
       }
-
-      .p-datatable-tbody > tr:nth-child(even) {
-        background: var(--surface-50);
-      }
-
+      
       .p-datatable-tbody > tr:hover {
         background: var(--surface-hover);
       }
+      
+      .p-datatable-tbody > tr:nth-child(even) {
+        background: var(--surface-50);
+      }
+      
+      .p-datatable-tbody > tr:nth-child(even):hover {
+        background: var(--surface-hover);
+      }
+    }
+  }
 
-      // Custom cell styles
-      .id-badge {
-        display: inline-block;
-        padding: 0.25rem 0.5rem;
-        background: var(--surface-200);
+  // Custom cell styles
+  .id-badge {
+    display: inline-block;
+    background: var(--primary-color);
+    color: var(--primary-color-text);
+    padding: 0.4rem 0.8rem;
+    border-radius: 1rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    letter-spacing: 0.5px;
+  }
+
+  .nombre-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .bodega-icon {
+      color: var(--primary-color);
+      font-size: 1rem;
+    }
+
+    .nombre {
+      font-weight: 600;
+      color: var(--text-color);
+    }
+  }
+
+  .ubicacion-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .ubicacion-icon {
+      color: var(--orange-500);
+      font-size: 0.9rem;
+    }
+
+    .ubicacion {
+      color: var(--text-color-secondary);
+      font-size: 0.9rem;
+    }
+  }
+
+  .estado-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+
+  .fecha {
+    color: var(--text-color-secondary);
+    font-size: 0.85rem;
+  }
+
+  .table-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    align-items: center;
+
+    ::ng-deep .p-button {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  // Empty state
+  .empty-message {
+    text-align: center;
+    padding: 3rem 1rem;
+
+    .empty-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+
+      .empty-icon {
+        font-size: 4rem;
+        color: var(--surface-400);
+      }
+
+      h3 {
+        margin: 0;
         color: var(--text-color);
-        border-radius: 4px;
-        font-size: 0.8rem;
         font-weight: 600;
       }
 
-      .nombre-cell {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-
-        .bodega-icon {
-          color: var(--primary-color);
-          font-size: 1rem;
-        }
-
-        .nombre {
-          font-weight: 600;
-          color: var(--text-color);
-        }
-      }
-
-      .ubicacion-cell {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-
-        .ubicacion-icon {
-          color: var(--orange-500);
-          font-size: 0.9rem;
-        }
-
-        .ubicacion {
-          color: var(--text-color-secondary);
-          font-size: 0.9rem;
-          max-width: 220px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          display: inline-block;
-        }
-      }
-
-      .estado-cell {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-      }
-
-      .fecha {
+      p {
+        margin: 0;
         color: var(--text-color-secondary);
-        font-size: 0.85rem;
-      }
-
-      .table-actions {
-        display: flex;
-        gap: 0.5rem;
-        justify-content: center;
-        align-items: center;
-        padding: 0.25rem;
-        width: 100%;
-        min-height: 3rem;
-
-        ::ng-deep .p-button {
-          width: 2.5rem;
-          height: 2.5rem;
-          border-radius: 50%;
-          transition: all 0.2s ease;
-          border: none;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          
-          &:hover {
-            transform: scale(1.1);
-          }
-
-          &.p-button-text.p-button-info {
-            color: var(--blue-500);
-            background: transparent;
-
-            &:hover {
-              background: var(--blue-50);
-              color: var(--blue-600);
-            }
-          }
-
-          &.p-button-text.p-button-warn {
-            color: var(--orange-500);
-            background: transparent;
-
-            &:hover {
-              background: var(--orange-50);
-              color: var(--orange-600);
-            }
-          }
-
-          &.p-button-text.p-button-danger {
-            color: var(--red-500);
-            background: transparent;
-
-            &:hover {
-              background: var(--red-50);
-              color: var(--red-600);
-            }
-          }
-
-          .p-button-icon {
-            font-size: 1rem;
-          }
-        }
-      }
-
-      // Empty state
-      .empty-message {
-        text-align: center;
-        padding: 3rem 1rem;
-
-        .empty-content {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 1rem;
-
-          .empty-icon {
-            font-size: 4rem;
-            color: var(--surface-400);
-          }
-
-          h3 {
-            margin: 0;
-            color: var(--text-color);
-            font-weight: 600;
-          }
-
-          p {
-            margin: 0;
-            color: var(--text-color-secondary);
-          }
-        }
       }
     }
+  }
 
-    ::ng-deep .p-paginator {
-      background: var(--surface-section);
-      border: 1px solid var(--surface-border);
-      border-top: none;
-      padding: 0.75rem;
-      overflow-x: auto;
-    }
+  ::ng-deep .p-paginator {
+    background: var(--surface-section);
+    border: 1px solid var(--surface-border);
+    border-top: none;
+    padding: 0.75rem;
   }
 
   // Dialog Styles
@@ -766,21 +695,15 @@
     }
 
     .table-section {
-      .table-wrapper {
-        // Force horizontal scroll on mobile
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        
-        &::-webkit-scrollbar {
-          height: 6px;
-        }
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch;
+      
+      ::ng-deep .p-card {
+        overflow-x: auto !important;
       }
 
-      ::ng-deep .p-table {
-        // Ensure minimum table width on mobile
-        .p-datatable-wrapper {
-          min-width: 900px;
-        }
+      ::ng-deep .p-datatable {
+        min-width: 80rem !important;
 
         .p-datatable-thead > tr > th,
         .p-datatable-tbody > tr > td {
@@ -871,34 +794,32 @@
     }
 
     .table-section {
-      .table-wrapper {
-        // Enhanced mobile scrolling
-        overflow-x: auto;
-        overflow-y: hidden;
-        -webkit-overflow-scrolling: touch;
-        scroll-behavior: smooth;
-        
-        // Show scroll hint
-        &::after {
-          content: "← Desliza para ver más →";
-          position: absolute;
-          bottom: 0;
-          left: 50%;
-          transform: translateX(-50%);
-          background: var(--surface-700);
-          color: white;
-          padding: 0.25rem 0.5rem;
-          border-radius: 4px 4px 0 0;
-          font-size: 0.7rem;
-          opacity: 0.8;
-          pointer-events: none;
-        }
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch;
+      position: relative;
+      
+      // Show scroll hint
+      &::after {
+        content: "← Desliza para ver más →";
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--surface-700);
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px 4px 0 0;
+        font-size: 0.7rem;
+        opacity: 0.8;
+        pointer-events: none;
+      }
+      
+      ::ng-deep .p-card {
+        overflow-x: auto !important;
       }
 
-      ::ng-deep .p-table {
-        .p-datatable-wrapper {
-          min-width: 900px; // Ensure table doesn't compress
-        }
+      ::ng-deep .p-datatable {
+        min-width: 80rem !important;
 
         .p-datatable-thead > tr > th,
         .p-datatable-tbody > tr > td {

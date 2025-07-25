@@ -76,6 +76,7 @@ interface ProductoFormulario {
 })
 export class Productos implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
+  private searchSubject = new Subject<string>();
 
   // Data
   productos: Producto[] = [];
@@ -151,7 +152,17 @@ export class Productos implements OnInit, OnDestroy {
   }
 
   private setupGlobalFilterListener(): void {
-    // Implementar debounce para el filtro global si es necesario
+    // Crear un Subject para el debounce del filtro
+    this.searchSubject = new Subject<string>();
+    
+    this.searchSubject.pipe(
+      debounceTime(300), // Esperar 300ms después del último input
+      distinctUntilChanged(), // Solo procesar si el valor cambió
+      takeUntil(this.destroy$)
+    ).subscribe(searchTerm => {
+      this.globalFilter = searchTerm;
+      this.performSearch();
+    });
   }
 
   loadProductos(): void {
@@ -198,15 +209,77 @@ export class Productos implements OnInit, OnDestroy {
 
   onGlobalFilter(event: Event): void {
     const target = event.target as HTMLInputElement;
-    this.globalFilter = target.value;
-    
-    // Aplicar filtros - convertir empty string a undefined
+    this.searchSubject.next(target.value);
+  }
+
+  private performSearch(): void {
     const filterValue = this.globalFilter.trim();
-    this.filtros.descripcion = filterValue ? filterValue : undefined;
-    this.filtros.codigo = filterValue ? filterValue : undefined;
+    
+    // Limpiar todos los filtros de búsqueda
+    this.filtros.descripcion = undefined;
+    this.filtros.codigo = undefined;
+    
+    // Si hay texto de búsqueda, hacer búsquedas secuenciales
+    if (filterValue) {
+      this.searchWithBothFields(filterValue);
+      return;
+    }
+    
+    // Si no hay filtro, cargar todos los productos
     this.filtros.page = 1;
     this.first = 0;
     this.loadProductos();
+  }
+
+  private searchWithBothFields(searchTerm: string): void {
+    // Primero intentar buscar por código
+    this.filtros.codigo = searchTerm;
+    this.filtros.descripcion = undefined;
+    this.filtros.page = 1;
+    this.first = 0;
+    
+    // Ejecutar búsqueda por código
+    this.loading = true;
+    this.productosService.getProductos(this.filtros)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: ProductosResponse) => {
+          if (response.data.length > 0) {
+            // Encontró resultados por código
+            this.productos = response.data;
+            this.totalRecords = response.meta.total;
+            this.loading = false;
+            this.cdr.detectChanges();
+          } else {
+            // No encontró por código, buscar por descripción
+            this.searchByDescription(searchTerm);
+          }
+        },
+        error: (error) => {
+          // Si falla la búsqueda por código, intentar por descripción
+          this.searchByDescription(searchTerm);
+        }
+      });
+  }
+
+  private searchByDescription(searchTerm: string): void {
+    this.filtros.codigo = undefined;
+    this.filtros.descripcion = searchTerm;
+    
+    this.productosService.getProductos(this.filtros)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: ProductosResponse) => {
+          this.productos = response.data;
+          this.totalRecords = response.meta.total;
+          this.loading = false;
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          this.loading = false;
+          this.showError('Error al buscar productos', error);
+        }
+      });
   }
 
   // CRUD Operations

@@ -192,29 +192,10 @@
 
   // Table Section
   .table-section {
-    .table-wrapper {
-      width: 100%;
+    overflow-x: auto;
+    
+    ::ng-deep .p-card {
       overflow-x: auto;
-      overflow-y: hidden;
-      
-      // Scroll styling
-      &::-webkit-scrollbar {
-        height: 8px;
-      }
-      
-      &::-webkit-scrollbar-track {
-        background: var(--surface-100);
-        border-radius: 4px;
-      }
-      
-      &::-webkit-scrollbar-thumb {
-        background: var(--surface-400);
-        border-radius: 4px;
-        
-        &:hover {
-          background: var(--surface-500);
-        }
-      }
     }
 
     ::ng-deep .p-table {
@@ -725,21 +706,15 @@
     }
 
     .table-section {
-      .table-wrapper {
-        // Force horizontal scroll on mobile
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        
-        &::-webkit-scrollbar {
-          height: 6px;
-        }
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch;
+      
+      ::ng-deep .p-card {
+        overflow-x: auto !important;
       }
 
-      ::ng-deep .p-table {
-        // Ensure minimum table width on mobile
-        .p-datatable-wrapper {
-          min-width: 800px;
-        }
+      ::ng-deep .p-datatable {
+        min-width: 80rem !important;
 
         .p-datatable-thead > tr > th,
         .p-datatable-tbody > tr > td {
@@ -840,34 +815,32 @@
     }
 
     .table-section {
-      .table-wrapper {
-        // Enhanced mobile scrolling
-        overflow-x: auto;
-        overflow-y: hidden;
-        -webkit-overflow-scrolling: touch;
-        scroll-behavior: smooth;
-        
-        // Show scroll hint
-        &::after {
-          content: "← Desliza para ver más →";
-          position: absolute;
-          bottom: 0;
-          left: 50%;
-          transform: translateX(-50%);
-          background: var(--surface-700);
-          color: white;
-          padding: 0.25rem 0.5rem;
-          border-radius: 4px 4px 0 0;
-          font-size: 0.7rem;
-          opacity: 0.8;
-          pointer-events: none;
-        }
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch;
+      position: relative;
+      
+      // Show scroll hint
+      &::after {
+        content: "← Desliza para ver más →";
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--surface-700);
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px 4px 0 0;
+        font-size: 0.7rem;
+        opacity: 0.8;
+        pointer-events: none;
+      }
+      
+      ::ng-deep .p-card {
+        overflow-x: auto !important;
       }
 
-      ::ng-deep .p-table {
-        .p-datatable-wrapper {
-          min-width: 800px; // Ensure table doesn't compress
-        }
+      ::ng-deep .p-datatable {
+        min-width: 80rem !important;
 
         .p-datatable-thead > tr > th,
         .p-datatable-tbody > tr > td {

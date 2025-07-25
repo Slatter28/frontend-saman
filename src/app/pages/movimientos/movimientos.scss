@@ -643,7 +643,6 @@
 // Tabs - CORREGIDO PARA DARK/LIGHT
 // REEMPLAZAR la sección de Tabs en movimientos.scss con esta versión CORREGIDA:
 
-// Tabs - CORREGIDO PARA SCROLL
 .inventario-tabs {
   flex: 1;
   overflow: hidden;
@@ -700,82 +699,60 @@
       
       p-tabpanel {
         height: 100%;
-        overflow: auto; // ✅ CRÍTICO: Permitir scroll
-        padding: 0; // ✅ CORREGIDO: Quitar padding del panel
+        overflow: auto !important;
+        padding: 0;
         background: var(--surface-card);
         
         &:not(.p-tabpanel-active) {
           display: none;
         }
         
-        // ✅ NUEVO: Contenedor interno con padding
-        > div {
+        .tab-content {
           padding: 1rem;
-          min-height: 100%;
+          height: auto;
+          min-height: 450px;
         }
       }
     }
   }
 }
 
-// ✅ NUEVO: Estilos específicos para las tablas con scroll
 .inventario-table,
 .resumen-table {
-  height: 100%;
-  
   ::ng-deep .p-datatable {
-    background: var(--surface-card);
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    
     .p-datatable-wrapper {
-      flex: 1;
-      overflow: auto; // ✅ CRÍTICO: Scroll en el wrapper de la tabla
-      max-height: calc(65vh - 200px); // ✅ Altura máxima para forzar scroll
+      max-height: 400px !important;
+      overflow-y: auto !important;
+      overflow-x: auto !important;
     }
     
     .p-datatable-thead > tr > th {
-      background: var(--surface-section);
-      color: var(--text-color);
+      background: var(--surface-section) !important;
+      color: var(--text-color) !important;
       font-weight: 600;
-      font-size: 0.875rem;
-      padding: 0.75rem 0.5rem;
-      border-bottom: 2px solid var(--surface-border);
-      position: sticky; // ✅ Header fijo al hacer scroll
+      position: sticky;
       top: 0;
-      z-index: 1;
+      z-index: 10;
     }
     
     .p-datatable-tbody > tr > td {
-      padding: 0.75rem 0.5rem;
-      border-bottom: 1px solid var(--surface-border);
-      vertical-align: top;
-      background: var(--surface-card);
-      color: var(--text-color);
+      background: var(--surface-card) !important;
+      color: var(--text-color) !important;
     }
     
     .p-datatable-tbody > tr:hover {
       background: var(--surface-hover) !important;
     }
-    
-    // ✅ NUEVO: Ajustar paginador
-    .p-paginator {
-      background: var(--surface-section);
-      border-top: 1px solid var(--surface-border);
-      flex-shrink: 0;
-    }
   }
 }
 
-// ✅ NUEVO: Estilos específicos para la grilla de bodegas
 .bodegas-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1rem;
   padding: 1rem;
-  overflow-y: auto; // ✅ CRÍTICO: Scroll para la grilla
-  max-height: calc(65vh - 150px);
+  max-height: 400px;
+  overflow-y: auto !important;
   
   .bodega-card {
     background: var(--surface-card);
@@ -784,7 +761,7 @@
     overflow: hidden;
     box-shadow: var(--card-shadow);
     transition: transform 0.2s, box-shadow 0.2s;
-    height: fit-content; // ✅ Altura automática
+    height: fit-content;
     
     &:hover {
       transform: translateY(-2px);
@@ -884,132 +861,9 @@
   }
 }
 
-// Tables - CORREGIDO PARA DARK/LIGHT
-.inventario-table,
-.resumen-table {
-  height: 100%;
-  
-  ::ng-deep .p-datatable {
-    background: var(--surface-card);
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    
-    .p-datatable-wrapper {
-      flex: 1;
-      overflow: auto; // ✅ CRÍTICO: Scroll en el wrapper de la tabla
-      max-height: calc(65vh - 200px); // ✅ Altura máxima para forzar scroll
-    }
-    
-    .p-datatable-thead > tr > th {
-      background: var(--surface-section);
-      color: var(--text-color);
-      font-weight: 600;
-      font-size: 0.875rem;
-      padding: 0.75rem 0.5rem;
-      border-bottom: 2px solid var(--surface-border);
-      position: sticky; // ✅ Header fijo al hacer scroll
-      top: 0;
-      z-index: 1;
-    }
-    
-    .p-datatable-tbody > tr > td {
-      padding: 0.75rem 0.5rem;
-      border-bottom: 1px solid var(--surface-border);
-      vertical-align: top;
-      background: var(--surface-card);
-      color: var(--text-color);
-    }
-    
-    .p-datatable-tbody > tr:hover {
-      background: var(--surface-hover) !important;
-    }
-    
-    // ✅ NUEVO: Ajustar paginador
-    .p-paginator {
-      background: var(--surface-section);
-      border-top: 1px solid var(--surface-border);
-      flex-shrink: 0;
-    }
-  }
-}
+// Estilos duplicados eliminados - ver definición anterior
 
-// Bodegas Grid - CORREGIDO PARA DARK/LIGHT
-.bodegas-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1rem;
-  padding: 1rem;
-  overflow-y: auto; // ✅ CRÍTICO: Scroll para la grilla
-  max-height: calc(65vh - 150px);
-  
-  .bodega-card {
-    background: var(--surface-card);
-    border: 1px solid var(--surface-border);
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: var(--card-shadow);
-    transition: transform 0.2s, box-shadow 0.2s;
-    height: fit-content; // ✅ Altura automática
-    
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--card-hover-shadow, 0 4px 12px rgba(0,0,0,0.15));
-    }
-    
-    .bodega-header {
-      background: var(--surface-section);
-      padding: 1rem;
-      border-bottom: 1px solid var(--surface-border);
-      
-      h4 {
-        margin: 0 0 0.5rem 0;
-        color: var(--primary-color);
-        font-size: 1.1rem;
-        font-weight: 600;
-      }
-      
-      .ubicacion {
-        margin: 0;
-        color: var(--text-color-secondary);
-        font-size: 0.875rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        
-        i {
-          color: var(--primary-color);
-        }
-      }
-    }
-    
-    .bodega-stats {
-      padding: 1rem;
-      display: flex;
-      justify-content: space-around;
-      background: var(--surface-card);
-      
-      .stat {
-        text-align: center;
-        
-        .value {
-          display: block;
-          font-size: 1.5rem;
-          font-weight: 700;
-          color: var(--primary-color);
-          line-height: 1;
-        }
-        
-        .label {
-          display: block;
-          font-size: 0.875rem;
-          color: var(--text-color-secondary);
-          margin-top: 0.25rem;
-        }
-      }
-    }
-  }
-}
+// Estilos duplicados eliminados - ver definición anterior
 
 
 // Footer - CORREGIDO PARA DARK/LIGHT

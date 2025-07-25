@@ -56,7 +56,7 @@ export class Sidebar implements OnInit {
       },
       {
         label: 'Movimientos',
-        icon: 'pi pi-exchange',
+        icon: 'pi pi-arrow-right-arrow-left',
         route: '/movimientos'
       },
       {

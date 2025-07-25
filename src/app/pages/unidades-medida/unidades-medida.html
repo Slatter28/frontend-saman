@@ -115,22 +115,19 @@
     <!-- Table Section -->
     <div class="table-section">
       <p-card header="Lista de Unidades de Medida">
-        <div class="table-wrapper">
-          <p-table 
-            [value]="unidades" 
-            [paginator]="true" 
-            [rows]="rows"
-            [totalRecords]="totalRecords"
-            [lazy]="true"
-            [loading]="loading"
-            [first]="first"
-            (onLazyLoad)="onPageChange($event)"
-            [showCurrentPageReport]="true"
-            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} unidades"
-            [tableStyle]="{'min-width': '800px'}"
-            dataKey="id"
-            [scrollable]="true"
-            scrollHeight="flex">
+        <p-table 
+          [value]="unidades" 
+          [paginator]="true" 
+          [rows]="rows"
+          [totalRecords]="totalRecords"
+          [lazy]="true"
+          [loading]="loading"
+          [first]="first"
+          (onLazyLoad)="onPageChange($event)"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} unidades"
+          [tableStyle]="{'min-width': '80rem'}"
+          styleClass="p-datatable-sm">
 
             <ng-template pTemplate="header">
               <tr>
@@ -224,8 +221,7 @@
                 </td>
               </tr>
             </ng-template>
-          </p-table>
-        </div>
+        </p-table>
       </p-card>
     </div>
   </div>
