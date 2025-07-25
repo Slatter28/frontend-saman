@@ -1,0 +1,1246 @@
+.productos-container {
+  padding: 1.5rem;
+  min-height: 100vh;
+  background-color: var(--surface-ground);
+
+  // Page Header
+  .page-header {
+    margin-bottom: 2rem;
+    
+    h1 {
+      color: var(--text-color);
+      font-size: 2.5rem;
+      font-weight: 600;
+      margin: 0 0 0.5rem 0;
+      line-height: 1.2;
+    }
+    
+    p {
+      color: var(--text-color-secondary);
+      font-size: 1.1rem;
+      margin: 0;
+      line-height: 1.4;
+    }
+  }
+
+  // Main Card
+  .main-card {
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--surface-border);
+    border-radius: var(--border-radius);
+    
+    ::ng-deep .p-card-body {
+      padding: 0;
+    }
+    
+    ::ng-deep .p-card-content {
+      padding: 0;
+    }
+  }
+
+  // Toolbar
+  .toolbar-custom {
+    border-bottom: 1px solid var(--surface-border);
+    padding: 1rem 1.5rem;
+    
+    .toolbar-start {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    
+    .toolbar-end {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    
+    ::ng-deep .p-toolbar {
+      background: var(--surface-card);
+      border: none;
+      padding: 0;
+    }
+  }
+
+  // Search Section
+  .search-section {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--surface-border);
+    background: var(--surface-50);
+    
+    .search-field {
+      width: 100%;
+      max-width: 400px;
+      
+      ::ng-deep .p-inputtext {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        font-size: 1rem;
+        border-radius: var(--border-radius);
+        border: 1px solid var(--surface-border);
+        background: var(--surface-card);
+        
+        &:focus {
+          border-color: var(--primary-color);
+          box-shadow: 0 0 0 0.2rem var(--primary-color-alpha);
+        }
+        
+        &::placeholder {
+          color: var(--text-color-secondary);
+        }
+      }
+      
+      ::ng-deep .p-icon {
+        left: 0.75rem;
+        color: var(--text-color-secondary);
+      }
+    }
+  }
+
+  // Table Styles
+  ::ng-deep .p-datatable {
+    .p-datatable-thead > tr > th {
+      background: var(--surface-100);
+      color: var(--text-color);
+      font-weight: 600;
+      padding: 1rem;
+      border-bottom: 2px solid var(--surface-border);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .p-datatable-tbody > tr > td {
+      padding: 1rem;
+      border-bottom: 1px solid var(--surface-border);
+      vertical-align: middle;
+    }
+    
+    .p-datatable-tbody > tr:hover {
+      background: var(--surface-hover);
+    }
+    
+    .p-datatable-tbody > tr:nth-child(even) {
+      background: var(--surface-50);
+    }
+    
+    .p-datatable-tbody > tr:nth-child(even):hover {
+      background: var(--surface-hover);
+    }
+  }
+
+  // Table Cell Content
+  .codigo-badge {
+    display: inline-block;
+    background: var(--primary-color);
+    color: var(--primary-color-text);
+    padding: 0.4rem 0.8rem;
+    border-radius: 1rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    letter-spacing: 0.5px;
+  }
+  
+  .descripcion-cell {
+    strong {
+      color: var(--text-color);
+      font-weight: 600;
+    }
+  }
+  
+  .fecha-text {
+    color: var(--text-color-secondary);
+    font-size: 0.875rem;
+  }
+
+  // Action Buttons
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    
+    ::ng-deep .p-button {
+      width: 2.5rem;
+      height: 2.5rem;
+      
+      .p-button-icon {
+        font-size: 0.875rem;
+      }
+    }
+  }
+
+  // Kardex Dialog Styles
+  ::ng-deep .kardex-dialog {
+    .p-dialog-header {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-600));
+      border-bottom: none;
+      color: white;
+      
+      .p-dialog-title {
+        font-weight: 600;
+        color: white;
+        font-size: 1.25rem;
+      }
+      
+      .p-dialog-header-close {
+        color: white;
+        
+        &:hover {
+          background: rgba(255, 255, 255, 0.1);
+        }
+      }
+    }
+    
+    .p-dialog-content {
+      padding: 0;
+      background: var(--surface-ground);
+      max-height: calc(80vh - 120px);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  // Loading State
+  .kardex-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    background: var(--surface-card);
+    min-height: 400px;
+    
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+      text-align: center;
+      max-width: 400px;
+    }
+    
+    .loading-spinner {
+      position: relative;
+      
+      ::ng-deep .custom-spinner {
+        .p-progress-spinner-circle {
+          stroke: var(--primary-color);
+          filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.3));
+        }
+      }
+    }
+    
+    .loading-content {
+      h3 {
+        margin: 0 0 0.75rem 0;
+        color: var(--text-color);
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
+      
+      p {
+        margin: 0 0 1.5rem 0;
+        color: var(--text-color-secondary);
+        font-size: 1rem;
+        line-height: 1.5;
+        
+        strong {
+          color: var(--primary-color);
+          font-weight: 600;
+        }
+      }
+    }
+    
+    .loading-dots {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      
+      span {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        animation: pulse 1.5s ease-in-out infinite;
+        
+        &:nth-child(1) { animation-delay: 0s; }
+        &:nth-child(2) { animation-delay: 0.2s; }
+        &:nth-child(3) { animation-delay: 0.4s; }
+      }
+    }
+  }
+
+  @keyframes pulse {
+    0%, 80%, 100% {
+      transform: scale(0.8);
+      opacity: 0.5;
+    }
+    40% {
+      transform: scale(1.2);
+      opacity: 1;
+    }
+  }
+
+  // Error State
+  .kardex-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    background: var(--surface-card);
+    min-height: 400px;
+    
+    .error-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+      text-align: center;
+      max-width: 400px;
+    }
+    
+    .error-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(239, 68, 68, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      i {
+        font-size: 2.5rem;
+        color: var(--red-500);
+      }
+    }
+    
+    .error-content {
+      h3 {
+        margin: 0 0 0.75rem 0;
+        color: var(--text-color);
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
+      
+      p {
+        margin: 0 0 2rem 0;
+        color: var(--text-color-secondary);
+        font-size: 1rem;
+        line-height: 1.5;
+      }
+    }
+    
+    .error-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+
+  .kardex-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .kardex-header {
+    padding: 2rem;
+    background: linear-gradient(135deg, var(--surface-50), var(--surface-100));
+    border-bottom: 1px solid var(--surface-border);
+    
+    .product-info {
+      .product-title {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        
+        h3 {
+          margin: 0;
+          color: var(--text-color);
+          font-size: 1.75rem;
+          font-weight: 700;
+          flex: 1;
+          min-width: 300px;
+        }
+      }
+      
+      .product-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        
+        .detail-item {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+          padding: 1rem;
+          background: var(--surface-card);
+          border-radius: var(--border-radius);
+          border: 1px solid var(--surface-border);
+          
+          .detail-label {
+            font-size: 0.875rem;
+            color: var(--text-color-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+          
+          .detail-value {
+            font-size: 1.125rem;
+            color: var(--text-color);
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+
+  .kardex-stats {
+    padding: 2rem;
+    background: var(--surface-card);
+    border-bottom: 1px solid var(--surface-border);
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      
+      .stat-card {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid var(--surface-border);
+        background: var(--surface-card);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 4px;
+          background: linear-gradient(90deg, var(--primary-color), var(--primary-400));
+        }
+        
+        &:hover {
+          box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+          transform: translateY(-2px);
+        }
+        
+        .stat-icon {
+          width: 48px;
+          height: 48px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.5rem;
+          color: white;
+          flex-shrink: 0;
+        }
+        
+        .stat-info {
+          flex: 1;
+          
+          .stat-label {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-color-secondary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+          }
+          
+          .stat-value {
+            display: block;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-color);
+            line-height: 1;
+          }
+        }
+        
+        &.entrada {
+          .stat-icon {
+            background: linear-gradient(135deg, var(--green-500), var(--green-400));
+          }
+          &::before {
+            background: var(--green-500);
+          }
+        }
+        
+        &.salida {
+          .stat-icon {
+            background: linear-gradient(135deg, var(--red-500), var(--red-400));
+          }
+          &::before {
+            background: var(--red-500);
+          }
+        }
+        
+        &.movimientos {
+          .stat-icon {
+            background: linear-gradient(135deg, var(--blue-500), var(--blue-400));
+          }
+          &::before {
+            background: var(--blue-500);
+          }
+        }
+        
+        &.promedio {
+          .stat-icon {
+            background: linear-gradient(135deg, var(--purple-500), var(--purple-400));
+          }
+          &::before {
+            background: var(--purple-500);
+          }
+        }
+      }
+    }
+  }
+
+  .kardex-table-container {
+    flex: 1;
+    padding: 2rem;
+    background: var(--surface-card);
+    overflow: auto;
+    
+    .table-header {
+      margin-bottom: 1.5rem;
+      
+      h4 {
+        margin: 0 0 0.5rem 0;
+        color: var(--text-color);
+        font-size: 1.25rem;
+        font-weight: 600;
+      }
+      
+      .table-description {
+        margin: 0;
+        color: var(--text-color-secondary);
+        font-size: 0.9rem;
+      }
+    }
+    
+    ::ng-deep .kardex-table {
+      .p-datatable-thead > tr > th {
+        background: var(--surface-100);
+        color: var(--text-color);
+        font-weight: 600;
+        padding: 1rem 0.75rem;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid var(--primary-color);
+      }
+      
+      .p-datatable-tbody > tr > td {
+        padding: 1rem 0.75rem;
+        border-bottom: 1px solid var(--surface-border);
+        vertical-align: middle;
+        font-size: 0.9rem;
+      }
+      
+      .p-datatable-tbody > tr:hover {
+        background: var(--surface-hover);
+      }
+      
+      .p-datatable-tbody > tr:nth-child(even) {
+        background: var(--surface-50);
+      }
+      
+      .p-datatable-tbody > tr:nth-child(even):hover {
+        background: var(--surface-hover);
+      }
+    }
+  }
+
+  // Kardex Table Cell Styles
+  .fecha-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    
+    .fecha-date {
+      font-weight: 600;
+      color: var(--text-color);
+      font-size: 0.9rem;
+    }
+    
+    .fecha-time {
+      font-size: 0.8rem;
+      color: var(--text-color-secondary);
+    }
+  }
+
+  .cantidad-cell {
+    font-weight: 700;
+    font-size: 1rem;
+    
+    &.entrada {
+      color: var(--green-600);
+    }
+    
+    &.salida {
+      color: var(--red-600);
+    }
+  }
+
+  .saldo-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    
+    .saldo-value {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text-color);
+    }
+    
+    .saldo-unit {
+      font-size: 0.75rem;
+      color: var(--text-color-secondary);
+      text-transform: uppercase;
+    }
+  }
+
+  .info-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    
+    .cell-icon {
+      color: var(--text-color-secondary);
+      font-size: 0.875rem;
+      flex-shrink: 0;
+    }
+    
+    span {
+      font-weight: 500;
+      color: var(--text-color);
+    }
+  }
+
+  .cliente-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    
+    .cliente-nombre {
+      font-weight: 500;
+      color: var(--text-color);
+    }
+    
+    .cliente-tipo {
+      font-size: 0.75rem;
+      color: var(--text-color-secondary);
+      font-style: italic;
+    }
+  }
+
+  .no-data {
+    color: var(--text-color-secondary);
+    font-style: italic;
+    font-size: 0.875rem;
+  }
+
+  .observacion-cell {
+    color: var(--text-color-secondary);
+    font-size: 0.875rem;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: help;
+  }
+
+  .empty-kardex {
+    text-align: center;
+    padding: 3rem 1rem;
+    
+    .empty-content {
+      .empty-icon {
+        font-size: 4rem;
+        color: var(--text-color-secondary);
+        margin-bottom: 1.5rem;
+      }
+      
+      h4 {
+        color: var(--text-color);
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0 0 0.75rem 0;
+      }
+      
+      p {
+        color: var(--text-color-secondary);
+        margin: 0;
+        font-size: 1rem;
+        line-height: 1.5;
+      }
+    }
+  }
+
+  .kardex-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-top: 1px solid var(--surface-border);
+    background: var(--surface-50);
+    
+    .footer-info {
+      .footer-text {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-color-secondary);
+        font-size: 0.875rem;
+        
+        i {
+          color: var(--primary-color);
+        }
+      }
+    }
+    
+    .footer-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+  }
+
+  // Empty State
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    
+    .empty-content {
+      .empty-icon {
+        font-size: 4rem;
+        color: var(--text-color-secondary);
+        margin-bottom: 1rem;
+      }
+      
+      h3 {
+        color: var(--text-color);
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0 0 0.5rem 0;
+      }
+      
+      p {
+        color: var(--text-color-secondary);
+        margin: 0 0 1.5rem 0;
+        font-size: 1rem;
+        line-height: 1.5;
+      }
+    }
+  }
+
+  // Dialog Styles
+  ::ng-deep .producto-dialog {
+    .p-dialog-header {
+      background: var(--surface-card);
+      border-bottom: 1px solid var(--surface-border);
+      
+      .p-dialog-title {
+        font-weight: 600;
+        color: var(--text-color);
+      }
+    }
+    
+    .p-dialog-content {
+      padding: 2rem;
+      background: var(--surface-card);
+    }
+  }
+
+  // Form Styles
+  .form-field {
+    margin-bottom: 1.5rem;
+    
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--text-color);
+      font-size: 0.9rem;
+      
+      &.required::after {
+        content: ' *';
+        color: var(--red-500);
+      }
+    }
+    
+    ::ng-deep .p-inputtext,
+    ::ng-deep .p-select {
+      width: 100%;
+      
+      &.ng-invalid {
+        border-color: var(--red-500);
+        
+        &:focus {
+          border-color: var(--red-500);
+          box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.2);
+        }
+      }
+    }
+    
+    .error-message {
+      color: var(--red-500);
+      font-size: 0.8rem;
+      margin-top: 0.25rem;
+      display: block;
+    }
+  }
+
+  // Dialog Footer
+  .dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--surface-border);
+  }
+
+  // Import Dialog
+  .import-content {
+    .import-info {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      padding: 1rem;
+      background: var(--blue-50);
+      border: 1px solid var(--blue-200);
+      border-radius: var(--border-radius);
+      
+      .info-icon {
+        color: var(--blue-500);
+        font-size: 1.5rem;
+        margin-top: 0.25rem;
+        flex-shrink: 0;
+      }
+      
+      .info-text {
+        flex: 1;
+        
+        h4 {
+          margin: 0 0 0.5rem 0;
+          color: var(--blue-700);
+          font-weight: 600;
+        }
+        
+        ul {
+          margin: 0;
+          padding-left: 1.25rem;
+          color: var(--blue-600);
+          
+          li {
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+          }
+        }
+      }
+    }
+    
+    ::ng-deep .upload-button {
+      width: 100%;
+      
+      .p-button {
+        width: 100%;
+        justify-content: center;
+        padding: 1rem;
+        font-size: 1rem;
+      }
+    }
+  }
+
+  // Responsive Design
+  @media (max-width: 768px) {
+    padding: 1rem;
+    
+    .page-header {
+      margin-bottom: 1.5rem;
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      p {
+        font-size: 1rem;
+      }
+    }
+    
+    .toolbar-custom {
+      padding: 1rem;
+      
+      .toolbar-start,
+      .toolbar-end {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        width: 100%;
+      }
+      
+      ::ng-deep .p-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+      }
+    }
+    
+    .search-section {
+      padding: 1rem;
+      
+      .search-field {
+        max-width: none;
+      }
+    }
+    
+    // Table responsive
+    ::ng-deep .p-datatable {
+      .p-datatable-thead > tr > th,
+      .p-datatable-tbody > tr > td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.875rem;
+      }
+    }
+    
+    .action-buttons {
+      flex-direction: column;
+      
+      ::ng-deep .p-button {
+        width: 100%;
+        height: auto;
+        padding: 0.5rem;
+      }
+    }
+    
+    // Dialog responsive
+    ::ng-deep .producto-dialog {
+      width: 95vw !important;
+      
+      .p-dialog-content {
+        padding: 1.5rem;
+      }
+    }
+    
+    .dialog-footer {
+      flex-direction: column;
+      
+      ::ng-deep .p-button {
+        width: 100%;
+      }
+    }
+
+    // Kardex responsive
+    ::ng-deep .kardex-dialog {
+      width: 95vw !important;
+      height: 90vh !important;
+      
+      .p-dialog-content {
+        overflow: auto;
+      }
+    }
+
+    .kardex-loading,
+    .kardex-error {
+      padding: 2rem 1rem;
+      min-height: 300px;
+      
+      .loading-container,
+      .error-container {
+        max-width: 100%;
+        gap: 1.5rem;
+      }
+      
+      .loading-content,
+      .error-content {
+        h3 {
+          font-size: 1.25rem;
+        }
+        
+        p {
+          font-size: 0.9rem;
+        }
+      }
+      
+      .error-actions {
+        flex-direction: column;
+        
+        ::ng-deep .p-button {
+          width: 100%;
+        }
+      }
+    }
+
+    .kardex-header {
+      padding: 1.5rem 1rem;
+      
+      .product-info {
+        .product-title {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 1rem;
+          
+          h3 {
+            font-size: 1.25rem;
+            min-width: auto;
+          }
+        }
+        
+        .product-details {
+          grid-template-columns: 1fr;
+          gap: 1rem;
+          
+          .detail-item {
+            padding: 0.75rem;
+            
+            .detail-label {
+              font-size: 0.8rem;
+            }
+            
+            .detail-value {
+              font-size: 1rem;
+            }
+          }
+        }
+      }
+    }
+
+    .kardex-stats {
+      padding: 1.5rem 1rem;
+      
+      .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        
+        .stat-card {
+          padding: 1rem;
+          
+          .stat-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 1.25rem;
+          }
+          
+          .stat-info {
+            .stat-label {
+              font-size: 0.8rem;
+            }
+            
+            .stat-value {
+              font-size: 1.5rem;
+            }
+          }
+        }
+      }
+    }
+
+    .kardex-table-container {
+      padding: 1.5rem 1rem;
+      
+      .table-header {
+        h4 {
+          font-size: 1.125rem;
+        }
+        
+        .table-description {
+          font-size: 0.85rem;
+        }
+      }
+      
+      ::ng-deep .kardex-table {
+        font-size: 0.8rem;
+        
+        .p-datatable-thead > tr > th,
+        .p-datatable-tbody > tr > td {
+          padding: 0.75rem 0.5rem;
+          font-size: 0.8rem;
+        }
+        
+        .p-datatable-thead > tr > th {
+          font-size: 0.75rem;
+        }
+      }
+      
+      .fecha-cell {
+        .fecha-date {
+          font-size: 0.8rem;
+        }
+        
+        .fecha-time {
+          font-size: 0.7rem;
+        }
+      }
+      
+      .cantidad-cell {
+        font-size: 0.9rem;
+      }
+      
+      .saldo-cell {
+        .saldo-value {
+          font-size: 0.9rem;
+        }
+        
+        .saldo-unit {
+          font-size: 0.7rem;
+        }
+      }
+      
+      .info-cell {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+        
+        .cell-icon {
+          display: none;
+        }
+        
+        span {
+          font-size: 0.8rem;
+        }
+      }
+      
+      .cliente-info {
+        .cliente-nombre {
+          font-size: 0.8rem;
+        }
+        
+        .cliente-tipo {
+          font-size: 0.7rem;
+        }
+      }
+      
+      .observacion-cell {
+        font-size: 0.8rem;
+        max-width: 150px;
+      }
+    }
+
+    .kardex-footer {
+      padding: 1rem;
+      flex-direction: column;
+      gap: 1rem;
+      
+      .footer-info {
+        .footer-text {
+          font-size: 0.8rem;
+          justify-content: center;
+        }
+      }
+      
+      .footer-actions {
+        justify-content: center;
+        
+        ::ng-deep .p-button {
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.5rem;
+    
+    .toolbar-custom {
+      padding: 0.75rem;
+    }
+    
+    .search-section {
+      padding: 0.75rem;
+    }
+    
+    ::ng-deep .p-datatable {
+      font-size: 0.8rem;
+      
+      .p-datatable-thead > tr > th,
+      .p-datatable-tbody > tr > td {
+        padding: 0.5rem 0.25rem;
+      }
+    }
+
+    // Kardex mobile adjustments
+    ::ng-deep .kardex-dialog {
+      width: 98vw !important;
+      height: 95vh !important;
+    }
+
+    .kardex-header {
+      padding: 1rem 0.75rem;
+    }
+
+    .kardex-stats {
+      padding: 1rem 0.75rem;
+    }
+
+    .kardex-table-container {
+      padding: 1rem 0.75rem;
+      
+      ::ng-deep .kardex-table {
+        .p-datatable-thead > tr > th,
+        .p-datatable-tbody > tr > td {
+          padding: 0.5rem 0.25rem;
+          font-size: 0.75rem;
+        }
+      }
+    }
+
+    .kardex-footer {
+      padding: 0.75rem;
+    }
+
+    .kardex-loading,
+    .kardex-error {
+      padding: 1.5rem 0.75rem;
+      min-height: 250px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.5rem;
+    
+    .toolbar-custom {
+      padding: 0.75rem;
+    }
+    
+    .search-section {
+      padding: 0.75rem;
+    }
+    
+    ::ng-deep .p-datatable {
+      font-size: 0.8rem;
+      
+      .p-datatable-thead > tr > th,
+      .p-datatable-tbody > tr > td {
+        padding: 0.5rem 0.25rem;
+      }
+    }
+  }
+}
+
+// Dark mode adjustments
+@media (prefers-color-scheme: dark) {
+  .productos-container {
+    .codigo-badge {
+      background: var(--primary-400);
+    }
+    
+    .import-content .import-info {
+      background: rgba(59, 130, 246, 0.1);
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+  }
+}

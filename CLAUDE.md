@@ -36,7 +36,7 @@ This is an Angular 20.1 warehouse management application called "frontend-saman"
 ### Application Structure
 ```
 src/app/
-├── pages/           # Feature pages (auth, dashboard, unidades-medida)
+├── pages/           # Feature pages (auth, dashboard, unidades-medida, bodegas, clientes, productos)
 ├── layout/          # Layout components (header, sidebar, main-layout)  
 ├── services/        # Business logic and API services
 ├── guards/          # Route protection (auth-guard, login-guard)
@@ -56,7 +56,7 @@ src/app/
 ### Routing Architecture
 - **Layout-based routing** with MainLayout wrapper for protected routes
 - **Guard protection** on all authenticated routes
-- **Lazy loading** potential with feature modules
+- **Lazy loading** implemented for bodegas, clientes, and productos modules
 - **Login/Dashboard flow** with automatic redirection
 
 **Route Structure:**
@@ -71,7 +71,10 @@ src/app/
   canActivate: [authGuard],
   children: [
     { path: 'dashboard', component: Dashboard },
-    { path: 'unidades-medida', component: UnidadesMedida }
+    { path: 'unidades-medida', component: UnidadesMedida },
+    { path: 'bodegas', loadComponent: () => import('./pages/bodegas/bodegas').then(m => m.Bodegas) },
+    { path: 'clientes', loadComponent: () => import('./pages/clientes/clientes').then(m => m.Clientes) },
+    { path: 'productos', loadComponent: () => import('./pages/productos/productos').then(m => m.Productos) }
   ]
 }
 ```

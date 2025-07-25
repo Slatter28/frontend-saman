@@ -26,6 +26,11 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/clientes/clientes').then(m => m.Clientes),
     title: 'Clientes - SAMAN'
   },
+  {
+    path: 'productos',
+    loadComponent: () => import('./pages/productos/productos').then(m => m.Productos),
+    title: 'Productos - SAMAN'
+  },
     ]
   },
   { path: '**', redirectTo: '/login' }

@@ -1,1 +1,609 @@
-<p>productos works!</p>
+<div class="productos-container">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+  
+  <!-- Header Section -->
+  <div class="page-header">
+    <h1>Productos</h1>
+    <p>Gestión de productos del sistema</p>
+  </div>
+
+  <!-- Main Content Card -->
+  <p-card styleClass="main-card">
+    
+    <!-- Toolbar -->
+    <p-toolbar styleClass="toolbar-custom">
+      <ng-template pTemplate="start">
+        <div class="toolbar-start">
+          <p-button 
+            icon="pi pi-plus" 
+            label="Nuevo Producto" 
+            severity="primary"
+            (onClick)="openNew()"
+            pTooltip="Crear nuevo producto"
+            tooltipPosition="bottom">
+          </p-button>
+          
+          <p-button 
+            icon="pi pi-upload" 
+            label="Importar" 
+            severity="secondary"
+            (onClick)="displayImportDialog = true"
+            pTooltip="Importar productos desde Excel"
+            tooltipPosition="bottom">
+          </p-button>
+        </div>
+      </ng-template>
+      
+      <ng-template pTemplate="end">
+        <div class="toolbar-end">
+          <p-button 
+            icon="pi pi-download" 
+            label="Plantilla" 
+            severity="help"
+            (onClick)="downloadTemplate()"
+            pTooltip="Descargar plantilla de importación"
+            tooltipPosition="bottom">
+          </p-button>
+          
+          <p-button 
+            icon="pi pi-file-excel" 
+            label="Excel" 
+            severity="success"
+            (onClick)="exportExcel()"
+            pTooltip="Exportar a Excel"
+            tooltipPosition="bottom">
+          </p-button>
+          
+          <p-button 
+            icon="pi pi-file-pdf" 
+            label="PDF" 
+            severity="danger"
+            (onClick)="exportPDF()"
+            pTooltip="Exportar a PDF"
+            tooltipPosition="bottom">
+          </p-button>
+        </div>
+      </ng-template>
+    </p-toolbar>
+
+    <!-- Search Section -->
+    <div class="search-section">
+      <p-iconField iconPosition="left" styleClass="search-field">
+        <p-inputIcon styleClass="pi pi-search"></p-inputIcon>
+        <input 
+          type="text" 
+          pInputText 
+          placeholder="Buscar por código o descripción..."
+          (input)="onGlobalFilter($event)"
+          [value]="globalFilter">
+      </p-iconField>
+    </div>
+
+    <!-- Table -->
+    <p-table 
+      [value]="productos"
+      [loading]="loading"
+      [paginator]="true"
+      [rows]="rows"
+      [totalRecords]="totalRecords"
+      [lazy]="true"
+      (onLazyLoad)="onPageChange($event)"
+      [first]="first"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} productos"
+      [tableStyle]="{'min-width': '50rem'}"
+      styleClass="p-datatable-sm">
+      
+      <!-- Table Header -->
+      <ng-template pTemplate="header">
+        <tr>
+          <th *ngFor="let col of columns" 
+              [pSortableColumn]="col.sortable ? col.field : undefined"
+              [style.width]="col.width">
+            {{ col.header }}
+            <p-sortIcon 
+              *ngIf="col.sortable" 
+              [field]="col.field">
+            </p-sortIcon>
+          </th>
+          <th style="width: 160px">Acciones</th>
+        </tr>
+      </ng-template>
+      
+      <!-- Table Body -->
+      <ng-template pTemplate="body" let-producto>
+        <tr>
+          <td>
+            <span class="codigo-badge">{{ producto.codigo }}</span>
+          </td>
+          <td>
+            <div class="descripcion-cell">
+              <strong>{{ producto.descripcion }}</strong>
+            </div>
+          </td>
+          <td>
+            <p-tag 
+              [value]="producto.unidadMedida.nombre"
+              severity="info"
+              [rounded]="true">
+            </p-tag>
+          </td>
+          <td>
+            <span class="fecha-text">
+              {{ producto.creadoEn | date:'dd/MM/yyyy HH:mm' }}
+            </span>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <p-button 
+                icon="pi pi-chart-line" 
+                severity="info"
+                size="small"
+                (onClick)="viewKardex(producto)"
+                pTooltip="Ver kardex"
+                tooltipPosition="top">
+              </p-button>
+              
+              <p-button 
+                icon="pi pi-pencil" 
+                severity="secondary"
+                size="small"
+                (onClick)="editProducto(producto)"
+                pTooltip="Editar producto"
+                tooltipPosition="top">
+              </p-button>
+              
+              <p-button 
+                icon="pi pi-trash" 
+                severity="danger"
+                size="small"
+                (onClick)="deleteProducto(producto)"
+                pTooltip="Eliminar producto"
+                tooltipPosition="top">
+              </p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      
+      <!-- Empty State -->
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" class="empty-state">
+            <div class="empty-content">
+              <i class="pi pi-box empty-icon"></i>
+              <h3>No hay productos</h3>
+              <p>No se encontraron productos que coincidan con la búsqueda.</p>
+              <p-button 
+                label="Crear Primer Producto" 
+                icon="pi pi-plus"
+                (onClick)="openNew()">
+              </p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <!-- Producto Dialog -->
+  <p-dialog 
+    [(visible)]="displayDialog"
+    [header]="dialogTitle"
+    [modal]="true"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="false"
+    styleClass="producto-dialog"
+    [style]="{ width: '500px' }">
+    
+    <form [formGroup]="productoForm" (ngSubmit)="saveProducto()">
+      
+      <!-- Código -->
+      <div class="form-field">
+        <label for="codigo" class="required">Código</label>
+        <input 
+          id="codigo"
+          type="text" 
+          pInputText 
+          formControlName="codigo"
+          placeholder="Ingresa el código del producto"
+          [class.ng-invalid]="isFieldInvalid('codigo')"
+          maxlength="50">
+        
+        <small 
+          *ngIf="isFieldInvalid('codigo')" 
+          class="error-message">
+          {{ getFieldError('codigo') }}
+        </small>
+      </div>
+
+      <!-- Descripción -->
+      <div class="form-field">
+        <label for="descripcion" class="required">Descripción</label>
+        <input 
+          id="descripcion"
+          type="text" 
+          pInputText 
+          formControlName="descripcion"
+          placeholder="Ingresa la descripción del producto"
+          [class.ng-invalid]="isFieldInvalid('descripcion')"
+          maxlength="200">
+        
+        <small 
+          *ngIf="isFieldInvalid('descripcion')" 
+          class="error-message">
+          {{ getFieldError('descripcion') }}
+        </small>
+      </div>
+
+      <!-- Unidad de Medida -->
+      <div class="form-field">
+        <label for="unidadMedida" class="required">Unidad de Medida</label>
+        <p-select 
+          id="unidadMedida"
+          [options]="unidadesMedida"
+          formControlName="unidadMedidaId"
+          placeholder="Selecciona una unidad de medida"
+          optionLabel="nombre"
+          optionValue="id"
+          [class.ng-invalid]="isFieldInvalid('unidadMedidaId')"
+          [style]="{ width: '100%' }">
+        </p-select>
+        
+        <small 
+          *ngIf="isFieldInvalid('unidadMedidaId')" 
+          class="error-message">
+          {{ getFieldError('unidadMedidaId') }}
+        </small>
+      </div>
+
+      <!-- Dialog Footer -->
+      <div class="dialog-footer">
+        <p-button 
+          label="Cancelar" 
+          icon="pi pi-times" 
+          severity="secondary"
+          (onClick)="displayDialog = false">
+        </p-button>
+        
+        <p-button 
+          [label]="saveButtonLabel"
+          [icon]="saveButtonIcon"
+          severity="primary"
+          type="submit"
+          [disabled]="productoForm.invalid">
+        </p-button>
+      </div>
+    </form>
+  </p-dialog>
+
+  <!-- Import Dialog -->
+  <p-dialog 
+    [(visible)]="displayImportDialog"
+    header="Importar Productos"
+    [modal]="true"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '600px' }">
+    
+    <div class="import-content">
+      <div class="import-info">
+        <i class="pi pi-info-circle info-icon"></i>
+        <div class="info-text">
+          <h4>Instrucciones de Importación</h4>
+          <ul>
+            <li>El archivo debe estar en formato Excel (.xlsx)</li>
+            <li>Debe contener las columnas: código, descripción, unidadMedidaId</li>
+            <li>Descarga la plantilla para ver el formato correcto</li>
+          </ul>
+        </div>
+      </div>
+      
+      <p-fileUpload 
+        mode="basic" 
+        chooseLabel="Seleccionar Archivo"
+        accept=".xlsx,.xls"
+        [maxFileSize]="10000000"
+        (onSelect)="onUpload($event)"
+        [auto]="true"
+        styleClass="upload-button">
+      </p-fileUpload>
+    </div>
+
+    <div class="dialog-footer">
+      <p-button 
+        label="Cerrar" 
+        icon="pi pi-times" 
+        severity="secondary"
+        (onClick)="displayImportDialog = false">
+      </p-button>
+      
+      <p-button 
+        label="Descargar Plantilla" 
+        icon="pi pi-download" 
+        severity="help"
+        (onClick)="downloadTemplate()">
+      </p-button>
+    </div>
+  </p-dialog>
+
+  <!-- Kardex Dialog -->
+  <p-dialog 
+    [(visible)]="displayKardexDialog"
+    header="Kardex de Producto"
+    [modal]="true"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="true"
+    styleClass="kardex-dialog"
+    [style]="{ width: '90vw', maxWidth: '1200px', height: '80vh' }">
+    
+    <!-- Loading State -->
+    <div class="kardex-loading" *ngIf="loadingKardex">
+      <div class="loading-container">
+        <div class="loading-spinner">
+          <p-progressSpinner 
+            styleClass="custom-spinner" 
+            strokeWidth="4" 
+            animationDuration="1s"
+            [style]="{ width: '60px', height: '60px' }">
+          </p-progressSpinner>
+        </div>
+        <div class="loading-content">
+          <h3>Cargando Kardex</h3>
+          <p>Obteniendo historial de movimientos de <strong>{{ selectedProducto?.descripcion }}</strong></p>
+          <div class="loading-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div class="kardex-error" *ngIf="!loadingKardex && !kardexData">
+      <div class="error-container">
+        <div class="error-icon">
+          <i class="pi pi-exclamation-triangle"></i>
+        </div>
+        <div class="error-content">
+          <h3>Error al cargar kardex</h3>
+          <p>No se pudo obtener el historial de movimientos del producto.</p>
+          <div class="error-actions">
+            <p-button 
+              label="Reintentar" 
+              icon="pi pi-refresh"
+              severity="primary"
+              (onClick)="viewKardex(selectedProducto!)"
+              [outlined]="true">
+            </p-button>
+            <p-button 
+              label="Cerrar" 
+              icon="pi pi-times"
+              severity="secondary"
+              (onClick)="closeKardexDialog()">
+            </p-button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="kardex-content" *ngIf="!loadingKardex && kardexData">
+      
+      <!-- Product Info Header -->
+      <div class="kardex-header">
+        <div class="product-info">
+          <div class="product-title">
+            <h3>{{ kardexData.producto.codigo }} - {{ kardexData.producto.descripcion }}</h3>
+            <p-tag 
+              value="Kardex"
+              severity="info"
+              [rounded]="true"
+              icon="pi pi-chart-line">
+            </p-tag>
+          </div>
+          <div class="product-details">
+            <div class="detail-item">
+              <span class="detail-label">Unidad:</span>
+              <span class="detail-value">{{ kardexData.producto.unidadMedida.nombre }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Stock Actual:</span>
+              <p-tag 
+                [value]="kardexData.stockActual.toString()"
+                [severity]="kardexData.stockActual > 10 ? 'success' : kardexData.stockActual > 0 ? 'warning' : 'danger'"
+                [rounded]="true"
+                icon="pi pi-box">
+              </p-tag>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Total Movimientos:</span>
+              <span class="detail-value">{{ kardexData.kardex?.length || 0 }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistics Cards (optional) -->
+      <div class="kardex-stats" *ngIf="kardexData.estadisticas">
+        <div class="stats-grid">
+          <div class="stat-card entrada">
+            <div class="stat-icon">
+              <i class="pi pi-arrow-up"></i>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Total Entradas</span>
+              <span class="stat-value">{{ kardexData.estadisticas?.totalEntradas || 0 }}</span>
+            </div>
+          </div>
+          
+          <div class="stat-card salida">
+            <div class="stat-icon">
+              <i class="pi pi-arrow-down"></i>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Total Salidas</span>
+              <span class="stat-value">{{ kardexData.estadisticas?.totalSalidas || 0 }}</span>
+            </div>
+          </div>
+          
+          <div class="stat-card movimientos">
+            <div class="stat-icon">
+              <i class="pi pi-calendar"></i>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Movimientos del Mes</span>
+              <span class="stat-value">{{ kardexData.estadisticas?.movimientosDelMes || 0 }}</span>
+            </div>
+          </div>
+          
+          <div class="stat-card promedio">
+            <div class="stat-icon">
+              <i class="pi pi-chart-line"></i>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Promedio Mensual</span>
+              <span class="stat-value">{{ kardexData.estadisticas?.promedioMensual || 0 }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Kardex Table -->
+      <div class="kardex-table-container">
+        <div class="table-header">
+          <h4>Historial de Movimientos</h4>
+          <p class="table-description">Registro cronológico de entradas y salidas del inventario</p>
+        </div>
+        
+        <p-table 
+          [value]="kardexData.kardex"
+          [paginator]="true"
+          [rows]="10"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} movimientos"
+          [tableStyle]="{'min-width': '50rem'}"
+          styleClass="p-datatable-sm kardex-table"
+          [sortField]="'fecha'"
+          [sortOrder]="-1">
+          
+          <ng-template pTemplate="header">
+            <tr>
+              <th pSortableColumn="fecha" style="width: 140px">
+                Fecha
+                <p-sortIcon field="fecha"></p-sortIcon>
+              </th>
+              <th style="width: 100px">Tipo</th>
+              <th style="width: 100px">Cantidad</th>
+              <th style="width: 100px">Saldo</th>
+              <th style="width: 150px">Bodega</th>
+              <th style="width: 150px">Usuario</th>
+              <th style="width: 150px">Cliente</th>
+              <th>Observación</th>
+            </tr>
+          </ng-template>
+          
+          <ng-template pTemplate="body" let-item>
+            <tr>
+              <td>
+                <div class="fecha-cell">
+                  <span class="fecha-date">{{ item.fecha | date:'dd/MM/yyyy' }}</span>
+                  <span class="fecha-time">{{ item.fecha | date:'HH:mm' }}</span>
+                </div>
+              </td>
+              <td>
+                <p-tag 
+                  [value]="getMovimientoLabel(item.tipo)"
+                  [severity]="getMovimientoSeverity(item.tipo)"
+                  [icon]="getMovimientoIcon(item.tipo)"
+                  [rounded]="true">
+                </p-tag>
+              </td>
+              <td>
+                <span class="cantidad-cell" [class]="item.tipo">
+                  {{ item.tipo === 'entrada' ? '+' : '-' }}{{ item.cantidad }}
+                </span>
+              </td>
+              <td>
+                <div class="saldo-cell">
+                  <span class="saldo-value">{{ item.saldo }}</span>
+                  <span class="saldo-unit">{{ kardexData.producto.unidadMedida.nombre }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="info-cell">
+                  <i class="pi pi-warehouse cell-icon"></i>
+                  <span>{{ item.bodega.nombre }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="info-cell">
+                  <i class="pi pi-user cell-icon"></i>
+                  <span>{{ item.usuario.nombre }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="info-cell" *ngIf="item.cliente; else noCliente">
+                  <i class="pi pi-users cell-icon"></i>
+                  <div class="cliente-info">
+                    <span class="cliente-nombre">{{ item.cliente.nombre }}</span>
+                    <span class="cliente-tipo">({{ item.cliente.tipo }})</span>
+                  </div>
+                </div>
+                <ng-template #noCliente>
+                  <span class="no-data">-</span>
+                </ng-template>
+              </td>
+              <td>
+                <span class="observacion-cell" 
+                      [title]="item.observacion"
+                      *ngIf="item.observacion; else noObservacion">
+                  {{ item.observacion }}
+                </span>
+                <ng-template #noObservacion>
+                  <span class="no-data">-</span>
+                </ng-template>
+              </td>
+            </tr>
+          </ng-template>
+          
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="8" class="empty-kardex">
+                <div class="empty-content">
+                  <i class="pi pi-chart-line empty-icon"></i>
+                  <h4>Sin movimientos registrados</h4>
+                  <p>Este producto no tiene movimientos de inventario.</p>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+
+    <!-- Dialog Footer -->
+    <div class="kardex-footer" *ngIf="!loadingKardex">
+      <div class="footer-info" *ngIf="kardexData">
+        <span class="footer-text">
+          <i class="pi pi-info-circle"></i>
+          Última actualización: {{ kardexData.kardex && kardexData.kardex.length > 0 ? (kardexData.kardex[kardexData.kardex.length - 1].fecha | date:'dd/MM/yyyy HH:mm') : 'Sin datos' }}
+        </span>
+      </div>
+      <div class="footer-actions">
+        <p-button 
+          label="Cerrar" 
+          icon="pi pi-times" 
+          severity="secondary"
+          (onClick)="closeKardexDialog()">
+        </p-button>
+      </div>
+    </div>
+  </p-dialog>
+
+</div>

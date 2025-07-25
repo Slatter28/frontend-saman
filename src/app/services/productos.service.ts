@@ -10,8 +10,9 @@ import {
   CreateProductoDto,
   UpdateProductoDto,
   ProductoMovimientos,
-  ProductoKardex
+
 } from '../interfaces/producto.interface';
+import { ProductoKardex } from '../interfaces/movimiento.interface';
 
 @Injectable({
   providedIn: 'root'
