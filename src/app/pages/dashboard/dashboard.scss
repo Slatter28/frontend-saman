@@ -1,310 +1,603 @@
 .dashboard-container {
   padding: 0;
-  
-  .dashboard-header {
-    margin-bottom: 2rem;
-    
-    h1 {
-      margin: 0 0 0.5rem 0;
-      color: var(--text-color);
-      font-size: 2rem;
-      font-weight: 600;
-    }
-    
-    p {
-      margin: 0;
-      color: var(--text-color-secondary);
-      font-size: 1rem;
-    }
-  }
 
-  // Stats Cards Grid
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
+  // Header Section
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 2rem;
+    padding: 1.5rem 0;
 
-    ::ng-deep .stats-card {
-      .p-card-header {
-        padding: 1rem 1rem 0.5rem 1rem;
-        font-weight: 600;
+    .header-content {
+      h1 {
+        margin: 0 0 0.5rem 0;
         color: var(--text-color);
-      }
-
-      .p-card-body {
-        padding: 0.5rem 1rem 1rem 1rem;
-      }
-    }
-
-    .stat-content {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      .stat-value {
-        font-size: 2rem;
+        font-size: 2.5rem;
         font-weight: 700;
-        color: var(--primary-color);
       }
 
-      .stat-change {
-        display: flex;
-        align-items: center;
-        gap: 0.25rem;
-        font-size: 0.9rem;
-        font-weight: 500;
-
-        &.positive {
-          color: var(--green-500);
-        }
-
-        &.negative {
-          color: var(--red-500);
-        }
-
-        i {
-          font-size: 0.8rem;
-        }
-      }
-    }
-  }
-
-  // Main Content Grid
-  .content-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-
-    .chart-section,
-    .table-section {
-      grid-column: 1 / -1;
-    }
-
-    .form-section,
-    .progress-section,
-    .actions-section {
-      grid-column: span 1;
-    }
-  }
-
-  // Form Styles
-  .form-section {
-    .form-field {
-      margin-bottom: 1.5rem;
-
-      label {
-        display: block;
-        margin-bottom: 0.5rem;
-        color: var(--text-color);
-        font-weight: 500;
-        font-size: 0.9rem;
-      }
-
-      input,
-      textarea,
-      ::ng-deep .p-select,
-      ::ng-deep .p-multiselect,
-      ::ng-deep .p-datepicker,
-      ::ng-deep .p-inputnumber {
-        width: 100%;
-      }
-
-      ::ng-deep .p-inputtext,
-      ::ng-deep .p-select,
-      ::ng-deep .p-multiselect,
-      ::ng-deep .p-datepicker input,
-      ::ng-deep .p-textarea,
-      ::ng-deep .p-inputnumber input {
-        padding: 0.75rem;
-        border: 1px solid var(--surface-border);
-        border-radius: 6px;
-        background: var(--surface-0);
-        color: var(--text-color);
-        font-size: 0.9rem;
-        transition: all 0.3s ease;
-
-        &:focus {
-          outline: none;
-          border-color: var(--primary-color);
-          box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb), 0.2);
-        }
-      }
-
-      .checkbox-group,
-      .radio-group {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-
-        label {
-          margin: 0;
-          cursor: pointer;
-          font-size: 0.9rem;
-        }
-      }
-
-      .radio-group {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.75rem;
-
-        .radio-item {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-        }
-      }
-
-      ::ng-deep .p-rating {
-        .p-rating-icon {
-          color: var(--yellow-500);
-          font-size: 1.25rem;
-        }
-      }
-
-      ::ng-deep .p-slider {
-        margin: 1rem 0;
-      }
-
-      ::ng-deep .p-togglebutton {
-        min-width: 120px;
+      p {
+        margin: 0;
+        color: var(--text-color-secondary);
+        font-size: 1.1rem;
+        font-weight: 400;
       }
     }
 
-    .form-actions {
-      padding-top: 1rem;
-      border-top: 1px solid var(--surface-border);
-      margin-top: 1.5rem;
-    }
-  }
-
-  // Table Styles
-  .table-section {
-    ::ng-deep .p-table {
-      .p-table-header {
-        background: var(--surface-section);
-        border: 1px solid var(--surface-border);
-      }
-
-      .p-datatable-thead > tr > th {
-        background: var(--surface-section);
-        color: var(--text-color);
-        font-weight: 600;
-        padding: 1rem;
-        border: 1px solid var(--surface-border);
-      }
-
-      .p-datatable-tbody > tr > td {
-        padding: 1rem;
-        border: 1px solid var(--surface-border);
-      }
-
-      .p-datatable-tbody > tr:nth-child(even) {
-        background: var(--surface-50);
-      }
-
-      .p-datatable-tbody > tr:hover {
-        background: var(--surface-hover);
-      }
-    }
-
-    ::ng-deep .p-paginator {
-      background: var(--surface-section);
-      border: 1px solid var(--surface-border);
-      border-top: none;
-      padding: 0.75rem;
-    }
-  }
-
-  // Progress Section
-  .progress-section {
-    .progress-item {
-      margin-bottom: 1.5rem;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-
-      label {
-        display: block;
-        margin-bottom: 0.5rem;
-        color: var(--text-color);
-        font-weight: 500;
-        font-size: 0.9rem;
-      }
-
-      ::ng-deep .p-progressbar {
-        height: 1.5rem;
-        border-radius: 8px;
-        overflow: hidden;
-
-        .p-progressbar-value {
-          border-radius: 8px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 0.8rem;
-          font-weight: 600;
-          color: white;
-        }
-      }
-    }
-  }
-
-  // Actions Section
-  .actions-section {
-    .button-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 1rem;
-
+    .header-actions {
       ::ng-deep .p-button {
-        justify-content: center;
-        padding: 0.75rem 1rem;
+        padding: 0.75rem 1.5rem;
         font-size: 0.9rem;
-        border-radius: 6px;
+        border-radius: 8px;
         transition: all 0.3s ease;
 
         &:hover {
-          transform: translateY(-1px);
+          transform: translateY(-2px);
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
       }
     }
   }
 
-  // Chart Section
-  .chart-section {
-    ::ng-deep .p-chart {
-      canvas {
-        max-height: 300px;
+  // Loading State
+  .dashboard-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+
+    .loading-content {
+      text-align: center;
+      color: var(--text-color-secondary);
+
+      h3 {
+        margin: 1rem 0 0.5rem 0;
+        color: var(--text-color);
+        font-weight: 600;
+      }
+
+      p {
+        margin: 0;
+        font-size: 0.9rem;
       }
     }
   }
 
-  // Card Styles
-  ::ng-deep .p-card {
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border: 1px solid var(--surface-border);
-    background: var(--surface-card);
+  // Main Content
+  .dashboard-content {
+    // Statistics Section
+    .stats-section {
+      margin-bottom: 2rem;
 
-    .p-card-header {
-      background: var(--surface-section);
-      border-bottom: 1px solid var(--surface-border);
-      padding: 1.25rem 1.5rem;
-      font-weight: 600;
-      color: var(--text-color);
-      border-radius: 12px 12px 0 0;
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+
+
+        ::ng-deep .stats-card {
+          transition: all 0.3s ease;
+          border-radius: 12px;
+          overflow: hidden;
+
+          &:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+          }
+
+          .p-card-header {
+            background: var(--surface-100);
+            border-bottom: 1px solid var(--surface-border);
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+
+          .p-card-body {
+            padding: 1.5rem;
+          }
+
+          &.productos .p-card-header {
+            background: linear-gradient(135deg, var(--blue-50) 0%, var(--blue-100) 100%);
+            color: var(--blue-800);
+          }
+
+          &.clientes .p-card-header {
+            background: linear-gradient(135deg, var(--green-50) 0%, var(--green-100) 100%);
+            color: var(--green-800);
+          }
+
+          &.bodegas .p-card-header {
+            background: linear-gradient(135deg, var(--orange-50) 0%, var(--orange-100) 100%);
+            color: var(--orange-800);
+          }
+
+          &.movimientos-hoy .p-card-header {
+            background: linear-gradient(135deg, var(--purple-50) 0%, var(--purple-100) 100%);
+            color: var(--purple-800);
+          }
+
+          &.movimientos-mes .p-card-header {
+            background: linear-gradient(135deg, var(--teal-50) 0%, var(--teal-100) 100%);
+            color: var(--teal-800);
+          }
+        }
+
+        .stat-content {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          height: 80px;
+
+          .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+            line-height: 1;
+          }
+
+          .stat-icon {
+            width: 4rem;
+            height: 4rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+
+            i {
+              color: white !important;
+            }
+
+            &.productos {
+              background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            }
+
+            &.clientes {
+              background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            }
+
+            &.bodegas {
+              background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            }
+
+            &.movimientos-hoy {
+              background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            }
+
+            &.movimientos-mes {
+              background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+            }
+          }
+        }
+      }
     }
 
-    .p-card-body {
-      padding: 1.5rem;
+    // Charts Section
+    .charts-section {
+      margin-bottom: 2rem;
+
+      .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+
+        .chart-card-wrapper {
+          ::ng-deep .section-card {
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--surface-border);
+            transition: all 0.3s ease;
+            height: 100%;
+
+            &:hover {
+              transform: translateY(-1px);
+              box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+            }
+
+            .p-card-header {
+              background: var(--surface-section);
+              border-bottom: 2px solid var(--primary-color);
+              padding: 1rem 1.5rem;
+              font-weight: 600;
+              color: var(--text-color);
+              border-radius: 12px 12px 0 0;
+              font-size: 1rem;
+            }
+
+            .p-card-body {
+              padding: 1.5rem;
+            }
+
+            &.chart-card .p-card-header {
+              background: linear-gradient(135deg, var(--surface-section) 0%, var(--surface-100) 100%);
+              border-bottom: 2px solid var(--primary-color);
+            }
+          }
+        }
+      }
     }
 
-    .p-card-content {
-      padding: 0;
+    // Data Section
+    .data-section {
+      .data-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+
+
+        .data-card-wrapper {
+          ::ng-deep .section-card {
+            border-radius: 16px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--surface-border);
+            transition: all 0.3s ease;
+            height: 100%;
+
+            &:hover {
+              transform: translateY(-2px);
+              box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
+            }
+
+            .p-card-header {
+              background: var(--surface-section);
+              border-bottom: 1px solid var(--surface-border);
+              padding: 1.5rem 2rem;
+              font-weight: 600;
+              color: var(--text-color);
+              border-radius: 16px 16px 0 0;
+              font-size: 1.1rem;
+            }
+
+            .p-card-body {
+              padding: 2rem;
+            }
+
+            &.stock-bajo .p-card-header {
+              background: linear-gradient(135deg, var(--red-50) 0%, var(--red-100) 100%);
+              color: var(--red-800);
+              border-bottom: 2px solid var(--red-500);
+            }
+          }
+        }
+      }
+    }
+
+    // Movimientos Recientes
+    .movimientos-recientes {
+      .movimientos-loading,
+      .stock-loading,
+      .inventario-loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        padding: 3rem;
+        color: var(--text-color-secondary);
+        font-size: 1rem;
+      }
+
+      .movimientos-list {
+        max-height: 400px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--primary-color) var(--surface-ground);
+
+        .movimiento-item {
+          padding: 1.5rem;
+          border-bottom: 1px solid var(--surface-border);
+          transition: all 0.2s ease;
+          border-radius: 8px;
+          margin-bottom: 0.5rem;
+
+          &:hover {
+            background: var(--surface-hover);
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          }
+
+          &:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+          }
+
+          .movimiento-info {
+            .movimiento-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 0.75rem;
+
+              .movimiento-fecha {
+                font-size: 0.85rem;
+                color: var(--text-color-secondary);
+                font-weight: 500;
+              }
+            }
+
+            .movimiento-details {
+              .producto-info {
+                margin-bottom: 0.5rem;
+
+                strong {
+                  color: var(--text-color);
+                  font-size: 0.95rem;
+                }
+              }
+
+              .movimiento-meta {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 0.5rem;
+
+                .cantidad {
+                  font-weight: 600;
+                  font-size: 0.9rem;
+                  color: var(--text-color);
+                }
+
+                .bodega {
+                  font-size: 0.85rem;
+                  color: var(--text-color-secondary);
+                  background: var(--surface-100);
+                  padding: 0.25rem 0.5rem;
+                  border-radius: 4px;
+                }
+              }
+
+              .cliente-info {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-size: 0.85rem;
+                color: var(--text-color-secondary);
+
+                i {
+                  color: var(--primary-color);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--text-color-secondary);
+
+        i {
+          font-size: 4rem;
+          margin-bottom: 1.5rem;
+          color: var(--surface-400);
+        }
+
+        p {
+          margin: 0;
+          font-size: 1rem;
+          font-weight: 500;
+        }
+      }
+    }
+
+    // Stock Bajo
+    .stock-bajo-content {
+      .stock-list {
+        max-height: 400px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--red-500) var(--surface-ground);
+
+        .stock-item {
+          padding: 1.5rem;
+          border-bottom: 1px solid var(--surface-border);
+          transition: all 0.2s ease;
+          border-radius: 8px;
+          margin-bottom: 0.5rem;
+
+          &:hover {
+            background: var(--red-50);
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.1);
+          }
+
+          &:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+          }
+
+          .stock-info {
+            .producto-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 0.75rem;
+
+              .codigo-badge {
+                background: var(--surface-200);
+                color: var(--text-color);
+                padding: 0.25rem 0.5rem;
+                border-radius: 4px;
+                font-size: 0.8rem;
+                font-weight: 600;
+                font-family: 'Courier New', monospace;
+              }
+            }
+
+            .producto-name {
+              font-weight: 600;
+              color: var(--text-color);
+              margin-bottom: 0.5rem;
+              font-size: 0.95rem;
+            }
+
+            .producto-precio {
+              font-size: 0.85rem;
+              color: var(--text-color-secondary);
+            }
+          }
+        }
+      }
+    }
+
+    // Inventario Resumen
+    .inventario-resumen {
+      .inventario-list {
+        max-height: 400px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--primary-color) var(--surface-ground);
+
+        .inventario-item {
+          padding: 2rem;
+          border-bottom: 1px solid var(--surface-border);
+          transition: all 0.2s ease;
+          border-radius: 8px;
+          margin-bottom: 0.5rem;
+
+          &:hover {
+            background: var(--surface-hover);
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          }
+
+          &:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+          }
+
+          .bodega-header {
+            margin-bottom: 1rem;
+
+            .bodega-info {
+              h4 {
+                margin: 0 0 0.75rem 0;
+                color: var(--text-color);
+                font-weight: 600;
+                font-size: 1.1rem;
+              }
+
+              .bodega-stats {
+                display: flex;
+                gap: 1.5rem;
+
+                .stat {
+                  display: flex;
+                  align-items: center;
+                  gap: 0.5rem;
+                  font-size: 0.85rem;
+                  color: var(--text-color-secondary);
+
+                  i {
+                    color: var(--primary-color);
+                  }
+                }
+              }
+            }
+          }
+
+          .productos-preview {
+            .producto-preview {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              padding: 0.5rem 0;
+              border-bottom: 1px solid var(--surface-100);
+
+              &:last-child {
+                border-bottom: none;
+              }
+
+              .producto-name {
+                font-size: 0.9rem;
+                color: var(--text-color);
+                flex: 1;
+              }
+            }
+
+            .more-productos {
+              text-align: center;
+              padding-top: 0.5rem;
+              color: var(--text-color-secondary);
+              font-style: italic;
+            }
+          }
+        }
+      }
+    }
+
+    // Charts Section
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 2rem;
+
+      .dashboard-section {
+        margin-bottom: 1.5rem;
+      }
+    }
+
+    // Chart Styles
+    ::ng-deep .chart-card {
+      .p-card-header {
+        background: linear-gradient(135deg, var(--surface-section) 0%, var(--surface-100) 100%);
+        border-bottom: 2px solid var(--primary-color);
+        font-weight: 600;
+        color: var(--text-color);
+      }
+    }
+
+    .chart-container {
+      height: 300px;
+      position: relative;
+
+      .chart-loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        height: 100%;
+        color: var(--text-color-secondary);
+        font-size: 0.9rem;
+      }
+
+      .empty-chart {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: var(--text-color-secondary);
+
+        i {
+          font-size: 2.5rem;
+          margin-bottom: 1rem;
+          color: var(--surface-400);
+        }
+
+        p {
+          margin: 0;
+          font-size: 0.9rem;
+          font-weight: 500;
+        }
+      }
+
+      ::ng-deep .custom-chart {
+        height: 100% !important;
+        
+        canvas {
+          max-height: 280px !important;
+          border-radius: 6px;
+        }
+      }
     }
   }
 }
@@ -312,35 +605,33 @@
 // Dark Theme Adjustments
 :host-context(.my-app-dark) {
   .dashboard-container {
-    ::ng-deep .p-card {
+    .page-header {
+      .header-content h1 {
+        color: var(--primary-color);
+      }
+    }
+
+    ::ng-deep .section-card,
+    ::ng-deep .stats-card {
       background: var(--surface-card);
       border-color: var(--surface-border);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
 
       .p-card-header {
         background: var(--surface-section);
         border-bottom-color: var(--surface-border);
       }
+
+      &:hover {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      }
     }
 
-    ::ng-deep .p-table {
-      .p-datatable-thead > tr > th {
+    ::ng-deep .chart-card {
+      .p-card-header {
         background: var(--surface-section);
-        border-color: var(--surface-border);
+        border-bottom-color: var(--primary-color);
       }
-
-      .p-datatable-tbody > tr > td {
-        border-color: var(--surface-border);
-      }
-
-      .p-datatable-tbody > tr:nth-child(even) {
-        background: var(--surface-100);
-      }
-    }
-
-    ::ng-deep .p-paginator {
-      background: var(--surface-section);
-      border-color: var(--surface-border);
     }
   }
 }
@@ -348,15 +639,23 @@
 // Responsive Design
 @media (max-width: 1200px) {
   .dashboard-container {
-    .content-grid {
-      grid-template-columns: 1fr;
+    .dashboard-content {
+      .stats-section .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      }
 
-      .chart-section,
-      .table-section,
-      .form-section,
-      .progress-section,
-      .actions-section {
-        grid-column: span 1;
+
+      .data-section .data-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .chart-container {
+        height: 280px;
+
+        ::ng-deep .custom-chart canvas {
+          max-height: 260px !important;
+        }
       }
     }
   }
@@ -364,31 +663,62 @@
 
 @media (max-width: 768px) {
   .dashboard-container {
-    .stats-grid {
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    .page-header {
+      flex-direction: column;
+      align-items: flex-start;
       gap: 1rem;
-    }
 
-    .dashboard-header {
-      h1 {
-        font-size: 1.75rem;
+      .header-content {
+        h1 {
+          font-size: 2rem;
+        }
+
+        p {
+          font-size: 1rem;
+        }
+      }
+
+      .header-actions {
+        align-self: stretch;
+
+        ::ng-deep .p-button {
+          width: 100%;
+          justify-content: center;
+        }
       }
     }
 
-    .actions-section {
-      .button-grid {
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-        gap: 0.75rem;
-      }
-    }
+    .dashboard-content {
+      .stats-section .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
 
-    ::ng-deep .p-card {
-      .p-card-header {
-        padding: 1rem;
+        .stat-content {
+          height: 60px;
+
+          .stat-value {
+            font-size: 1.8rem;
+          }
+
+          .stat-icon {
+            width: 3rem;
+            height: 3rem;
+            font-size: 1.2rem;
+          }
+        }
       }
 
-      .p-card-body {
-        padding: 1rem;
+      .data-section .data-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .chart-container {
+        height: 250px;
+
+        ::ng-deep .custom-chart canvas {
+          max-height: 230px !important;
+        }
       }
     }
   }
@@ -396,30 +726,40 @@
 
 @media (max-width: 480px) {
   .dashboard-container {
-    .stats-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .dashboard-header {
-      h1 {
-        font-size: 1.5rem;
+    .page-header {
+      .header-content h1 {
+        font-size: 1.75rem;
       }
     }
 
-    .actions-section {
-      .button-grid {
+    .dashboard-content {
+      .stats-section .stats-grid {
         grid-template-columns: 1fr;
-      }
-    }
 
-    .form-section {
-      .form-field {
-        .radio-group {
-          .radio-item {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.25rem;
+        .stat-content {
+          .stat-value {
+            font-size: 1.5rem;
           }
+
+          .stat-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            font-size: 1rem;
+          }
+        }
+      }
+
+      .movimientos-recientes .movimientos-list,
+      .stock-bajo-content .stock-list,
+      .inventario-resumen .inventario-list {
+        max-height: 300px;
+      }
+
+      .chart-container {
+        height: 200px;
+
+        ::ng-deep .custom-chart canvas {
+          max-height: 180px !important;
         }
       }
     }

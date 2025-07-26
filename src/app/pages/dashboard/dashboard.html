@@ -1,368 +1,337 @@
 <div class="dashboard-container">
   <p-toast></p-toast>
-  
+
   <!-- Header Section -->
-  <div class="dashboard-header">
-    <h1>Dashboard SAMAN</h1>
-    <p>Panel de control del sistema de gestión empresarial</p>
-  </div>
-
-  <!-- Stats Cards -->
-  <div class="stats-grid">
-    <p-card header="Productos" styleClass="stats-card">
-      <div class="stat-content">
-        <div class="stat-value">1,234</div>
-        <div class="stat-change positive">
-          <i class="pi pi-arrow-up"></i> +12.5%
-        </div>
-      </div>
-    </p-card>
-
-    <p-card header="Ventas del Mes" styleClass="stats-card">
-      <div class="stat-content">
-        <div class="stat-value">$45,678</div>
-        <div class="stat-change positive">
-          <i class="pi pi-arrow-up"></i> +8.2%
-        </div>
-      </div>
-    </p-card>
-
-    <p-card header="Clientes" styleClass="stats-card">
-      <div class="stat-content">
-        <div class="stat-value">856</div>
-        <div class="stat-change negative">
-          <i class="pi pi-arrow-down"></i> -2.1%
-        </div>
-      </div>
-    </p-card>
-
-    <p-card header="Pedidos Pendientes" styleClass="stats-card">
-      <div class="stat-content">
-        <div class="stat-value">42</div>
-        <div class="stat-change">
-          <i class="pi pi-minus"></i> 0%
-        </div>
-      </div>
-    </p-card>
-  </div>
-
-  <!-- Main Content Grid -->
-  <div class="content-grid">
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Dashboard</h1>
+      <p>Panel de control y estadísticas del sistema</p>
+    </div>
     
-    <!-- Chart Section -->
-    <div class="chart-section">
-      <p-card header="Gráfico de Ventas y Compras">
-        <p-chart 
-          type="line" 
-          [data]="chartData" 
-          [options]="chartOptions"
-          width="100%"
-          height="300px">
-        </p-chart>
-      </p-card>
+    <!-- Refresh Button -->
+    <div class="header-actions">
+      <p-button 
+        icon="pi pi-refresh" 
+        label="Actualizar"
+        severity="secondary"
+        [outlined]="true"
+        (click)="refreshDashboard()"
+        [loading]="loading"
+        pTooltip="Actualizar datos del dashboard">
+      </p-button>
     </div>
+  </div>
 
-    <!-- Form Section -->
-    <div class="form-section">
-      <p-card header="Formulario de Ejemplo">
-        <form [formGroup]="sampleForm" (ngSubmit)="onSubmit()">
-          
-          <!-- Text Input -->
-          <div class="form-field">
-            <label for="name">Nombre</label>
-            <input 
-              id="name" 
-              type="text" 
-              pInputText 
-              formControlName="name" 
-              placeholder="Ingresa el nombre">
-          </div>
+  <!-- Loading State -->
+  <div class="dashboard-loading" *ngIf="initialLoading">
+    <div class="loading-content">
+      <p-progressSpinner 
+        styleClass="custom-spinner" 
+        strokeWidth="4" 
+        animationDuration="1s"
+        [style]="{ width: '60px', height: '60px' }">
+      </p-progressSpinner>
+      <h3>Cargando Dashboard</h3>
+      <p>Obteniendo estadísticas y datos del sistema...</p>
+    </div>
+  </div>
 
-          <!-- Email Input -->
-          <div class="form-field">
-            <label for="email">Email</label>
-            <input 
-              id="email" 
-              type="email" 
-              pInputText 
-              formControlName="email" 
-              placeholder="ejemplo@correo.com">
-          </div>
-
-          <!-- Select -->
-          <div class="form-field">
-            <label for="category">Categoría</label>
-            <p-select 
-              id="category"
-              [options]="categories"
-              formControlName="category"
-              placeholder="Selecciona una categoría"
-              optionLabel="label"
-              optionValue="value">
-            </p-select>
-          </div>
-
-          <!-- MultiSelect -->
-          <div class="form-field">
-            <label for="multiCategories">Múltiples Categorías</label>
-            <p-multiSelect 
-              id="multiCategories"
-              [options]="categories"
-              [(ngModel)]="selectedCategories"
-              [ngModelOptions]="{standalone: true}"
-              placeholder="Selecciona categorías"
-              optionLabel="label">
-            </p-multiSelect>
-          </div>
-
-          <!-- DatePicker -->
-          <div class="form-field">
-            <label for="date">Fecha</label>
-            <p-datepicker 
-              id="date"
-              formControlName="date"
-              placeholder="Selecciona una fecha"
-              [showIcon]="true">
-            </p-datepicker>
-          </div>
-
-          <!-- Textarea -->
-          <div class="form-field">
-            <label for="description">Descripción</label>
-            <textarea 
-              id="description"
-              pTextarea 
-              formControlName="description"
-              placeholder="Ingresa una descripción"
-              rows="3">
-            </textarea>
-          </div>
-
-          <!-- Input Number -->
-          <div class="form-field">
-            <label for="number">Cantidad</label>
-            <p-inputNumber
-              id="number"
-              [(ngModel)]="numberValue"
-              [ngModelOptions]="{standalone: true}"
-              [min]="0"
-              [max]="1000"
-              placeholder="Ingresa un número">
-            </p-inputNumber>
-          </div>
-
-          <!-- Rating -->
-          <div class="form-field">
-            <label for="rating">Calificación</label>
-            <p-rating 
-              id="rating"
-              [(ngModel)]="rating"
-              [ngModelOptions]="{standalone: true}">
-            </p-rating>
-          </div>
-
-          <!-- Slider -->
-          <div class="form-field">
-            <label for="slider">Porcentaje: {{sliderValue}}%</label>
-            <p-slider 
-              id="slider"
-              [(ngModel)]="sliderValue"
-              [ngModelOptions]="{standalone: true}"
-              [min]="0"
-              [max]="100">
-            </p-slider>
-          </div>
-
-          <!-- Checkboxes and Radio -->
-          <div class="form-field">
-            <div class="checkbox-group">
-              <p-checkbox 
-                [(ngModel)]="checkboxValue"
-                [ngModelOptions]="{standalone: true}"
-                binary="true"
-                inputId="check1">
-              </p-checkbox>
-              <label for="check1">Acepto términos y condiciones</label>
+  <!-- Main Content -->
+  <div class="dashboard-content" *ngIf="!initialLoading">
+    
+    <!-- Statistics Cards -->
+    <div class="stats-section">
+      <div class="stats-grid">
+        <p-card header="Total Productos" styleClass="stats-card productos">
+          <div class="stat-content">
+            <div class="stat-value">{{ estadisticas?.totalProductos | number }}</div>
+            <div class="stat-icon productos">
+              <i class="pi pi-box"></i>
             </div>
           </div>
+        </p-card>
 
-          <div class="form-field">
-            <label>Opciones:</label>
-            <div class="radio-group">
-              <div class="radio-item">
-                <p-radioButton 
-                  [(ngModel)]="radioValue"
-                  [ngModelOptions]="{standalone: true}"
-                  value="option1"
-                  inputId="radio1">
-                </p-radioButton>
-                <label for="radio1">Opción 1</label>
-              </div>
-              <div class="radio-item">
-                <p-radioButton 
-                  [(ngModel)]="radioValue"
-                  [ngModelOptions]="{standalone: true}"
-                  value="option2"
-                  inputId="radio2">
-                </p-radioButton>
-                <label for="radio2">Opción 2</label>
-              </div>
+        <p-card header="Total Clientes" styleClass="stats-card clientes">
+          <div class="stat-content">
+            <div class="stat-value">{{ estadisticas?.totalClientes | number }}</div>
+            <div class="stat-icon clientes">
+              <i class="pi pi-users"></i>
             </div>
           </div>
+        </p-card>
 
-          <!-- Toggle Button -->
-          <div class="form-field">
-            <label for="toggle">Activar notificaciones</label>
-            <p-toggleButton 
-              id="toggle"
-              [(ngModel)]="toggleValue"
-              [ngModelOptions]="{standalone: true}"
-              onLabel="Activado"
-              offLabel="Desactivado">
-            </p-toggleButton>
+        <p-card header="Total Bodegas" styleClass="stats-card bodegas">
+          <div class="stat-content">
+            <div class="stat-value">{{ estadisticas?.totalBodegas | number }}</div>
+            <div class="stat-icon bodegas">
+              <i class="pi pi-warehouse"></i>
+            </div>
           </div>
+        </p-card>
 
-          <!-- Submit Button -->
-          <div class="form-actions">
-            <p-button 
-              type="submit"
-              label="Enviar"
-              icon="pi pi-check"
-              [disabled]="sampleForm.invalid">
-            </p-button>
+        <p-card header="Movimientos Hoy" styleClass="stats-card movimientos-hoy">
+          <div class="stat-content">
+            <div class="stat-value">{{ estadisticas?.movimientosHoy | number }}</div>
+            <div class="stat-icon movimientos-hoy">
+              <i class="pi pi-calendar"></i>
+            </div>
           </div>
-        </form>
-      </p-card>
+        </p-card>
+
+        <p-card header="Movimientos del Mes" styleClass="stats-card movimientos-mes">
+          <div class="stat-content">
+            <div class="stat-value">{{ estadisticas?.movimientosEsteMes | number }}</div>
+            <div class="stat-icon movimientos-mes">
+              <i class="pi pi-chart-line"></i>
+            </div>
+          </div>
+        </p-card>
+      </div>
     </div>
 
-    <!-- Table Section -->
-    <div class="table-section">
-      <p-card header="Tabla de Productos">
-        <p-table [value]="products" [paginator]="true" [rows]="5" [showCurrentPageReport]="true"
-          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} productos"
-          [tableStyle]="{'min-width': '50rem'}">
-          
-          <ng-template pTemplate="header">
-            <tr>
-              <th>ID</th>
-              <th>Producto</th>
-              <th>Categoría</th>
-              <th>Precio</th>
-              <th>Stock</th>
-              <th>Estado</th>
-              <th>Rating</th>
-              <th>Fecha</th>
-            </tr>
-          </ng-template>
-          
-          <ng-template pTemplate="body" let-product>
-            <tr>
-              <td>{{product.id}}</td>
-              <td>{{product.name}}</td>
-              <td>{{product.category}}</td>
-              <td>{{product.price | currency:'COP':'symbol':'1.0-0'}}</td>
-              <td>
-                <p-badge 
-                  [value]="product.stock.toString()"
-                  [severity]="product.stock > 10 ? 'success' : product.stock > 0 ? 'warn' : 'danger'">
-                </p-badge>
-              </td>
-              <td>
-                <p-tag 
-                  [value]="product.status"
-                  [severity]="getSeverity(product.status)">
-                </p-tag>
-              </td>
-              <td>
-                <p-rating 
-                  [ngModel]="product.rating"
-                  [readonly]="true">
-                </p-rating>
-              </td>
-              <td>{{product.date | date:'dd/MM/yyyy'}}</td>
-            </tr>
-          </ng-template>
-        </p-table>
-      </p-card>
+    <!-- Charts Section -->
+    <div class="charts-section">
+      <div class="charts-grid">
+        
+        <!-- Movimientos por Día -->
+        <div class="chart-card-wrapper">
+          <p-card header="Movimientos por Día" styleClass="section-card chart-card">
+            <div class="chart-container">
+              <div class="chart-loading" *ngIf="loadingGraficos">
+                <p-progressSpinner [style]="{ width: '30px', height: '30px' }"></p-progressSpinner>
+                <span>Cargando gráfico...</span>
+              </div>
+              
+              <p-chart 
+                *ngIf="!loadingGraficos && movimientosPorDiaChart.labels"
+                type="line" 
+                [data]="movimientosPorDiaChart" 
+                [options]="chartOptions"
+                styleClass="custom-chart">
+              </p-chart>
+              
+              <div class="empty-chart" *ngIf="!loadingGraficos && !movimientosPorDiaChart.labels">
+                <i class="pi pi-chart-line"></i>
+                <p>No hay datos para mostrar</p>
+              </div>
+            </div>
+          </p-card>
+        </div>
+
+        <!-- Entradas vs Salidas -->
+        <div class="chart-card-wrapper">
+          <p-card header="Entradas vs Salidas" styleClass="section-card chart-card">
+            <div class="chart-container">
+              <div class="chart-loading" *ngIf="loadingGraficos">
+                <p-progressSpinner [style]="{ width: '30px', height: '30px' }"></p-progressSpinner>
+                <span>Cargando gráfico...</span>
+              </div>
+              
+              <p-chart 
+                *ngIf="!loadingGraficos && entradasVsSalidasChart.labels"
+                type="doughnut" 
+                [data]="entradasVsSalidasChart" 
+                [options]="chartOptions"
+                styleClass="custom-chart">
+              </p-chart>
+              
+              <div class="empty-chart" *ngIf="!loadingGraficos && !entradasVsSalidasChart.labels">
+                <i class="pi pi-chart-pie"></i>
+                <p>No hay datos para mostrar</p>
+              </div>
+            </div>
+          </p-card>
+        </div>
+
+        <!-- Top Productos -->
+        <div class="chart-card-wrapper">
+          <p-card header="Top Productos Más Movidos" styleClass="section-card chart-card">
+            <div class="chart-container">
+              <div class="chart-loading" *ngIf="loadingGraficos">
+                <p-progressSpinner [style]="{ width: '30px', height: '30px' }"></p-progressSpinner>
+                <span>Cargando gráfico...</span>
+              </div>
+              
+              <p-chart 
+                *ngIf="!loadingGraficos && topProductosChart.labels"
+                type="bar" 
+                [data]="topProductosChart" 
+                [options]="chartOptions"
+                styleClass="custom-chart">
+              </p-chart>
+              
+              <div class="empty-chart" *ngIf="!loadingGraficos && !topProductosChart.labels">
+                <i class="pi pi-chart-bar"></i>
+                <p>No hay datos para mostrar</p>
+              </div>
+            </div>
+          </p-card>
+        </div>
+
+        <!-- Movimientos por Bodega -->
+        <div class="chart-card-wrapper">
+          <p-card header="Movimientos por Bodega" styleClass="section-card chart-card">
+            <div class="chart-container">
+              <div class="chart-loading" *ngIf="loadingGraficos">
+                <p-progressSpinner [style]="{ width: '30px', height: '30px' }"></p-progressSpinner>
+                <span>Cargando gráfico...</span>
+              </div>
+              
+              <p-chart 
+                *ngIf="!loadingGraficos && movimientosPorBodegaChart.labels"
+                type="bar" 
+                [data]="movimientosPorBodegaChart" 
+                [options]="chartOptions"
+                styleClass="custom-chart">
+              </p-chart>
+              
+              <div class="empty-chart" *ngIf="!loadingGraficos && !movimientosPorBodegaChart.labels">
+                <i class="pi pi-chart-bar"></i>
+                <p>No hay datos para mostrar</p>
+              </div>
+            </div>
+          </p-card>
+        </div>
+      </div>
     </div>
 
-    <!-- Progress Section -->
-    <div class="progress-section">
-      <p-card header="Indicadores de Progreso">
-        <div class="progress-item">
-          <label>Objetivo de Ventas</label>
-          <p-progressBar 
-            [value]="75"
-            [showValue]="true">
-          </p-progressBar>
+    <!-- Data Section -->
+    <div class="data-section">
+      <div class="data-grid">
+        
+        <!-- Movimientos Recientes -->
+        <div class="data-card-wrapper">
+          <p-card header="Movimientos Recientes" styleClass="section-card">
+            <div class="movimientos-recientes">
+              <div class="movimientos-loading" *ngIf="loadingMovimientos">
+                <p-progressSpinner [style]="{ width: '30px', height: '30px' }"></p-progressSpinner>
+                <span>Cargando movimientos...</span>
+              </div>
+
+              <div class="movimientos-list" *ngIf="!loadingMovimientos && movimientosRecientes.length > 0">
+                <div class="movimiento-item" *ngFor="let mov of movimientosRecientes">
+                  <div class="movimiento-info">
+                    <div class="movimiento-header">
+                      <p-tag 
+                        [severity]="mov.tipo === 'entrada' ? 'success' : 'danger'">
+                        <i [class]="mov.tipo === 'entrada' ? 'pi pi-arrow-up' : 'pi pi-arrow-down'"></i>
+                        {{ mov.tipo === 'entrada' ? 'Entrada' : 'Salida' }}
+                      </p-tag>
+                      <span class="movimiento-fecha">{{ mov.fecha | date:'dd/MM HH:mm' }}</span>
+                    </div>
+                    <div class="movimiento-details">
+                      <div class="producto-info">
+                        <strong>{{ mov.producto.descripcion }}</strong>
+                      </div>
+                      <div class="movimiento-meta">
+                        <span class="cantidad">
+                          {{ mov.tipo === 'entrada' ? '+' : '-' }}{{ mov.cantidad }}
+                        </span>
+                        <span class="bodega">{{ mov.bodega.nombre }}</span>
+                      </div>
+                      <div class="cliente-info" *ngIf="mov.cliente">
+                        <i class="pi pi-user"></i>
+                        <span>{{ mov.cliente.nombre }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="empty-state" *ngIf="!loadingMovimientos && movimientosRecientes.length === 0">
+                <i class="pi pi-inbox"></i>
+                <p>No hay movimientos recientes</p>
+              </div>
+            </div>
+          </p-card>
         </div>
 
-        <div class="progress-item">
-          <label>Satisfacción del Cliente</label>
-          <p-progressBar 
-            [value]="88"
-            [showValue]="true"
-            severity="success">
-          </p-progressBar>
+        <!-- Productos Stock Bajo -->
+        <div class="data-card-wrapper">
+          <p-card header="Productos con Stock Bajo" styleClass="section-card stock-bajo">
+            <div class="stock-bajo-content">
+              <div class="stock-loading" *ngIf="loadingStock">
+                <p-progressSpinner [style]="{ width: '30px', height: '30px' }"></p-progressSpinner>
+                <span>Cargando inventario...</span>
+              </div>
+
+              <div class="stock-list" *ngIf="!loadingStock && productosStockBajo.length > 0">
+                <div class="stock-item" *ngFor="let producto of productosStockBajo">
+                  <div class="stock-info">
+                    <div class="producto-header">
+                      <span class="codigo-badge">{{ producto.codigo }}</span>
+                      <p-badge 
+                        [value]="producto.stock_actual.toString()"
+                        severity="danger">
+                      </p-badge>
+                    </div>
+                    <div class="producto-name">{{ producto.descripcion }}</div>
+                    <div class="producto-precio" *ngIf="producto.precio_promedio">
+                      Precio promedio: {{ producto.precio_promedio | currency:'COP':'symbol':'1.0-0' }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="empty-state" *ngIf="!loadingStock && productosStockBajo.length === 0">
+                <i class="pi pi-check-circle"></i>
+                <p>Todos los productos tienen stock suficiente</p>
+              </div>
+            </div>
+          </p-card>
         </div>
 
-        <div class="progress-item">
-          <label>Inventario Disponible</label>
-          <p-progressBar 
-            [value]="45"
-            [showValue]="true"
-            severity="warn">
-          </p-progressBar>
+        <!-- Inventario por Bodegas -->
+        <div class="data-card-wrapper">
+          <p-card header="Inventario por Bodegas" styleClass="section-card">
+            <div class="inventario-resumen">
+              <div class="inventario-loading" *ngIf="loadingInventario">
+                <p-progressSpinner [style]="{ width: '30px', height: '30px' }"></p-progressSpinner>
+                <span>Cargando inventario...</span>
+              </div>
+
+              <div class="inventario-list" *ngIf="!loadingInventario && inventarioResumen.length > 0">
+                <div class="inventario-item" *ngFor="let bodega of inventarioResumen">
+                  <div class="bodega-header">
+                    <div class="bodega-info">
+                      <h4>{{ bodega.bodega_nombre }}</h4>
+                      <div class="bodega-stats">
+                        <span class="stat">
+                          <i class="pi pi-box"></i>
+                          {{ bodega.total_productos }} productos
+                        </span>
+                        <span class="stat">
+                          <i class="pi pi-database"></i>
+                          {{ bodega.stock_total }} unidades
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Top productos de la bodega -->
+                  <div class="productos-preview" *ngIf="bodega.productos.length > 0">
+                    <div class="producto-preview" *ngFor="let prod of bodega.productos | slice:0:3">
+                      <span class="producto-name">{{ prod.producto_descripcion }}</span>
+                      <p-badge 
+                        [value]="prod.stock_actual.toString()"
+                        [severity]="prod.stock_actual > 10 ? 'success' : prod.stock_actual > 0 ? 'warn' : 'danger'">
+                      </p-badge>
+                    </div>
+                    <div class="more-productos" *ngIf="bodega.productos.length > 3">
+                      <small>y {{ bodega.productos.length - 3 }} más...</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="empty-state" *ngIf="!loadingInventario && inventarioResumen.length === 0">
+                <i class="pi pi-warehouse"></i>
+                <p>No hay datos de inventario</p>
+              </div>
+            </div>
+          </p-card>
         </div>
-      </p-card>
+      </div>
     </div>
-
-    <!-- Actions Section -->
-    <div class="actions-section">
-      <p-card header="Acciones Rápidas">
-        <div class="button-grid">
-          <p-button 
-            label="Éxito"
-            icon="pi pi-check"
-            severity="success"
-            (onClick)="showSuccess()">
-          </p-button>
-
-          <p-button 
-            label="Información"
-            icon="pi pi-info"
-            severity="info"
-            (onClick)="showInfo()">
-          </p-button>
-
-          <p-button 
-            label="Advertencia"
-            icon="pi pi-exclamation-triangle"
-            severity="warn"
-            (onClick)="showWarn()">
-          </p-button>
-
-          <p-button 
-            label="Error"
-            icon="pi pi-times"
-            severity="danger"
-            (onClick)="showError()">
-          </p-button>
-
-          <p-button 
-            label="Secundario"
-            icon="pi pi-cog"
-            severity="secondary">
-          </p-button>
-
-          <p-button 
-            label="Outlined"
-            icon="pi pi-star"
-            variant="outlined">
-          </p-button>
-        </div>
-      </p-card>
-    </div>
-
   </div>
 </div>
