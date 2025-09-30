@@ -59,16 +59,16 @@ export class Sidebar implements OnInit {
         icon: 'pi pi-arrow-right-arrow-left',
         route: '/movimientos'
       },
-      {
-        label: 'Reportes',
-        icon: 'pi pi-chart-bar',
-        route: '/reportes'
-      },
-      {
-        label: 'Configuración',
-        icon: 'pi pi-cog',
-        route: '/configuracion'
-      }
+      // {
+      //   label: 'Reportes',
+      //   icon: 'pi pi-chart-bar',
+      //   route: '/reportes'
+      // },
+      // {
+      //   label: 'Configuración',
+      //   icon: 'pi pi-cog',
+      //   route: '/configuracion'
+      // }
     ];
   }
 

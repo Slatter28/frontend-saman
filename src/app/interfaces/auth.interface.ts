@@ -4,11 +4,18 @@ export interface User {
   correo: string;
   rol: string;
   creadoEn: string;
+  bodegaId?: string;
 }
 
 export interface LoginRequest {
   correo: string;
   contrasena: string;
+  bodegaId?: string;
+}
+
+export interface BodegaOption {
+  id: string;
+  nombre: string;
 }
 
 export interface LoginResponse {
@@ -18,5 +25,5 @@ export interface LoginResponse {
 
 export interface ValidateResponse {
   valid: boolean;
-  user: User;
+  user: User | null;
 }

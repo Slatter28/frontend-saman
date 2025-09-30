@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { OfflineService } from './offline.service';
 import { 
   UnidadMedida, 
   UnidadMedidaDetalle,
@@ -19,7 +20,10 @@ import { environment } from '../../environments/environment';
 export class UnidadesMedidaService {
   private readonly apiUrl = `${environment.apiUrl}/unidades-medida`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private offlineService: OfflineService
+  ) {}
 
   /**
    * Obtiene la lista de unidades de medida con filtros y paginación
@@ -37,42 +41,63 @@ export class UnidadesMedidaService {
       params = params.set('nombre', filters.nombre.trim());
     }
 
-    return this.http.get<UnidadesMedidaResponse>(this.apiUrl, { params });
+    const cacheKey = `unidades_medida_${JSON.stringify(filters)}`;
+    const httpRequest = this.http.get<UnidadesMedidaResponse>(this.apiUrl, { params });
+    return this.offlineService.cacheFirstRequest(cacheKey, httpRequest, 10 * 60 * 1000);
   }
 
   /**
    * Obtiene todas las unidades de medida sin paginación (para selects/dropdowns)
    */
   getAllUnidadesMedida(): Observable<UnidadMedida[]> {
-    return this.http.get<UnidadMedida[]>(`${this.apiUrl}/all`);
+    const cacheKey = 'unidades_medida_all';
+    const httpRequest = this.http.get<UnidadMedida[]>(`${this.apiUrl}/all`);
+    return this.offlineService.cacheFirstRequest(cacheKey, httpRequest, 15 * 60 * 1000);
   }
 
   /**
    * Obtiene una unidad de medida por ID con productos asociados
    */
   getUnidadMedidaById(id: number): Observable<UnidadMedidaDetalle> {
-    return this.http.get<UnidadMedidaDetalle>(`${this.apiUrl}/${id}`);
+    const cacheKey = `unidad_medida_${id}`;
+    const httpRequest = this.http.get<UnidadMedidaDetalle>(`${this.apiUrl}/${id}`);
+    return this.offlineService.cacheFirstRequest(cacheKey, httpRequest, 10 * 60 * 1000);
   }
 
   /**
    * Crea una nueva unidad de medida
    */
   createUnidadMedida(unidad: CreateUnidadMedidaDto): Observable<UnidadMedida> {
-    return this.http.post<UnidadMedida>(this.apiUrl, unidad);
+    return this.offlineService.onlineOnlyRequest<UnidadMedida>(
+      'POST',
+      this.apiUrl,
+      unidad,
+      `Crear unidad de medida: ${unidad.nombre}`
+    );
   }
 
   /**
    * Actualiza una unidad de medida existente
    */
   updateUnidadMedida(id: number, unidad: UpdateUnidadMedidaDto): Observable<UnidadMedida> {
-    return this.http.patch<UnidadMedida>(`${this.apiUrl}/${id}`, unidad);
+    return this.offlineService.onlineOnlyRequest<UnidadMedida>(
+      'PATCH',
+      `${this.apiUrl}/${id}`,
+      unidad,
+      `Actualizar unidad de medida ID: ${id}`
+    );
   }
 
   /**
    * Elimina una unidad de medida
    */
   deleteUnidadMedida(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    return this.offlineService.onlineOnlyRequest<void>(
+      'DELETE',
+      `${this.apiUrl}/${id}`,
+      undefined,
+      `Eliminar unidad de medida ID: ${id}`
+    );
   }
 
   /**
@@ -86,7 +111,9 @@ export class UnidadesMedidaService {
    * Obtiene estadísticas de las unidades de medida
    */
   getUnidadesMedidaStats(): Observable<UnidadesMedidaStats> {
-    return this.http.get<UnidadesMedidaStats>(`${this.apiUrl}/stats`);
+    const cacheKey = 'unidades_medida_stats';
+    const httpRequest = this.http.get<UnidadesMedidaStats>(`${this.apiUrl}/stats`);
+    return this.offlineService.cacheFirstRequest(cacheKey, httpRequest, 5 * 60 * 1000);
   }
 
   /**

@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { OfflineService } from './offline.service';
+import { environment } from '../../environments/environment';
 import { 
   Bodega, 
   BodegaCreate, 
@@ -14,9 +16,12 @@ import {
   providedIn: 'root'
 })
 export class BodegasService {
-  private readonly baseUrl = 'http://localhost:3000/api/bodegas';
+  private readonly baseUrl = `${environment.apiUrl}/bodegas`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private offlineService: OfflineService
+  ) {}
 
   /**
    * Obtiene la lista de bodegas con paginación y filtros
@@ -37,41 +42,62 @@ export class BodegasService {
       params = params.set('ubicacion', filters.ubicacion);
     }
 
-    return this.http.get<BodegasResponse>(this.baseUrl, { params });
+    const cacheKey = `bodegas_${JSON.stringify(filters)}`;
+    const httpRequest = this.http.get<BodegasResponse>(this.baseUrl, { params });
+    return this.offlineService.cacheFirstRequest(cacheKey, httpRequest, 5 * 60 * 1000);
   }
 
   /**
    * Obtiene el detalle de una bodega específica
    */
   getBodegaById(id: number): Observable<Bodega> {
-    return this.http.get<Bodega>(`${this.baseUrl}/${id}`);
+    const cacheKey = `bodega_${id}`;
+    const httpRequest = this.http.get<Bodega>(`${this.baseUrl}/${id}`);
+    return this.offlineService.cacheFirstRequest(cacheKey, httpRequest, 10 * 60 * 1000);
   }
 
   /**
    * Obtiene el inventario de una bodega específica
    */
   getBodegaInventario(id: number): Observable<BodegaInventario> {
-    return this.http.get<BodegaInventario>(`${this.baseUrl}/${id}/inventario`);
+    const cacheKey = `bodega_inventario_${id}`;
+    const httpRequest = this.http.get<BodegaInventario>(`${this.baseUrl}/${id}/inventario`);
+    return this.offlineService.cacheFirstRequest(cacheKey, httpRequest, 2 * 60 * 1000);
   }
 
   /**
    * Crea una nueva bodega
    */
   createBodega(bodega: BodegaCreate): Observable<Bodega> {
-    return this.http.post<Bodega>(this.baseUrl, bodega);
+    return this.offlineService.onlineOnlyRequest<Bodega>(
+      'POST',
+      this.baseUrl,
+      bodega,
+      `Crear bodega: ${bodega.nombre}`
+    );
   }
 
   /**
    * Actualiza una bodega existente
    */
   updateBodega(id: number, bodega: BodegaUpdate): Observable<Bodega> {
-    return this.http.patch<Bodega>(`${this.baseUrl}/${id}`, bodega);
+    return this.offlineService.onlineOnlyRequest<Bodega>(
+      'PATCH',
+      `${this.baseUrl}/${id}`,
+      bodega,
+      `Actualizar bodega ID: ${id}`
+    );
   }
 
   /**
    * Elimina una bodega (solo admin)
    */
   deleteBodega(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+    return this.offlineService.onlineOnlyRequest<void>(
+      'DELETE',
+      `${this.baseUrl}/${id}`,
+      undefined,
+      `Eliminar bodega ID: ${id}`
+    );
   }
 }

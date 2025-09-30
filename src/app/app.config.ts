@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection, isDevMode } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
@@ -6,6 +6,7 @@ import { providePrimeNG } from 'primeng/config';
 import { routes } from './app.routes';
 import Aura from '@primeuix/themes/aura';
 import { authInterceptor } from './interceptors/auth.interceptor.functional';
+import { provideServiceWorker } from '@angular/service-worker';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -36,6 +37,9 @@ export const appConfig: ApplicationConfig = {
         reject: 'Rechazar',
    
     }
-        })
+        }), provideServiceWorker('ngsw-worker.js', {
+            enabled: !isDevMode(),
+            registrationStrategy: 'registerWhenStable:30000'
+          })
   ]
 };

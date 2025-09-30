@@ -38,6 +38,7 @@ export interface CreateEntradaDto {
   productoId: number;
   bodegaId: number;
   cantidad: number;
+  precio?: number;
   clienteId?: number;
   observacion?: string;
 }

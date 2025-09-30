@@ -20,12 +20,14 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { MenuModule } from 'primeng/menu';
 import { TextareaModule } from 'primeng/textarea';
+import { SplitButtonModule } from 'primeng/splitbutton';
 
 // Services
 import { MovimientosService } from '../../services/movimientos.service';
 import { ProductosService } from '../../services/productos.service';
 import { BodegasService } from '../../services/bodegas.service';
 import { ClientesService } from '../../services/clientes.service';
+import { AuthService } from '../../services/auth.service';
 import { MessageService, ConfirmationService } from 'primeng/api';
 
 // Interfaces
@@ -34,6 +36,7 @@ import {
   MovimientosFilter,
   CreateEntradaDto,
   CreateSalidaDto,
+  UpdateMovimientoDto,
   MovimientoTableColumn,
   MovimientosResponse
 } from '../../interfaces/movimiento.interface';
@@ -43,6 +46,38 @@ import { Cliente, ClientesResponse } from '../../interfaces/cliente.interface';
 import { DatePicker } from 'primeng/datepicker';
 import { CheckboxModule } from 'primeng/checkbox';
 import { TabsModule } from 'primeng/tabs';
+
+// Interfaces para división de productos
+interface ProductoDestino {
+  productoId: number | null;
+  cantidad: number | null;
+}
+
+interface DivisionProductoDto {
+  productoOrigenId: number;
+  bodegaId: number;
+  cantidadTotal: number;
+  productosDestino: {
+    productoId: number;
+    cantidad: number;
+  }[];
+  observacion?: string;
+}
+
+interface ProductoIngrediente {
+  productoId: number | null;
+  cantidad: number | null;
+}
+
+interface CombinacionProductoDto {
+  bodegaId: number;
+  productoComboId: number;
+  ingredientes: {
+    productoId: number;
+    cantidad: number;
+  }[];
+  observacion?: string;
+}
 @Component({
   selector: 'app-movimientos',
   standalone: true,
@@ -67,7 +102,9 @@ import { TabsModule } from 'primeng/tabs';
 CheckboxModule,
 FormsModule,
     MenuModule,
-    TextareaModule,TabsModule
+    TextareaModule,
+    TabsModule,
+    SplitButtonModule
   ],
   templateUrl: './movimientos.html',
   styleUrls: ['./movimientos.scss'],
@@ -91,14 +128,31 @@ export class Movimientos implements OnInit, OnDestroy {
   displayEntradaDialog = false;
   displaySalidaDialog = false;
   displayInventarioDialog = false;
+  displayEditDialog = false;
+  displayDivisionDialog = false;
+  displayCombinacionDialog = false;
   
   // Forms
   entradaForm!: FormGroup;
   salidaForm!: FormGroup;
   filtroForm!: FormGroup;
+  editForm!: FormGroup;
+  divisionForm!: FormGroup;
+  combinacionForm!: FormGroup;
   
   // Selected items
   selectedMovimiento: Movimiento | null = null;
+  movimientoToEdit: Movimiento | null = null;
+  
+  // División de productos
+  productosDestino: ProductoDestino[] = [];
+  
+  // Combinación de productos
+  ingredientes: ProductoIngrediente[] = [];
+  
+  // User permissions
+  isAdmin = false;
+  currentUser: any = null;
   
   // Filters
   filtros: MovimientosFilter = {
@@ -125,6 +179,46 @@ export class Movimientos implements OnInit, OnDestroy {
     { label: 'Salida', value: 'salida' }
   ];
   
+  // Menu Items para SplitButtons
+  movimientosMenuItems = [
+    {
+      label: 'Nueva Entrada',
+      icon: 'pi pi-arrow-up',
+      command: () => this.openEntradaDialog()
+    },
+    {
+      label: 'Nueva Salida',
+      icon: 'pi pi-arrow-down',
+      command: () => this.openSalidaDialog()
+    }
+  ];
+  
+  operacionesMenuItems = [
+    {
+      label: 'División de Producto',
+      icon: 'pi pi-share-alt',
+      command: () => this.openDivisionDialog()
+    },
+    {
+      label: 'Combinación de Productos',
+      icon: 'pi pi-sitemap',
+      command: () => this.openCombinacionDialog()
+    }
+  ];
+  
+  reportesMenuItems = [
+    {
+      label: 'Excel Movimientos',
+      icon: 'pi pi-file-excel',
+      command: () => this.exportExcel()
+    },
+    {
+      label: 'Excel Inventario',
+      icon: 'pi pi-chart-bar',
+      command: () => this.exportInventarioExcel()
+    }
+  ];
+  
   private destroy$ = new Subject<void>();
 
   inventarioData: any = null;
@@ -141,12 +235,14 @@ inventarioFiltros = {
     private productosService: ProductosService,
     private bodegasService: BodegasService,
     private clientesService: ClientesService,
+    private authService: AuthService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef
   ) {
     this.initializeForms();
+    this.initializeUserPermissions();
   }
   
   ngOnInit(): void {
@@ -165,6 +261,7 @@ inventarioFiltros = {
       productoId: [null, Validators.required],
       bodegaId: [null, Validators.required],
       cantidad: [null, [Validators.required, Validators.min(0.01)]],
+      precio: [null, [Validators.min(0)]],
       clienteId: [null],
       observacion: ['']
     });
@@ -186,6 +283,21 @@ inventarioFiltros = {
       clienteId: [null],
       fechaDesde: [null],
       fechaHasta: [null]
+    });
+    
+    // Formulario de división
+    this.divisionForm = this.fb.group({
+      productoOrigenId: [null, Validators.required],
+      bodegaId: [null, Validators.required],
+      cantidadTotal: [null, [Validators.required, Validators.min(0.01)]],
+      observacion: ['']
+    });
+    
+    // Formulario de combinación
+    this.combinacionForm = this.fb.group({
+      productoComboId: [null, Validators.required],
+      bodegaId: [null, Validators.required],
+      observacion: ['']
     });
   }
   
@@ -370,12 +482,105 @@ inventarioFiltros = {
   }
   
   exportExcel(): void {
-    // TODO: Implementar exportación
-    this.messageService.add({
-      severity: 'info',
-      summary: 'Funcionalidad',
-      detail: 'Exportación Excel próximamente disponible'
-    });
+    console.log('Iniciando descarga de Excel...');
+    const filtrosActuales = { ...this.filtros };
+    console.log('Filtros actuales:', filtrosActuales);
+    
+    this.movimientosService.downloadExcel(filtrosActuales)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (blob: Blob) => {
+          console.log('Blob recibido:', blob);
+          this.downloadFile(blob, this.generateFileName());
+          this.showSuccess('Excel descargado correctamente');
+        },
+        error: (error) => {
+          console.error('Error en exportExcel:', error);
+          
+          let errorMessage = 'Error al descargar Excel';
+          if (error.status === 400) {
+            errorMessage = 'Solicitud inválida - Verifique los filtros aplicados';
+          } else if (error.status === 401) {
+            errorMessage = 'No autorizado - Verifique su sesión';
+          } else if (error.status === 403) {
+            errorMessage = 'Acceso denegado - Sin permisos suficientes';
+          } else if (error.status === 500) {
+            errorMessage = 'Error del servidor al generar Excel';
+          }
+          
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error al descargar Excel',
+            detail: `${errorMessage} (${error.status})`,
+            life: 5000
+          });
+        }
+      });
+  }
+
+  private downloadFile(blob: Blob, fileName: string): void {
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  }
+
+  private generateFileName(): string {
+    const today = new Date();
+    const dateStr = today.getFullYear() + '-' + 
+                   String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                   String(today.getDate()).padStart(2, '0');
+    return `movimientos_${dateStr}.xlsx`;
+  }
+
+  private generateInventarioFileName(): string {
+    const today = new Date();
+    const dateStr = today.getFullYear() + '-' + 
+                   String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                   String(today.getDate()).padStart(2, '0');
+    return `inventario_${dateStr}.xlsx`;
+  }
+
+  exportInventarioExcel(): void {
+    console.log('Iniciando descarga de inventario Excel...');
+    
+    // Usar bodegaId si hay filtro de bodega aplicado en inventario
+    const bodegaId = this.inventarioFiltros?.bodegaId;
+    
+    this.movimientosService.downloadInventarioExcel(bodegaId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (blob: Blob) => {
+          console.log('Inventario Excel blob recibido:', blob);
+          this.downloadFile(blob, this.generateInventarioFileName());
+          this.showSuccess('Reporte de inventario descargado correctamente');
+        },
+        error: (error) => {
+          console.error('Error en exportInventarioExcel:', error);
+          
+          let errorMessage = 'Error al descargar reporte de inventario';
+          if (error.status === 400) {
+            errorMessage = 'Solicitud inválida - Verifique los parámetros';
+          } else if (error.status === 401) {
+            errorMessage = 'No autorizado - Verifique su sesión';
+          } else if (error.status === 403) {
+            errorMessage = 'Acceso denegado - Sin permisos suficientes';
+          } else if (error.status === 500) {
+            errorMessage = 'Error del servidor al generar reporte';
+          }
+          
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error al descargar inventario',
+            detail: `${errorMessage} (${error.status})`,
+            life: 5000
+          });
+        }
+      });
   }
   
   exportPDF(): void {
@@ -474,4 +679,512 @@ getStockSeverity(stock: number | null | undefined): "success" | "warning" | "dan
   if (stockValue > 10) return 'warning';
   return 'danger';
 }
+
+// ============= NUEVOS MÉTODOS PARA EDICIÓN Y CONTROL DE ROLES =============
+
+/**
+ * Inicializar permisos del usuario
+ */
+initializeUserPermissions(): void {
+  this.currentUser = this.authService.getCurrentUser();
+  this.isAdmin = this.currentUser?.rol === 'admin';
+  console.log('Permisos de usuario:', { isAdmin: this.isAdmin, rol: this.currentUser?.rol });
+}
+
+/**
+ * Verificar si el usuario puede editar movimientos
+ */
+canEditMovimientos(): boolean {
+  return this.isAdmin;
+}
+
+/**
+ * Verificar si el usuario puede eliminar movimientos
+ */
+canDeleteMovimientos(): boolean {
+  return this.isAdmin;
+}
+
+/**
+ * Abrir dialog de edición de movimiento
+ */
+openEditDialog(movimiento: Movimiento): void {
+  if (!this.canEditMovimientos()) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Acceso denegado',
+      detail: 'Solo los administradores pueden editar movimientos'
+    });
+    return;
+  }
+
+  this.movimientoToEdit = { ...movimiento };
+  this.initializeEditForm();
+  this.displayEditDialog = true;
+}
+
+/**
+ * Inicializar formulario de edición
+ */
+initializeEditForm(): void {
+  if (!this.movimientoToEdit) return;
+
+  this.editForm = this.fb.group({
+    cantidad: [this.movimientoToEdit.cantidad, [Validators.required, Validators.min(0.01)]],
+    observacion: [this.movimientoToEdit.observacion || '']
+  });
+}
+
+/**
+ * Guardar cambios del movimiento editado
+ */
+saveEditedMovimiento(): void {
+  if (!this.editForm.valid || !this.movimientoToEdit) return;
+
+  const updateData: UpdateMovimientoDto = {
+    cantidad: this.editForm.value.cantidad,
+    observacion: this.editForm.value.observacion
+  };
+
+  this.movimientosService.updateMovimiento(this.movimientoToEdit.id, updateData)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: (updatedMovimiento) => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Movimiento actualizado',
+          detail: 'Los cambios se han guardado correctamente'
+        });
+        
+        this.displayEditDialog = false;
+        this.loadMovimientos(); // Recargar la tabla
+      },
+      error: (error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: error.message || 'Error al actualizar el movimiento'
+        });
+      }
+    });
+}
+
+/**
+ * Cancelar edición
+ */
+cancelEdit(): void {
+  this.displayEditDialog = false;
+  this.movimientoToEdit = null;
+  this.editForm?.reset();
+}
+
+/**
+ * Confirmar eliminación de movimiento
+ */
+confirmDelete(movimiento: Movimiento): void {
+  if (!this.canDeleteMovimientos()) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Acceso denegado',
+      detail: 'Solo los administradores pueden eliminar movimientos'
+    });
+    return;
+  }
+
+  this.confirmationService.confirm({
+    message: `¿Está seguro de eliminar este movimiento?<br><br>
+              <strong>Tipo:</strong> ${movimiento.tipo}<br>
+              <strong>Producto:</strong> ${movimiento.producto.descripcion}<br>
+              <strong>Cantidad:</strong> ${movimiento.cantidad}<br><br>
+              <em>Esta acción no se puede deshacer y afectará el inventario.</em>`,
+    header: 'Confirmar Eliminación',
+    icon: 'pi pi-exclamation-triangle',
+    acceptButtonStyleClass: 'p-button-danger',
+    acceptLabel: 'Sí, eliminar',
+    rejectLabel: 'Cancelar',
+    accept: () => {
+      this.deleteMovimiento(movimiento);
+    }
+  });
+}
+
+/**
+ * Eliminar movimiento
+ */
+deleteMovimiento(movimiento: Movimiento): void {
+  this.movimientosService.deleteMovimiento(movimiento.id)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Movimiento eliminado',
+          detail: 'El movimiento ha sido eliminado correctamente'
+        });
+        
+        this.loadMovimientos(); // Recargar la tabla
+      },
+      error: (error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: error.message || 'Error al eliminar el movimiento'
+        });
+      }
+    });
+}
+
+/**
+ * Verificar si el formulario de edición es válido
+ */
+isEditFormValid(): boolean {
+  return this.editForm?.valid || false;
+}
+
+/**
+ * Verificar si un campo del formulario de edición tiene errores
+ */
+isEditFieldInvalid(fieldName: string): boolean {
+  const field = this.editForm?.get(fieldName);
+  return !!(field && field.invalid && field.touched);
+}
+
+/**
+ * Obtener mensaje de error para un campo del formulario de edición
+ */
+getEditFieldError(fieldName: string): string {
+  const field = this.editForm?.get(fieldName);
+  if (field?.errors?.['required']) {
+    return `${fieldName === 'cantidad' ? 'Cantidad' : 'Campo'} es requerido`;
+  }
+  if (field?.errors?.['min']) {
+    return 'La cantidad debe ser mayor a 0';
+  }
+  return '';
+}
+
+// ============= MÉTODOS PARA DIVISIÓN DE PRODUCTOS =============
+
+/**
+ * Abrir dialog de división de productos
+ */
+openDivisionDialog(): void {
+  this.divisionForm.reset();
+  this.productosDestino = [];
+  this.displayDivisionDialog = true;
+}
+
+/**
+ * Cancelar división
+ */
+cancelDivision(): void {
+  this.displayDivisionDialog = false;
+  this.divisionForm.reset();
+  this.productosDestino = [];
+}
+
+/**
+ * Agregar producto destino
+ */
+agregarProductoDestino(): void {
+  this.productosDestino.push({
+    productoId: null,
+    cantidad: null
+  });
+}
+
+/**
+ * Remover producto destino
+ */
+removerProductoDestino(index: number): void {
+  this.productosDestino.splice(index, 1);
+}
+
+/**
+ * TrackBy function para *ngFor
+ */
+trackByIndex(index: number, item: any): number {
+  return index;
+}
+
+/**
+ * Cambio en producto origen
+ */
+onProductoOrigenChange(): void {
+  // Aquí podrías cargar información adicional del producto si es necesario
+  console.log('Producto origen seleccionado:', this.divisionForm.get('productoOrigenId')?.value);
+}
+
+/**
+ * Cambio en cantidad total
+ */
+onCantidadTotalChange(): void {
+  // Podrías implementar lógica para distribuir automáticamente la cantidad
+  console.log('Cantidad total cambiada:', this.divisionForm.get('cantidadTotal')?.value);
+}
+
+/**
+ * Cambio en cantidad de producto destino
+ */
+onCantidadDestinoChange(): void {
+  // Recalcular resumen
+  console.log('Cantidad destino cambiada, recalculando resumen...');
+}
+
+/**
+ * Obtener cantidad total del formulario
+ */
+getCantidadTotal(): number {
+  return this.divisionForm.get('cantidadTotal')?.value || 0;
+}
+
+/**
+ * Obtener cantidad total asignada a productos destino
+ */
+getCantidadAsignada(): number {
+  return this.productosDestino.reduce((total, item) => {
+    return total + (item.cantidad || 0);
+  }, 0);
+}
+
+/**
+ * Obtener diferencia entre cantidad total y asignada
+ */
+getDiferencia(): number {
+  return this.getCantidadTotal() - this.getCantidadAsignada();
+}
+
+/**
+ * Obtener clase CSS para mostrar diferencia
+ */
+getDiferenciaClass(): string {
+  const diferencia = this.getDiferencia();
+  if (diferencia === 0) return 'diferencia-ok';
+  if (diferencia > 0) return 'diferencia-falta';
+  return 'diferencia-sobra';
+}
+
+/**
+ * Verificar si el formulario de división es válido
+ */
+isDivisionFormValid(): boolean {
+  // Validar formulario básico
+  if (!this.divisionForm.valid) return false;
+  
+  // Validar que haya al menos un producto destino
+  if (this.productosDestino.length === 0) return false;
+  
+  // Validar que todos los productos destino tengan datos válidos
+  for (let item of this.productosDestino) {
+    if (!item.productoId || !item.cantidad || item.cantidad <= 0) {
+      return false;
+    }
+  }
+  
+  // Validar que las cantidades coincidan exactamente
+  if (this.getDiferencia() !== 0) return false;
+  
+  return true;
+}
+
+/**
+ * Verificar si un campo del formulario de división tiene errores
+ */
+isDivisionFieldInvalid(fieldName: string): boolean {
+  const field = this.divisionForm?.get(fieldName);
+  return !!(field && field.invalid && field.touched);
+}
+
+/**
+ * Procesar división de producto
+ */
+procesarDivision(): void {
+  if (!this.isDivisionFormValid()) {
+    this.markFormGroupTouched(this.divisionForm);
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Formulario incompleto',
+      detail: 'Por favor complete todos los campos requeridos y verifique que las cantidades coincidan'
+    });
+    return;
+  }
+
+  // Preparar datos para enviar
+  const divisionData: DivisionProductoDto = {
+    productoOrigenId: this.divisionForm.get('productoOrigenId')?.value,
+    bodegaId: this.divisionForm.get('bodegaId')?.value,
+    cantidadTotal: this.divisionForm.get('cantidadTotal')?.value,
+    productosDestino: this.productosDestino.map(item => ({
+      productoId: item.productoId!,
+      cantidad: item.cantidad!
+    })),
+    observacion: this.divisionForm.get('observacion')?.value || undefined
+  };
+
+  console.log('=== DATOS DE DIVISIÓN A ENVIAR AL BACKEND ===');
+  console.log(JSON.stringify(divisionData, null, 2));
+  console.log('=== FIN DE DATOS DE DIVISIÓN ===');
+
+  // Aquí llamarías al servicio para enviar al backend
+  // Por ahora solo mostramos los datos en consola como solicitaste
+  this.messageService.add({
+    severity: 'info',
+    summary: 'División preparada',
+    detail: 'Los datos de la división se muestran en la consola del navegador. Implementar endpoint en backend.'
+  });
+
+  // Opcional: cerrar el diálogo después de mostrar los datos
+  // this.displayDivisionDialog = false;
+  // this.divisionForm.reset();
+  // this.productosDestino = [];
+}
+
+// Método auxiliar Math.abs para el template
+Math = Math;
+
+// ============= MÉTODOS PARA COMBINACIÓN DE PRODUCTOS =============
+
+/**
+ * Abrir dialog de combinación de productos
+ */
+openCombinacionDialog(): void {
+  this.combinacionForm.reset();
+  this.ingredientes = [];
+  this.displayCombinacionDialog = true;
+}
+
+/**
+ * Cancelar combinación
+ */
+cancelCombinacion(): void {
+  this.displayCombinacionDialog = false;
+  this.combinacionForm.reset();
+  this.ingredientes = [];
+}
+
+/**
+ * Agregar ingrediente
+ */
+agregarIngrediente(): void {
+  this.ingredientes.push({
+    productoId: null,
+    cantidad: null
+  });
+}
+
+/**
+ * Remover ingrediente
+ */
+removerIngrediente(index: number): void {
+  this.ingredientes.splice(index, 1);
+}
+
+/**
+ * Cambio en ingrediente (recalcular totales)
+ */
+onIngredienteChange(): void {
+  // Recalcular totales automáticamente
+  console.log('Ingrediente cambiado, total:', this.getCantidadTotalIngredientes());
+}
+
+/**
+ * Obtener cantidad total de todos los ingredientes
+ */
+getCantidadTotalIngredientes(): number {
+  return this.ingredientes.reduce((total, item) => {
+    return total + (item.cantidad || 0);
+  }, 0);
+}
+
+/**
+ * Obtener nombre de producto por ID
+ */
+getProductoNombre(productoId: number | null): string {
+  if (!productoId) return '';
+  const producto = this.productos.find(p => p.id === productoId);
+  return producto ? `${producto.codigo} - ${producto.descripcion}` : 'Producto no encontrado';
+}
+
+/**
+ * Verificar si el formulario de combinación es válido
+ */
+isCombinacionFormValid(): boolean {
+  // Validar formulario básico
+  if (!this.combinacionForm.valid) return false;
+  
+  // Validar que haya al menos un ingrediente
+  if (this.ingredientes.length === 0) return false;
+  
+  // Validar que todos los ingredientes tengan datos válidos
+  for (let item of this.ingredientes) {
+    if (!item.productoId || !item.cantidad || item.cantidad <= 0) {
+      return false;
+    }
+  }
+  
+  // Validar que la cantidad total sea mayor a 0
+  if (this.getCantidadTotalIngredientes() <= 0) return false;
+  
+  return true;
+}
+
+/**
+ * Verificar si un campo del formulario de combinación tiene errores
+ */
+isCombinacionFieldInvalid(fieldName: string): boolean {
+  const field = this.combinacionForm?.get(fieldName);
+  return !!(field && field.invalid && field.touched);
+}
+
+/**
+ * Procesar combinación de productos
+ */
+procesarCombinacion(): void {
+  if (!this.isCombinacionFormValid()) {
+    this.markFormGroupTouched(this.combinacionForm);
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Formulario incompleto',
+      detail: 'Por favor complete todos los campos requeridos y agregue al menos un ingrediente válido'
+    });
+    return;
+  }
+
+  // Preparar datos para enviar
+  const combinacionData: CombinacionProductoDto = {
+    bodegaId: this.combinacionForm.get('bodegaId')?.value,
+    productoComboId: this.combinacionForm.get('productoComboId')?.value,
+    ingredientes: this.ingredientes.map(item => ({
+      productoId: item.productoId!,
+      cantidad: item.cantidad!
+    })),
+    observacion: this.combinacionForm.get('observacion')?.value || undefined
+  };
+
+  console.log('=== DATOS DE COMBINACIÓN A ENVIAR AL BACKEND ===');
+  console.log(JSON.stringify(combinacionData, null, 2));
+  console.log(`=== RESUMEN DE MOVIMIENTOS ===`);
+  console.log(`EGRESOS (Salidas):`);
+  this.ingredientes.forEach((item, index) => {
+    const producto = this.getProductoNombre(item.productoId);
+    console.log(`  ${index + 1}. ${producto}: -${item.cantidad} unidades`);
+  });
+  console.log(`INGRESO (Entrada):`);
+  console.log(`  Combo ${this.getProductoNombre(combinacionData.productoComboId)}: +${this.getCantidadTotalIngredientes()} unidades`);
+  console.log('=== FIN DE DATOS DE COMBINACIÓN ===');
+
+  // Aquí llamarías al servicio para enviar al backend
+  // Por ahora solo mostramos los datos en consola como solicitaste
+  this.messageService.add({
+    severity: 'info',
+    summary: 'Combinación preparada',
+    detail: 'Los datos de la combinación se muestran en la consola del navegador. Implementar endpoint en backend.'
+  });
+
+  // Opcional: cerrar el diálogo después de mostrar los datos
+  // this.displayCombinacionDialog = false;
+  // this.combinacionForm.reset();
+  // this.ingredientes = [];
+}
+
   }

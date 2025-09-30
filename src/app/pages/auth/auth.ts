@@ -4,10 +4,11 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { CheckboxModule } from 'primeng/checkbox';
+import { Select } from 'primeng/select';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
-import { LoginRequest } from '../../interfaces/auth.interface';
+import { LoginRequest, BodegaOption } from '../../interfaces/auth.interface';
 import { ToastModule } from 'primeng/toast';
 import { RippleModule } from 'primeng/ripple';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -20,6 +21,7 @@ import { CommonModule } from '@angular/common';
     PasswordModule,
     ButtonModule,
     CheckboxModule,
+    Select,
     ToastModule,
     ProgressSpinnerModule,
     RippleModule,
@@ -32,7 +34,12 @@ import { CommonModule } from '@angular/common';
 export class AuthComponent implements OnInit {
   loginForm!: FormGroup;
   loading = false;
-  isDarkTheme = false;
+  loadingMessage = 'Iniciando sesión...';
+
+  bodegas: BodegaOption[] = [
+    { id: 'principal', nombre: 'Bodega Fabrica' },
+    { id: 'sucursal', nombre: 'Bodega Hacienda' }
+  ];
 
   constructor(
     private fb: FormBuilder,
@@ -51,6 +58,7 @@ export class AuthComponent implements OnInit {
     this.loginForm = this.fb.group({
       correo: ['', [Validators.required, Validators.email]],
       contrasena: ['', [Validators.required, Validators.minLength(6)]],
+      bodegaId: ['principal', [Validators.required]],
       rememberEmail: [false]
     });
   }
@@ -68,33 +76,49 @@ export class AuthComponent implements OnInit {
   onSubmit(): void {
     if (this.loginForm.valid) {
       this.loading = true;
+      this.loadingMessage = 'Verificando credenciales...';
+      
       const credentials: LoginRequest = {
         correo: this.loginForm.value.correo,
-        contrasena: this.loginForm.value.contrasena
+        contrasena: this.loginForm.value.contrasena,
+        bodegaId: this.loginForm.value.bodegaId
       };
 
       this.authService.login(credentials).subscribe({
         next: (response) => {
+          this.loadingMessage = 'Configurando sesión...';
           this.handleRememberEmail();
+          
           this.messageService.add({
             severity: 'success',
-            summary: 'Éxito',
-            detail: `Bienvenido, ${response.usuario.nombre}`
+            summary: 'Bienvenido',
+            detail: `Hola ${response.usuario.nombre}!`
           });
-          setTimeout(() => {
-            this.router.navigate(['/dashboard']);
-          }, 1000);
+          
+          // Navegación inmediata sin setTimeout
+          this.loadingMessage = 'Cargando aplicación...';
+          this.router.navigate(['/dashboard']).then(() => {
+            this.loading = false;
+          });
         },
         error: (error) => {
           this.loading = false;
+          this.loadingMessage = 'Iniciando sesión...';
+          
+          let errorMessage = 'Credenciales inválidas';
+          if (error.error?.message) {
+            errorMessage = error.error.message;
+          } else if (error.status === 0) {
+            errorMessage = 'Error de conexión. Verifica tu internet.';
+          } else if (error.status >= 500) {
+            errorMessage = 'Error del servidor. Intenta más tarde.';
+          }
+          
           this.messageService.add({
             severity: 'error',
-            summary: 'Error',
-            detail: error.error?.message || 'Credenciales inválidas'
+            summary: 'Error de autenticación',
+            detail: errorMessage
           });
-        },
-        complete: () => {
-          this.loading = false;
         }
       });
     } else {
@@ -130,7 +154,12 @@ export class AuthComponent implements OnInit {
   getFieldError(fieldName: string): string {
     const field = this.loginForm.get(fieldName);
     if (field?.errors?.['required']) {
-      return `${fieldName === 'correo' ? 'Email' : 'Contraseña'} es requerido`;
+      switch(fieldName) {
+        case 'correo': return 'Email es requerido';
+        case 'contrasena': return 'Contraseña es requerida';
+        case 'bodegaId': return 'Seleccione una bodega';
+        default: return `${fieldName} es requerido`;
+      }
     }
     if (field?.errors?.['email']) {
       return 'Email inválido';

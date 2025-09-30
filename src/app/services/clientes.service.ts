@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { OfflineService } from './offline.service';
 import { 
   Cliente, 
   ClienteDetalle, 
@@ -20,7 +21,10 @@ import { environment } from '../../environments/environment';
 export class ClientesService {
   private readonly apiUrl = `${environment.apiUrl}/clientes`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private offlineService: OfflineService
+  ) {}
 
   /**
    * Obtiene la lista de clientes con filtros y paginación
@@ -44,42 +48,63 @@ export class ClientesService {
       params = params.set('tipo', filters.tipo);
     }
 
-    return this.http.get<ClientesResponse>(this.apiUrl, { params });
+    const cacheKey = `clientes_${JSON.stringify(filters)}`;
+    const httpRequest = this.http.get<ClientesResponse>(this.apiUrl, { params });
+    return this.offlineService.cacheFirstRequest(cacheKey, httpRequest, 5 * 60 * 1000);
   }
 
   /**
    * Obtiene el detalle de un cliente específico
    */
   getCliente(id: number): Observable<ClienteDetalle> {
-    return this.http.get<ClienteDetalle>(`${this.apiUrl}/${id}`);
+    const cacheKey = `cliente_${id}`;
+    const httpRequest = this.http.get<ClienteDetalle>(`${this.apiUrl}/${id}`);
+    return this.offlineService.cacheFirstRequest(cacheKey, httpRequest, 10 * 60 * 1000);
   }
 
   /**
    * Obtiene los movimientos de un cliente específico
    */
   getClienteMovimientos(id: number): Observable<ClienteMovimientosResponse> {
-    return this.http.get<ClienteMovimientosResponse>(`${this.apiUrl}/${id}/movimientos`);
+    const cacheKey = `cliente_movimientos_${id}`;
+    const httpRequest = this.http.get<ClienteMovimientosResponse>(`${this.apiUrl}/${id}/movimientos`);
+    return this.offlineService.cacheFirstRequest(cacheKey, httpRequest, 2 * 60 * 1000);
   }
 
   /**
    * Crea un nuevo cliente
    */
   createCliente(cliente: CreateClienteDto): Observable<Cliente> {
-    return this.http.post<Cliente>(this.apiUrl, cliente);
+    return this.offlineService.onlineOnlyRequest<Cliente>(
+      'POST',
+      this.apiUrl,
+      cliente,
+      `Crear cliente: ${cliente.nombre}`
+    );
   }
 
   /**
    * Actualiza un cliente existente
    */
   updateCliente(id: number, cliente: Partial<CreateClienteDto>): Observable<Cliente> {
-    return this.http.patch<Cliente>(`${this.apiUrl}/${id}`, cliente);
+    return this.offlineService.onlineOnlyRequest<Cliente>(
+      'PATCH',
+      `${this.apiUrl}/${id}`,
+      cliente,
+      `Actualizar cliente ID: ${id}`
+    );
   }
 
   /**
    * Elimina un cliente
    */
   deleteCliente(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    return this.offlineService.onlineOnlyRequest<void>(
+      'DELETE',
+      `${this.apiUrl}/${id}`,
+      undefined,
+      `Eliminar cliente ID: ${id}`
+    );
   }
 
   /**

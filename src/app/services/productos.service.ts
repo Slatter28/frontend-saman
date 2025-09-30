@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { map, debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { map, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { OfflineService } from './offline.service';
 import { environment } from '../../environments/environment';
 import {
   Producto,
@@ -27,7 +28,10 @@ export class ProductosService {
   private loadingSubject = new BehaviorSubject<boolean>(false);
   public loading$ = this.loadingSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private offlineService: OfflineService
+  ) {}
 
   // Obtener lista de productos con filtros y paginación
   getProductos(filtros: ProductosFilter = {}): Observable<ProductosResponse> {
@@ -51,7 +55,10 @@ export class ProductosService {
       params = params.set('unidadMedidaId', filtros.unidadMedidaId.toString());
     }
 
-    return this.http.get<ProductosResponse>(this.apiUrl, { params }).pipe(
+    const cacheKey = `productos_${JSON.stringify(filtros)}`;
+    const httpRequest = this.http.get<ProductosResponse>(this.apiUrl, { params });
+
+    return this.offlineService.cacheFirstRequest(cacheKey, httpRequest, 2 * 60 * 1000).pipe(
       map(response => {
         this.loadingSubject.next(false);
         this.filtrosSubject.next(filtros);
@@ -62,32 +69,53 @@ export class ProductosService {
 
   // Obtener producto por ID
   getProducto(id: number): Observable<Producto> {
-    return this.http.get<Producto>(`${this.apiUrl}/${id}`);
+    const cacheKey = `producto_${id}`;
+    const httpRequest = this.http.get<Producto>(`${this.apiUrl}/${id}`);
+    return this.offlineService.cacheFirstRequest(cacheKey, httpRequest, 5 * 60 * 1000);
   }
 
   // Crear nuevo producto
   createProducto(producto: CreateProductoDto): Observable<Producto> {
-    return this.http.post<Producto>(this.apiUrl, producto);
+    return this.offlineService.onlineOnlyRequest<Producto>(
+      'POST',
+      this.apiUrl,
+      producto,
+      `Crear producto: ${producto.descripcion}`
+    );
   }
 
   // Actualizar producto
   updateProducto(id: number, producto: UpdateProductoDto): Observable<Producto> {
-    return this.http.patch<Producto>(`${this.apiUrl}/${id}`, producto);
+    return this.offlineService.onlineOnlyRequest<Producto>(
+      'PATCH',
+      `${this.apiUrl}/${id}`,
+      producto,
+      `Actualizar producto ID: ${id}`
+    );
   }
 
   // Eliminar producto
   deleteProducto(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    return this.offlineService.onlineOnlyRequest<void>(
+      'DELETE',
+      `${this.apiUrl}/${id}`,
+      undefined,
+      `Eliminar producto ID: ${id}`
+    );
   }
 
   // Obtener movimientos de un producto por código
   getMovimientosProducto(codigo: string): Observable<ProductoMovimientos> {
-    return this.http.get<ProductoMovimientos>(`${this.movimientosUrl}/producto/${codigo}`);
+    const cacheKey = `movimientos_producto_${codigo}`;
+    const httpRequest = this.http.get<ProductoMovimientos>(`${this.movimientosUrl}/producto/${codigo}`);
+    return this.offlineService.cacheFirstRequest(cacheKey, httpRequest, 1 * 60 * 1000);
   }
 
   // Obtener kardex de un producto
   getKardexProducto(productId: number): Observable<ProductoKardex> {
-    return this.http.get<ProductoKardex>(`${this.movimientosUrl}/kardex/${productId}`);
+    const cacheKey = `kardex_producto_${productId}`;
+    const httpRequest = this.http.get<ProductoKardex>(`${this.movimientosUrl}/kardex/${productId}`);
+    return this.offlineService.cacheFirstRequest(cacheKey, httpRequest, 1 * 60 * 1000);
   }
 
   // Verificar si un código de producto existe

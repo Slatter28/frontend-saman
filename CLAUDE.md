@@ -48,9 +48,11 @@ src/app/
 
 ### Authentication System
 - **JWT-based authentication** with localStorage persistence
+- **PWA Session Management** with extended 7-day sessions for installed apps
 - **Functional guards** (`authGuard`, `loginGuard`) using `CanActivateFn`
 - **HTTP interceptor** automatically attaches Bearer tokens to requests
-- **AuthService** manages auth state with BehaviorSubject pattern
+- **AuthService** manages auth state with BehaviorSubject pattern and activity tracking
+- **Offline-compatible authentication** maintains sessions when connection is lost
 - **API base URL**: `http://localhost:3000/api`
 
 ### Routing Architecture
@@ -105,6 +107,24 @@ Key business entities include:
 - **HttpClient** for API communication with centralized base URL
 - **Error handling** with navigation fallbacks
 - **Reactive state management** using BehaviorSubject/Observable patterns
+- **Offline-first architecture** with cache-first request strategies
+
+### PWA and Offline Functionality
+- **Progressive Web App** with Service Worker support
+- **Offline-first architecture** using cache-first strategies for data persistence
+- **Queue-based synchronization** for offline operations with automatic retry
+- **Extended PWA sessions** (7 days for PWA, 8 hours for browser) with activity tracking
+- **Connection status monitoring** with real-time sync progress indicators
+- **LocalStorage persistence** for authentication state and offline data
+- **Intelligent cache management** with automatic expiration and cleanup
+- **Development PWA mode**: Add `?pwa=true` to URL to simulate PWA behavior in development
+
+### Session Management
+- **PWA sessions**: 7 days duration with extended offline tolerance
+- **Browser sessions**: 8 hours duration with 30 minutes offline tolerance  
+- **Activity tracking**: User interactions extend session automatically
+- **Offline validation**: Maintains authentication when server is unreachable
+- **Smart reconnection**: Silent token validation when connection returns
 
 ### Bundle Configuration
 - **Initial bundle**: 500kB warning, 1MB error

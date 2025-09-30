@@ -6,13 +6,16 @@ import { RippleModule } from 'primeng/ripple';
 import { AvatarModule } from 'primeng/avatar';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
+import { ConnectionStatusComponent } from '../../components/connection-status/connection-status.component';
+
 @Component({
   selector: 'app-header',
   imports: [
      CommonModule,
     ButtonModule,
     AvatarModule,
-    RippleModule
+    RippleModule,
+    ConnectionStatusComponent
   ],
   templateUrl: './header.html',
   styleUrl: './header.scss'
@@ -98,11 +101,24 @@ export class Header implements OnInit {
 
   getUserInitials(): string {
     if (!this.currentUser) return 'U';
-    
+
     const names = this.currentUser.nombre.split(' ');
     if (names.length >= 2) {
       return (names[0].charAt(0) + names[1].charAt(0)).toUpperCase();
     }
     return this.currentUser.nombre.charAt(0).toUpperCase();
+  }
+
+  getBodegaName(): string {
+    if (!this.currentUser?.bodegaId) return 'Bodega Fabrica';
+
+    switch (this.currentUser.bodegaId) {
+      case 'principal':
+        return 'Bodega Fabrica';
+      case 'sucursal':
+        return 'Bodega Hacienda';
+      default:
+        return `Bodega ${this.currentUser.bodegaId}`;
+    }
   }
 }

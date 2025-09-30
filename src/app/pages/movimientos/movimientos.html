@@ -11,59 +11,40 @@
   <!-- Main Content Card -->
   <p-card styleClass="main-card">
     
-    <!-- Toolbar -->
-    <p-toolbar styleClass="toolbar-custom">
-      <ng-template pTemplate="start">
-        <div class="toolbar-start">
-          <p-button 
-            icon="pi pi-arrow-up" 
-            label="Nueva Entrada" 
-            severity="success"
-            (onClick)="openEntradaDialog()"
-            pTooltip="Registrar entrada de productos"
-            tooltipPosition="bottom">
-          </p-button>
-          
-          <p-button 
-            icon="pi pi-arrow-down" 
-            label="Nueva Salida" 
-            severity="info"
-            (onClick)="openSalidaDialog()"
-            pTooltip="Registrar salida de productos"
-            tooltipPosition="bottom">
-          </p-button>
-          
-        <p-button 
-  icon="pi pi-chart-bar" 
-  label="Inventario" 
-  severity="secondary"
-  (onClick)="openInventarioDialog()"
-  pTooltip="Ver inventario actual"
-  tooltipPosition="bottom">
-</p-button>
-        </div>
-      </ng-template>
-      
-      <ng-template pTemplate="end">
-        <div class="toolbar-end">
-          <p-button 
-            icon="pi pi-file-excel" 
-            label="Excel" 
-            severity="success"
-            pTooltip="Exportar a Excel"
-            tooltipPosition="bottom">
-          </p-button>
-          
-          <p-button 
-            icon="pi pi-file-pdf" 
-            label="PDF" 
-            severity="danger"
-            pTooltip="Exportar a PDF"
-            tooltipPosition="bottom">
-          </p-button>
-        </div>
-      </ng-template>
-    </p-toolbar>
+    <!-- Toolbar Mejorado con SplitButtons -->
+    <div class="simple-toolbar">
+      <div class="toolbar-row">
+        <!-- Movimientos Principales -->
+        <p-splitButton 
+          label="Nuevo Movimiento" 
+          icon="pi pi-plus"
+          severity="primary"
+          class="main-split-btn"
+          (onClick)="openEntradaDialog()"
+          [model]="movimientosMenuItems">
+        </p-splitButton>
+        
+        <!-- Operaciones Avanzadas -->
+        <p-splitButton 
+          label="Operaciones" 
+          icon="pi pi-cog"
+          severity="secondary"
+          class="operations-split-btn"
+          (onClick)="openDivisionDialog()"
+          [model]="operacionesMenuItems">
+        </p-splitButton>
+        
+        <!-- Consultas y Reportes -->
+        <p-splitButton 
+          label="Consultas" 
+          icon="pi pi-chart-bar"
+          severity="info"
+          class="reports-split-btn"
+          (onClick)="openInventarioDialog()"
+          [model]="reportesMenuItems">
+        </p-splitButton>
+      </div>
+    </div>
 
     <!-- Filters Section -->
     <div class="filters-section">
@@ -268,13 +249,26 @@
                 tooltipPosition="top">
               </p-button>
               
-              <!-- Solo admin puede editar/eliminar -->
+              <!-- Solo admin puede editar -->
               <p-button 
+                *ngIf="canEditMovimientos()"
                 icon="pi pi-pencil" 
                 severity="secondary"
                 size="small"
                 pTooltip="Editar movimiento"
-                tooltipPosition="top">
+                tooltipPosition="top"
+                (onClick)="openEditDialog(movimiento)">
+              </p-button>
+              
+              <!-- Solo admin puede eliminar -->
+              <p-button 
+                *ngIf="canDeleteMovimientos()"
+                icon="pi pi-trash" 
+                severity="danger"
+                size="small"
+                pTooltip="Eliminar movimiento"
+                tooltipPosition="top"
+                (onClick)="confirmDelete(movimiento)">
               </p-button>
             </div>
           </td>
@@ -388,7 +382,7 @@
         <label for="cantidad-entrada">
           Cantidad <span class="required">*</span>
         </label>
-        <p-inputNumber 
+        <p-inputNumber
           id="cantidad-entrada"
           formControlName="cantidad"
           mode="decimal"
@@ -398,11 +392,38 @@
           placeholder="0.00"
           [class.ng-invalid]="entradaForm.get('cantidad')?.invalid && entradaForm.get('cantidad')?.touched">
         </p-inputNumber>
-        
-        <small 
-          class="p-error" 
+
+        <small
+          class="p-error"
           *ngIf="entradaForm.get('cantidad')?.invalid && entradaForm.get('cantidad')?.touched">
           Cantidad debe ser mayor a 0
+        </small>
+      </div>
+
+      <!-- Precio Field -->
+      <div class="form-field">
+        <label for="precio-entrada">Precio Unitario</label>
+        <p-inputNumber
+          id="precio-entrada"
+          formControlName="precio"
+          mode="currency"
+          currency="USD"
+          locale="es-ES"
+          [minFractionDigits]="2"
+          [maxFractionDigits]="2"
+          [min]="0"
+          placeholder="0.00"
+          [class.ng-invalid]="entradaForm.get('precio')?.invalid && entradaForm.get('precio')?.touched">
+        </p-inputNumber>
+
+        <small class="p-help">
+          Precio unitario del producto en esta entrada (opcional)
+        </small>
+
+        <small
+          class="p-error"
+          *ngIf="entradaForm.get('precio')?.invalid && entradaForm.get('precio')?.touched">
+          El precio no puede ser negativo
         </small>
       </div>
 
@@ -913,6 +934,626 @@
           (onClick)="closeInventarioDialog()">
         </p-button>
       </div>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Dialog de Edición de Movimiento -->
+<p-dialog 
+  header="Editar Movimiento" 
+  [modal]="true" 
+  [closable]="true" 
+  [draggable]="false" 
+  [resizable]="false"
+  [style]="{ width: '500px' }"
+  [(visible)]="displayEditDialog">
+  
+  <div class="edit-dialog-content" *ngIf="movimientoToEdit">
+    
+    <!-- Información del movimiento (solo lectura) -->
+    <div class="movimiento-info">
+      <h4>Información del Movimiento</h4>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Tipo:</label>
+          <p-tag 
+            [value]="movimientoToEdit.tipo === 'entrada' ? 'Entrada' : 'Salida'"
+            [severity]="getSeverityForTipo(movimientoToEdit.tipo)"
+            [icon]="movimientoToEdit.tipo === 'entrada' ? 'pi pi-arrow-up' : 'pi pi-arrow-down'">
+          </p-tag>
+        </div>
+        
+        <div class="info-item">
+          <label>Producto:</label>
+          <span>{{ movimientoToEdit.producto.descripcion }}</span>
+        </div>
+        
+        <div class="info-item">
+          <label>Bodega:</label>
+          <span>{{ movimientoToEdit.bodega.nombre }}</span>
+        </div>
+        
+        <div class="info-item">
+          <label>Fecha:</label>
+          <span>{{ formatDate(movimientoToEdit.fecha) }}</span>
+        </div>
+        
+        <div class="info-item" *ngIf="movimientoToEdit.cliente">
+          <label>Cliente:</label>
+          <span>{{ movimientoToEdit.cliente.nombre }}</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Formulario de edición -->
+    <form [formGroup]="editForm" *ngIf="editForm" class="edit-form">
+      
+      <!-- Cantidad -->
+      <div class="field">
+        <label for="edit-cantidad">
+          <i class="pi pi-calculator"></i>
+          Cantidad *
+        </label>
+        <p-inputNumber
+          id="edit-cantidad"
+          formControlName="cantidad"
+          mode="decimal"
+          [minFractionDigits]="2"
+          [maxFractionDigits]="2"
+          [min]="0.01"
+          [step]="1"
+          placeholder="0.00"
+          styleClass="w-full"
+          [class.ng-invalid]="isEditFieldInvalid('cantidad')">
+        </p-inputNumber>
+        <small class="p-error" *ngIf="isEditFieldInvalid('cantidad')">
+          <i class="pi pi-exclamation-triangle"></i>
+          {{ getEditFieldError('cantidad') }}
+        </small>
+      </div>
+      
+      <!-- Observaciones -->
+      <div class="field">
+        <label for="edit-observacion">
+          <i class="pi pi-file-edit"></i>
+          Observaciones
+        </label>
+        <textarea
+          id="edit-observacion"
+          pInputTextarea
+          formControlName="observacion"
+          rows="3"
+          placeholder="Observaciones del movimiento (opcional)"
+          class="w-full">
+        </textarea>
+      </div>
+      
+    </form>
+  </div>
+  
+  <!-- Footer del dialog -->
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <p-button 
+        label="Cancelar" 
+        icon="pi pi-times" 
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="cancelEdit()">
+      </p-button>
+      
+      <p-button 
+        label="Guardar Cambios" 
+        icon="pi pi-check" 
+        severity="primary"
+        [disabled]="!isEditFormValid()"
+        (onClick)="saveEditedMovimiento()">
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Dialog de División de Producto -->
+<p-dialog 
+  header="División de Producto" 
+  [modal]="true" 
+  [closable]="true" 
+  [draggable]="false" 
+  [resizable]="false"
+  [style]="{ width: '800px', maxHeight: '90vh' }"
+  [(visible)]="displayDivisionDialog">
+  
+  <div class="division-dialog-content">
+    
+    <!-- Información explicativa -->
+    <div class="division-info">
+      <div class="info-header">
+        <i class="pi pi-info-circle"></i>
+        <h4>División de Producto</h4>
+      </div>
+      <p>Esta función permite dividir un producto existente en múltiples productos diferentes. 
+      Por ejemplo: dividir 10 vacas en 5 unidades de carne y 5 unidades de hueso.</p>
+    </div>
+    
+    <!-- Formulario de división -->
+    <form [formGroup]="divisionForm" *ngIf="divisionForm" class="division-form">
+      
+      <!-- Producto Origen -->
+      <div class="origen-section">
+        <h5><i class="pi pi-box"></i> Producto Origen</h5>
+        
+        <div class="form-grid">
+          <!-- Producto -->
+          <div class="form-field">
+            <label for="division-producto">
+              Producto <span class="required">*</span>
+            </label>
+            <p-select 
+              id="division-producto"
+              formControlName="productoOrigenId"
+              [options]="productos"
+              placeholder="Seleccionar producto a dividir"
+              optionLabel="descripcion"
+              optionValue="id"
+              [filter]="true"
+              filterBy="descripcion,codigo"
+              (onChange)="onProductoOrigenChange()"
+              [class.ng-invalid]="isDivisionFieldInvalid('productoOrigenId')">
+              <ng-template pTemplate="selectedItem" let-producto>
+                <span *ngIf="producto">{{ producto.codigo }} - {{ producto.descripcion }}</span>
+              </ng-template>
+              <ng-template pTemplate="item" let-producto>
+                <div class="producto-option">
+                  <span class="codigo">{{ producto.codigo }}</span>
+                  <span class="descripcion">{{ producto.descripcion }}</span>
+                </div>
+              </ng-template>
+            </p-select>
+            <small 
+              class="p-error" 
+              *ngIf="isDivisionFieldInvalid('productoOrigenId')">
+              Producto origen es requerido
+            </small>
+          </div>
+          
+          <!-- Bodega -->
+          <div class="form-field">
+            <label for="division-bodega">
+              Bodega <span class="required">*</span>
+            </label>
+            <p-select 
+              id="division-bodega"
+              formControlName="bodegaId"
+              [options]="bodegas"
+              placeholder="Seleccionar bodega"
+              optionLabel="nombre"
+              optionValue="id"
+              [class.ng-invalid]="isDivisionFieldInvalid('bodegaId')">
+            </p-select>
+            <small 
+              class="p-error" 
+              *ngIf="isDivisionFieldInvalid('bodegaId')">
+              Bodega es requerida
+            </small>
+          </div>
+          
+          <!-- Cantidad Total -->
+          <div class="form-field">
+            <label for="division-cantidad">
+              Cantidad Total <span class="required">*</span>
+            </label>
+            <p-inputNumber 
+              id="division-cantidad"
+              formControlName="cantidadTotal"
+              mode="decimal"
+              [minFractionDigits]="0"
+              [maxFractionDigits]="2"
+              [min]="0.01"
+              placeholder="0.00"
+              (onInput)="onCantidadTotalChange()"
+              [class.ng-invalid]="isDivisionFieldInvalid('cantidadTotal')">
+            </p-inputNumber>
+            <small 
+              class="p-error" 
+              *ngIf="isDivisionFieldInvalid('cantidadTotal')">
+              Cantidad debe ser mayor a 0
+            </small>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Productos Destino -->
+      <div class="destino-section">
+        <div class="destino-header">
+          <h5><i class="pi pi-arrow-right"></i> Productos Destino</h5>
+          <p-button 
+            icon="pi pi-plus" 
+            label="Agregar Producto"
+            severity="secondary"
+            size="small"
+            (onClick)="agregarProductoDestino()">
+          </p-button>
+        </div>
+        
+        <div class="productos-destino" *ngIf="productosDestino.length > 0">
+          <div 
+            *ngFor="let item of productosDestino; let i = index; trackBy: trackByIndex" 
+            class="producto-destino-item">
+            
+            <div class="item-header">
+              <span class="item-number">{{ i + 1 }}</span>
+              <h6>Producto Destino {{ i + 1 }}</h6>
+              <p-button 
+                icon="pi pi-trash" 
+                severity="danger" 
+                size="small"
+                [outlined]="true"
+                (onClick)="removerProductoDestino(i)"
+                pTooltip="Eliminar producto destino">
+              </p-button>
+            </div>
+            
+            <div class="item-form">
+              <div class="form-field">
+                <label>Producto</label>
+                <p-select 
+                  [(ngModel)]="item.productoId"
+                  [options]="productos"
+                  placeholder="Seleccionar producto"
+                  optionLabel="descripcion"
+                  optionValue="id"
+                  [filter]="true"
+                  filterBy="descripcion,codigo"
+                  [ngModelOptions]="{standalone: true}"
+                  [class.ng-invalid]="!item.productoId">
+                  <ng-template pTemplate="selectedItem" let-producto>
+                    <span *ngIf="producto">{{ producto.codigo }} - {{ producto.descripcion }}</span>
+                  </ng-template>
+                  <ng-template pTemplate="item" let-producto>
+                    <div class="producto-option">
+                      <span class="codigo">{{ producto.codigo }}</span>
+                      <span class="descripcion">{{ producto.descripcion }}</span>
+                    </div>
+                  </ng-template>
+                </p-select>
+              </div>
+              
+              <div class="form-field">
+                <label>Cantidad</label>
+                <p-inputNumber 
+                  [(ngModel)]="item.cantidad"
+                  mode="decimal"
+                  [minFractionDigits]="0"
+                  [maxFractionDigits]="2"
+                  [min]="0.01"
+                  placeholder="0.00"
+                  (onInput)="onCantidadDestinoChange()"
+                  [ngModelOptions]="{standalone: true}"
+                  [class.ng-invalid]="!item.cantidad || item.cantidad <= 0">
+                </p-inputNumber>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Mensaje si no hay productos destino -->
+        <div *ngIf="productosDestino.length === 0" class="no-productos-destino">
+          <i class="pi pi-info-circle"></i>
+          <p>No hay productos destino agregados. Haga clic en "Agregar Producto" para comenzar.</p>
+        </div>
+      </div>
+      
+      <!-- Resumen -->
+      <div class="division-resumen" *ngIf="productosDestino.length > 0">
+        <h5><i class="pi pi-calculator"></i> Resumen</h5>
+        <div class="resumen-grid">
+          <div class="resumen-item">
+            <label>Cantidad Total:</label>
+            <span class="value">{{ getCantidadTotal() }}</span>
+          </div>
+          <div class="resumen-item">
+            <label>Cantidad Asignada:</label>
+            <span class="value">{{ getCantidadAsignada() }}</span>
+          </div>
+          <div class="resumen-item">
+            <label>Diferencia:</label>
+            <span class="value" [class]="getDiferenciaClass()">{{ getDiferencia() }}</span>
+          </div>
+        </div>
+        
+        <!-- Alertas -->
+        <div *ngIf="getDiferencia() !== 0" class="division-alert">
+          <i class="pi pi-exclamation-triangle"></i>
+          <span *ngIf="getDiferencia() > 0" class="alert-text">
+            Faltan {{ getDiferencia() }} unidades por asignar
+          </span>
+          <span *ngIf="getDiferencia() < 0" class="alert-text">
+            Hay {{ Math.abs(getDiferencia()) }} unidades de más asignadas
+          </span>
+        </div>
+      </div>
+      
+      <!-- Observaciones -->
+      <div class="form-field">
+        <label for="division-observacion">Observaciones</label>
+        <textarea 
+          id="division-observacion"
+          pTextarea 
+          formControlName="observacion"
+          placeholder="Notas sobre la división del producto..."
+          rows="3"
+          [autoResize]="true">
+        </textarea>
+      </div>
+      
+    </form>
+  </div>
+  
+  <!-- Footer del dialog -->
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <p-button 
+        label="Cancelar" 
+        icon="pi pi-times" 
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="cancelDivision()">
+      </p-button>
+      
+      <p-button 
+        label="Procesar División" 
+        icon="pi pi-check" 
+        severity="warn"
+        [disabled]="!isDivisionFormValid()"
+        (onClick)="procesarDivision()">
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Dialog de Combinación de Productos -->
+<p-dialog 
+  header="Combinación de Productos (Crear Combo)" 
+  [modal]="true" 
+  [closable]="true" 
+  [draggable]="false" 
+  [resizable]="false"
+  [style]="{ width: '800px', maxHeight: '90vh' }"
+  [(visible)]="displayCombinacionDialog">
+  
+  <div class="combinacion-dialog-content">
+    
+    <!-- Información explicativa -->
+    <div class="combinacion-info">
+      <div class="info-header">
+        <i class="pi pi-info-circle"></i>
+        <h4>Combinación de Productos</h4>
+      </div>
+      <p>Esta función permite combinar varios productos individuales para crear un combo. 
+      Por ejemplo: Leche (2) + Mortadela (3) + Atún (4) = Combo Favorito 1 (9 unidades total).</p>
+    </div>
+    
+    <!-- Formulario de combinación -->
+    <form [formGroup]="combinacionForm" *ngIf="combinacionForm" class="combinacion-form">
+      
+      <!-- Productos Origen (Ingredientes) -->
+      <div class="ingredientes-section">
+        <div class="ingredientes-header">
+          <h5><i class="pi pi-minus-circle"></i> Productos Ingredientes (Egresos)</h5>
+          <p-button 
+            icon="pi pi-plus" 
+            label="Agregar Ingrediente"
+            severity="secondary"
+            size="small"
+            (onClick)="agregarIngrediente()">
+          </p-button>
+        </div>
+        
+        <div class="ingredientes-lista" *ngIf="ingredientes.length > 0">
+          <div 
+            *ngFor="let item of ingredientes; let i = index; trackBy: trackByIndex" 
+            class="ingrediente-item">
+            
+            <div class="item-header">
+              <span class="item-number">{{ i + 1 }}</span>
+              <h6>Ingrediente {{ i + 1 }}</h6>
+              <p-button 
+                icon="pi pi-trash" 
+                severity="danger" 
+                size="small"
+                [outlined]="true"
+                (onClick)="removerIngrediente(i)"
+                pTooltip="Eliminar ingrediente">
+              </p-button>
+            </div>
+            
+            <div class="item-form">
+              <div class="form-field">
+                <label>Producto</label>
+                <p-select 
+                  [(ngModel)]="item.productoId"
+                  [options]="productos"
+                  placeholder="Seleccionar producto"
+                  optionLabel="descripcion"
+                  optionValue="id"
+                  [filter]="true"
+                  filterBy="descripcion,codigo"
+                  [ngModelOptions]="{standalone: true}"
+                  (onChange)="onIngredienteChange()"
+                  [class.ng-invalid]="!item.productoId">
+                  <ng-template pTemplate="selectedItem" let-producto>
+                    <span *ngIf="producto">{{ producto.codigo }} - {{ producto.descripcion }}</span>
+                  </ng-template>
+                  <ng-template pTemplate="item" let-producto>
+                    <div class="producto-option">
+                      <span class="codigo">{{ producto.codigo }}</span>
+                      <span class="descripcion">{{ producto.descripcion }}</span>
+                    </div>
+                  </ng-template>
+                </p-select>
+              </div>
+              
+              <div class="form-field">
+                <label>Cantidad</label>
+                <p-inputNumber 
+                  [(ngModel)]="item.cantidad"
+                  mode="decimal"
+                  [minFractionDigits]="0"
+                  [maxFractionDigits]="2"
+                  [min]="0.01"
+                  placeholder="0.00"
+                  (onInput)="onIngredienteChange()"
+                  [ngModelOptions]="{standalone: true}"
+                  [class.ng-invalid]="!item.cantidad || item.cantidad <= 0">
+                </p-inputNumber>
+                <small class="cantidad-type egreso">Egreso (-{{ item.cantidad || 0 }})</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Mensaje si no hay ingredientes -->
+        <div *ngIf="ingredientes.length === 0" class="no-ingredientes">
+          <i class="pi pi-info-circle"></i>
+          <p>No hay ingredientes agregados. Haga clic en "Agregar Ingrediente" para comenzar.</p>
+        </div>
+      </div>
+      
+      <!-- Producto Combo (Destino) -->
+      <div class="combo-section">
+        <h5><i class="pi pi-plus-circle"></i> Producto Combo (Ingreso)</h5>
+        
+        <div class="form-grid">
+          <!-- Producto Combo -->
+          <div class="form-field">
+            <label for="combo-producto">
+              Producto Combo <span class="required">*</span>
+            </label>
+            <p-select 
+              id="combo-producto"
+              formControlName="productoComboId"
+              [options]="productos"
+              placeholder="Seleccionar producto combo"
+              optionLabel="descripcion"
+              optionValue="id"
+              [filter]="true"
+              filterBy="descripcion,codigo"
+              [class.ng-invalid]="isCombinacionFieldInvalid('productoComboId')">
+              <ng-template pTemplate="selectedItem" let-producto>
+                <span *ngIf="producto">{{ producto.codigo }} - {{ producto.descripcion }}</span>
+              </ng-template>
+              <ng-template pTemplate="item" let-producto>
+                <div class="producto-option">
+                  <span class="codigo">{{ producto.codigo }}</span>
+                  <span class="descripcion">{{ producto.descripcion }}</span>
+                </div>
+              </ng-template>
+            </p-select>
+            <small 
+              class="p-error" 
+              *ngIf="isCombinacionFieldInvalid('productoComboId')">
+              Producto combo es requerido
+            </small>
+          </div>
+          
+          <!-- Bodega -->
+          <div class="form-field">
+            <label for="combo-bodega">
+              Bodega <span class="required">*</span>
+            </label>
+            <p-select 
+              id="combo-bodega"
+              formControlName="bodegaId"
+              [options]="bodegas"
+              placeholder="Seleccionar bodega"
+              optionLabel="nombre"
+              optionValue="id"
+              [class.ng-invalid]="isCombinacionFieldInvalid('bodegaId')">
+            </p-select>
+            <small 
+              class="p-error" 
+              *ngIf="isCombinacionFieldInvalid('bodegaId')">
+              Bodega es requerida
+            </small>
+          </div>
+          
+          <!-- Cantidad Total (calculada automáticamente) -->
+          <div class="form-field">
+            <label>Cantidad Total del Combo</label>
+            <div class="cantidad-calculada">
+              <span class="valor-calculado">{{ getCantidadTotalIngredientes() }}</span>
+              <small class="cantidad-type ingreso">Ingreso (+{{ getCantidadTotalIngredientes() }})</small>
+            </div>
+            <small class="p-help">Se calcula automáticamente sumando todos los ingredientes</small>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Resumen de Movimientos -->
+      <div class="combinacion-resumen" *ngIf="ingredientes.length > 0">
+        <h5><i class="pi pi-list"></i> Resumen de Movimientos</h5>
+        
+        <!-- Egresos -->
+        <div class="resumen-seccion">
+          <h6><i class="pi pi-arrow-down"></i> Egresos (Salidas)</h6>
+          <div class="movimientos-lista">
+            <div *ngFor="let item of ingredientes" class="movimiento-item egreso">
+              <span class="producto-info">
+                {{ getProductoNombre(item.productoId) }}
+              </span>
+              <span class="cantidad">-{{ item.cantidad || 0 }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Ingreso -->
+        <div class="resumen-seccion">
+          <h6><i class="pi pi-arrow-up"></i> Ingreso (Entrada)</h6>
+          <div class="movimientos-lista">
+            <div class="movimiento-item ingreso">
+              <span class="producto-info">
+                {{ getProductoNombre(combinacionForm.get('productoComboId')?.value) || 'Seleccionar combo...' }}
+              </span>
+              <span class="cantidad">+{{ getCantidadTotalIngredientes() }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Observaciones -->
+      <div class="form-field">
+        <label for="combinacion-observacion">Observaciones</label>
+        <textarea 
+          id="combinacion-observacion"
+          pTextarea 
+          formControlName="observacion"
+          placeholder="Notas sobre la creación del combo..."
+          rows="3"
+          [autoResize]="true">
+        </textarea>
+      </div>
+      
+    </form>
+  </div>
+  
+  <!-- Footer del dialog -->
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <p-button 
+        label="Cancelar" 
+        icon="pi pi-times" 
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="cancelCombinacion()">
+      </p-button>
+      
+      <p-button 
+        label="Crear Combo" 
+        icon="pi pi-check" 
+        severity="help"
+        [disabled]="!isCombinacionFormValid()"
+        (onClick)="procesarCombinacion()">
+      </p-button>
     </div>
   </ng-template>
 </p-dialog>

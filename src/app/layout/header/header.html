@@ -22,6 +22,9 @@
 
   <!-- Right side - User Info and Actions -->
   <div class="header-right">
+    <!-- Connection Status -->
+    <app-connection-status></app-connection-status>
+
     <!-- Theme Toggle -->
     <button 
       type="button" 
@@ -33,11 +36,19 @@
       [title]="isDarkTheme ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'">
     </button>
 
+    <!-- Bodega Info -->
+    <div class="bodega-info">
+      <div class="bodega-badge">
+        <i class="pi pi-building"></i>
+        <span class="bodega-name">{{ getBodegaName() }}</span>
+      </div>
+    </div>
+
     <!-- User Info and Menu -->
     <div class="user-section">
       <div class="user-info" (click)="toggleUserMenu($event)">
         <span class="user-name">{{ currentUser?.nombre || 'Usuario' }}</span>
-        <p-avatar 
+        <p-avatar
           [label]="getUserInitials()"
           styleClass="user-avatar"
           size="normal">

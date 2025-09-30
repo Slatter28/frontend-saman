@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, BehaviorSubject, throwError } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError, map, tap, switchMap } from 'rxjs/operators';
+import { OfflineService } from './offline.service';
 import { environment } from '../../environments/environment';
 import {
   Movimiento,
@@ -36,7 +37,10 @@ export class MovimientosService {
   public readonly loading$ = this.loadingSubject$.asObservable();
   public readonly error$ = this.errorSubject$.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private offlineService: OfflineService
+  ) {}
 
   // Método principal para obtener movimientos con filtros
   getMovimientos(filtros: MovimientosFilter): Observable<MovimientosResponse> {
@@ -57,7 +61,39 @@ export class MovimientosService {
     if (filtros.usuarioId) params = params.set('usuarioId', filtros.usuarioId.toString());
     if (filtros.search) params = params.set('search', filtros.search);
 
-    return this.http.get<MovimientosResponse>(this.apiUrl, { params }).pipe(
+    const cacheKey = `movimientos_${JSON.stringify(filtros)}`;
+    const httpRequest = this.http.get<MovimientosResponse>(this.apiUrl, { params });
+
+    // Datos por defecto cuando no hay cache
+    const defaultResponse: MovimientosResponse = {
+      data: [],
+      meta: {
+        total: 0,
+        page: filtros.page || 1,
+        limit: filtros.limit || 10,
+        totalPages: 0
+      }
+    };
+
+    return this.offlineService.cacheFirstRequest(cacheKey, httpRequest, 1 * 60 * 1000, defaultResponse).pipe(
+      map(response => {
+        // Si estamos usando datos por defecto (vacíos) y estamos offline, 
+        // intentar recuperar movimientos offline del cache
+        if (response.data.length === 0 && !this.offlineService.isOnline) {
+          const offlineMovimientos = this.getOfflineMovimientos(filtros);
+          if (offlineMovimientos.length > 0) {
+            return {
+              ...response,
+              data: offlineMovimientos,
+              meta: {
+                ...response.meta,
+                total: offlineMovimientos.length
+              }
+            };
+          }
+        }
+        return response;
+      }),
       tap(response => {
         this.movimientosCache$.next(response.data);
         this.setLoading(false);
@@ -71,9 +107,28 @@ export class MovimientosService {
     this.setLoading(true);
     this.clearError();
 
-    return this.http.post<Movimiento>(`${this.apiUrl}/entrada`, entrada).pipe(
+    return this.offlineService.onlineOnlyRequest<Movimiento>(
+      'POST',
+      `${this.apiUrl}/entrada`,
+      entrada,
+      `Crear entrada: ${entrada.cantidad} unidades`
+    ).pipe(
+      map(movimiento => {
+        // Si es una operación offline, enriquecer los datos
+        if ((movimiento as any)._offline) {
+          return this.enrichOfflineMovimiento(movimiento, entrada, 'entrada');
+        }
+        return movimiento;
+      }),
       tap(movimiento => {
+        // Agregar al cache interno
         this.addMovimientoToCache(movimiento);
+        
+        // Si es una operación offline, también actualizar el cache persistente
+        if ((movimiento as any)._offline) {
+          this.updateOfflineCache(movimiento, 'entrada');
+        }
+        
         this.invalidateInventarioCache();
         this.setLoading(false);
       }),
@@ -86,9 +141,28 @@ export class MovimientosService {
     this.setLoading(true);
     this.clearError();
 
-    return this.http.post<Movimiento>(`${this.apiUrl}/salida`, salida).pipe(
+    return this.offlineService.onlineOnlyRequest<Movimiento>(
+      'POST',
+      `${this.apiUrl}/salida`,
+      salida,
+      `Crear salida: ${salida.cantidad} unidades`
+    ).pipe(
+      map(movimiento => {
+        // Si es una operación offline, enriquecer los datos
+        if ((movimiento as any)._offline) {
+          return this.enrichOfflineMovimiento(movimiento, salida, 'salida');
+        }
+        return movimiento;
+      }),
       tap(movimiento => {
+        // Agregar al cache interno
         this.addMovimientoToCache(movimiento);
+        
+        // Si es una operación offline, también actualizar el cache persistente
+        if ((movimiento as any)._offline) {
+          this.updateOfflineCache(movimiento, 'salida');
+        }
+        
         this.invalidateInventarioCache();
         this.setLoading(false);
       }),
@@ -125,7 +199,21 @@ getInventario(filtros?: {
     params = params.set('incluirCeros', 'true');
   }
 
-  return this.http.get<any>(`${this.apiUrl}/inventario`, { params }).pipe(
+  const cacheKey = `inventario_${JSON.stringify(filtros || {})}`;
+  const httpRequest = this.http.get<any>(`${this.apiUrl}/inventario`, { params });
+
+  // Datos por defecto para inventario
+  const defaultInventario = {
+    data: [],
+    meta: {
+      total: 0,
+      totalValue: 0,
+      totalStock: 0
+    },
+    message: 'Sin conexión - Datos no disponibles'
+  };
+
+  return this.offlineService.cacheFirstRequest(cacheKey, httpRequest, 2 * 60 * 1000, defaultInventario).pipe(
     tap(inventario => {
       this.inventarioCache$.next(inventario);
       this.setLoading(false);
@@ -139,7 +227,10 @@ getInventario(filtros?: {
     this.setLoading(true);
     this.clearError();
 
-    return this.http.get<Movimiento[]>(`${this.apiUrl}/producto/${codigo}`).pipe(
+    const cacheKey = `movimientos_by_codigo_${codigo}`;
+    const httpRequest = this.http.get<Movimiento[]>(`${this.apiUrl}/producto/${codigo}`);
+    
+    return this.offlineService.cacheFirstRequest(cacheKey, httpRequest, 1 * 60 * 1000, []).pipe(
       tap(() => this.setLoading(false)),
       catchError(error => this.handleError(error))
     );
@@ -161,7 +252,10 @@ getInventario(filtros?: {
     if (filtros?.bodegaId) params = params.set('bodegaId', filtros.bodegaId.toString());
     if (filtros?.tipo) params = params.set('tipo', filtros.tipo);
 
-    return this.http.get<ProductoKardex>(`${this.apiUrl}/kardex/${productId}`, { params }).pipe(
+    const cacheKey = `kardex_${productId}_${JSON.stringify(filtros || {})}`;
+    const httpRequest = this.http.get<ProductoKardex>(`${this.apiUrl}/kardex/${productId}`, { params });
+    
+    return this.offlineService.cacheFirstRequest(cacheKey, httpRequest, 1 * 60 * 1000).pipe(
       tap(() => this.setLoading(false)),
       catchError(error => this.handleError(error))
     );
@@ -172,7 +266,10 @@ getInventario(filtros?: {
     this.setLoading(true);
     this.clearError();
 
-    return this.http.get<Movimiento>(`${this.apiUrl}/${id}`).pipe(
+    const cacheKey = `movimiento_${id}`;
+    const httpRequest = this.http.get<Movimiento>(`${this.apiUrl}/${id}`);
+    
+    return this.offlineService.cacheFirstRequest(cacheKey, httpRequest, 5 * 60 * 1000).pipe(
       tap(() => this.setLoading(false)),
       catchError(error => this.handleError(error))
     );
@@ -333,6 +430,145 @@ getInventario(filtros?: {
     this.movimientosCache$.next([movimiento, ...current]);
   }
 
+  /**
+   * Actualizar cache persistente con movimientos offline
+   */
+  private updateOfflineCache(movimiento: Movimiento, tipo: 'entrada' | 'salida'): void {
+    try {
+      // Obtener los filtros actuales más comunes para actualizar esos caches
+      const commonFilters = [
+        { page: 1, limit: 10 },
+        { page: 1, limit: 10, tipo: tipo },
+        { page: 1, limit: 20 },
+        { page: 1, limit: 50 }
+      ];
+
+      commonFilters.forEach(filtros => {
+        const cacheKey = `movimientos_${JSON.stringify(filtros)}`;
+        const existingData = this.offlineService.getData(cacheKey, 24 * 60 * 60 * 1000); // 24 horas
+
+        if (existingData) {
+          // Agregar el nuevo movimiento al cache existente
+          const updatedData = {
+            ...existingData,
+            data: [movimiento, ...existingData.data.slice(0, (filtros.limit || 10) - 1)],
+            meta: {
+              ...existingData.meta,
+              total: existingData.meta.total + 1
+            }
+          };
+          
+          this.offlineService.storeData(cacheKey, updatedData);
+          console.log(`📦 Cache actualizado para filtros:`, filtros);
+        } else {
+          // Si no hay cache existente, crear uno nuevo con el movimiento
+          const newData = {
+            data: [movimiento],
+            meta: {
+              total: 1,
+              page: filtros.page || 1,
+              limit: filtros.limit || 10,
+              totalPages: 1
+            }
+          };
+          
+          this.offlineService.storeData(cacheKey, newData);
+          console.log(`📦 Cache creado para filtros:`, filtros);
+        }
+      });
+
+    } catch (error) {
+      console.error('Error actualizando cache offline:', error);
+    }
+  }
+
+  /**
+   * Obtener movimientos offline del cache
+   */
+  private getOfflineMovimientos(filtros: MovimientosFilter): Movimiento[] {
+    try {
+      // Intentar obtener de diferentes caches con los filtros dados
+      const possibleCacheKeys = [
+        `movimientos_${JSON.stringify(filtros)}`,
+        `movimientos_${JSON.stringify({ page: 1, limit: 10 })}`,
+        `movimientos_${JSON.stringify({ page: 1, limit: 10, tipo: filtros.tipo })}`,
+      ];
+
+      for (const cacheKey of possibleCacheKeys) {
+        const cachedData = this.offlineService.getData(cacheKey, 24 * 60 * 60 * 1000);
+        if (cachedData && cachedData.data && cachedData.data.length > 0) {
+          console.log(`📦 Recuperando movimientos offline desde: ${cacheKey}`);
+          
+          // Filtrar según los criterios actuales
+          let movimientos = cachedData.data;
+          
+          if (filtros.tipo) {
+            movimientos = movimientos.filter((m: Movimiento) => m.tipo === filtros.tipo);
+          }
+          
+          if (filtros.search) {
+            const searchTerm = filtros.search.toLowerCase();
+            movimientos = movimientos.filter((m: any) => 
+              (m.observaciones?.toLowerCase().includes(searchTerm)) ||
+              (m.producto?.codigo?.toLowerCase().includes(searchTerm)) ||
+              (m.producto?.descripcion?.toLowerCase().includes(searchTerm))
+            );
+          }
+          
+          // Aplicar paginación
+          const limit = filtros.limit || 10;
+          const offset = ((filtros.page || 1) - 1) * limit;
+          
+          return movimientos.slice(offset, offset + limit);
+        }
+      }
+      
+      return [];
+    } catch (error) {
+      console.error('Error obteniendo movimientos offline:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Enriquecer datos de movimiento offline con información completa
+   */
+  private enrichOfflineMovimiento(movimiento: any, data: any, tipo: 'entrada' | 'salida'): Movimiento {
+    return {
+      ...movimiento,
+      tipo: tipo,
+      cantidad: data.cantidad,
+      fechaMovimiento: data.fechaMovimiento || new Date().toISOString(),
+      observaciones: data.observaciones || '',
+      usuario: {
+        id: 1,
+        nombre: 'Usuario Offline'
+      },
+      producto: {
+        id: data.productoId || 0,
+        codigo: data.productoCodigo || 'SIN-CODIGO',
+        descripcion: data.productoDescripcion || 'Producto sin descripción',
+        unidadMedida: {
+          id: 1,
+          nombre: 'und',
+          descripcion: 'Unidad'
+        }
+      },
+      bodega: {
+        id: data.bodegaId || 0,
+        nombre: data.bodegaNombre || 'Bodega sin nombre',
+        ubicacion: 'Sin ubicación'
+      },
+      cliente: data.clienteId ? {
+        id: data.clienteId,
+        nombre: data.clienteNombre || 'Cliente sin nombre',
+        tipo: 'cliente' as any
+      } : undefined,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    } as Movimiento;
+  }
+
   private updateMovimientoInCache(movimiento: Movimiento): void {
     const current = this.movimientosCache$.value;
     const index = current.findIndex(m => m.id === movimiento.id);
@@ -361,5 +597,83 @@ getInventario(filtros?: {
   // Refrescar datos
   refresh(): void {
     this.clearCache();
+  }
+
+  // Descargar Excel de movimientos
+  downloadExcel(filtros?: MovimientosFilter): Observable<Blob> {
+    this.setLoading(true);
+    this.clearError();
+
+    console.log('Filtros originales para Excel:', filtros);
+    
+    // PRUEBA: Primero intentemos sin parámetros para descartar error del endpoint
+    console.log('Intentando descarga sin parámetros...');
+    console.log('URL:', `${this.apiUrl}/excel`);
+    
+    return this.http.get(`${this.apiUrl}/excel`, { 
+      responseType: 'blob',
+      observe: 'response'
+    }).pipe(
+      map(response => {
+        this.setLoading(false);
+        console.log('Respuesta exitosa SIN parámetros:', response);
+        return response.body as Blob;
+      }),
+      catchError(error => {
+        console.error('Error SIN parámetros:', error);
+        console.error('Status:', error.status);
+        console.error('Status text:', error.statusText);
+        console.error('Error body:', error.error);
+        
+        // Intentar leer el error blob como texto
+        if (error.error instanceof Blob) {
+          error.error.text().then((text: string) => {
+            console.error('Error body text SIN parámetros:', text);
+          });
+        }
+        
+        this.setLoading(false);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  // Descargar Excel de inventario
+  downloadInventarioExcel(bodegaId?: number): Observable<Blob> {
+    this.setLoading(true);
+    this.clearError();
+
+    let params = new HttpParams();
+    
+    if (bodegaId && !isNaN(Number(bodegaId))) {
+      params = params.set('bodegaId', bodegaId.toString());
+    }
+    
+    console.log('Descargando inventario Excel con parámetros:', params.toString());
+    console.log('URL:', `${this.apiUrl}/inventario-excel`);
+    
+    return this.http.get(`${this.apiUrl}/inventario-excel`, { 
+      params,
+      responseType: 'blob',
+      observe: 'response'
+    }).pipe(
+      map(response => {
+        this.setLoading(false);
+        console.log('Inventario Excel descargado exitosamente:', response);
+        return response.body as Blob;
+      }),
+      catchError(error => {
+        console.error('Error descargando inventario Excel:', error);
+        
+        if (error.error instanceof Blob) {
+          error.error.text().then((text: string) => {
+            console.error('Error body text:', text);
+          });
+        }
+        
+        this.setLoading(false);
+        return throwError(() => error);
+      })
+    );
   }
 }

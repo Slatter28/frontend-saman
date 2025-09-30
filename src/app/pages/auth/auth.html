@@ -1,61 +1,104 @@
 <div class="login-container">
   <p-toast></p-toast>
   
-  <!-- Animated background elements -->
-  <div class="bg-shapes">
-    <div class="shape shape-1"></div>
-    <div class="shape shape-2"></div>
-    <div class="shape shape-3"></div>
+  <!-- Modern background pattern -->
+  <div class="bg-pattern">
+    <div class="pattern-overlay"></div>
   </div>
   
   <div class="login-card">
     <!-- Loading overlay -->
     <div class="loading-overlay" *ngIf="loading">
-      <p-progressSpinner strokeWidth="3" fill="transparent" animationDuration="1s"></p-progressSpinner>
+      <div class="loading-content">
+        <p-progressSpinner strokeWidth="3" fill="transparent" animationDuration="1s"></p-progressSpinner>
+        <p class="loading-text">{{ loadingMessage }}</p>
+      </div>
     </div>
     
     <div class="login-header">
       <div class="company-logo">
-        <div class="logo-icon">
-          <i class="pi pi-shield"></i>
+        <div class="logo-container">
+          <div class="logo-icon">
+            <i class="pi pi-box"></i>
+          </div>
+          <div class="logo-text">
+            <h1 class="company-name">SAMAN</h1>
+            <p class="company-tagline">Gestión de Inventario</p>
+          </div>
         </div>
-        <h1 class="company-name">SAMAN</h1>
-        <p class="company-tagline">Sistema de Gestión Empresarial</p>
       </div>
     </div>
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
       <!-- Email Field -->
-      <div class="field">
-        <label for="email">Email</label>
-        <input 
-          id="email"
-          type="email" 
-          pInputText 
-          formControlName="correo"
-          placeholder="Ingresa tu email"
-          [class.ng-invalid]="isFieldInvalid('correo')"
-          autocomplete="email">
-        <small class="p-error" *ngIf="isFieldInvalid('correo')">
-          {{ getFieldError('correo') }}
-        </small>
+      <div class="field-group">
+        <div class="field-container">
+          <label for="email" class="field-label">
+            <i class="pi pi-envelope"></i>
+            Correo Electrónico
+          </label>
+          <input 
+            id="email"
+            type="email" 
+            pInputText 
+            formControlName="correo"
+            placeholder="usuario@empresa.com"
+            [class.ng-invalid]="isFieldInvalid('correo')"
+            autocomplete="email"
+            class="modern-input">
+          <small class="p-error" *ngIf="isFieldInvalid('correo')">
+            <i class="pi pi-exclamation-triangle"></i>
+            {{ getFieldError('correo') }}
+          </small>
+        </div>
       </div>
 
       <!-- Password Field -->
-      <div class="field">
-        <label for="password">Contraseña</label>
-        <p-password 
-          id="password"
-          formControlName="contrasena"
-          placeholder="Ingresa tu contraseña"
-          [feedback]="false"
-          [toggleMask]="true"
-          [class.ng-invalid]="isFieldInvalid('contrasena')"
-          autocomplete="current-password">
-        </p-password>
-        <small class="p-error" *ngIf="isFieldInvalid('contrasena')">
-          {{ getFieldError('contrasena') }}
-        </small>
+      <div class="field-group">
+        <div class="field-container">
+          <label for="password" class="field-label">
+            <i class="pi pi-lock"></i>
+            Contraseña
+          </label>
+          <p-password
+            id="password"
+            formControlName="contrasena"
+            placeholder="Ingresa tu contraseña"
+            [feedback]="false"
+            [toggleMask]="true"
+            [class.ng-invalid]="isFieldInvalid('contrasena')"
+            autocomplete="current-password"
+            styleClass="modern-password">
+          </p-password>
+          <small class="p-error" *ngIf="isFieldInvalid('contrasena')">
+            <i class="pi pi-exclamation-triangle"></i>
+            {{ getFieldError('contrasena') }}
+          </small>
+        </div>
+      </div>
+
+      <!-- Bodega Field -->
+      <div class="field-group">
+        <div class="field-container">
+          <label for="bodega" class="field-label">
+            <i class="pi pi-building"></i>
+            Seleccionar Bodega
+          </label>
+          <p-select
+            id="bodega"
+            formControlName="bodegaId"
+            [options]="bodegas"
+            optionLabel="nombre"
+            optionValue="id"
+            placeholder="Seleccione una bodega"
+            [class.ng-invalid]="isFieldInvalid('bodegaId')"
+            styleClass="modern-dropdown">
+          </p-select>
+          <small class="p-error" *ngIf="isFieldInvalid('bodegaId')">
+            <i class="pi pi-exclamation-triangle"></i>
+            {{ getFieldError('bodegaId') }}
+          </small>
+        </div>
       </div>
 
       <!-- Remember Email -->
@@ -65,7 +108,7 @@
           inputId="rememberEmail"
           binary="true">
         </p-checkbox>
-        <label for="rememberEmail">Recordar email</label>
+        <label for="rememberEmail">Recordar mi correo</label>
       </div>
 
       <!-- Submit Button -->
@@ -75,12 +118,18 @@
         pRipple 
         class="login-btn"
         [disabled]="loginForm.invalid || loading">
-        <span *ngIf="!loading">Iniciar Sesión</span>
-        <span *ngIf="loading" class="button-loading">
-          <i class="pi pi-spin pi-spinner"></i>
-          Iniciando sesión...
-        </span>
+        <i class="pi pi-sign-in" *ngIf="!loading"></i>
+        <i class="pi pi-spin pi-spinner" *ngIf="loading"></i>
+        <span>{{ loading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}</span>
       </button>
     </form>
+    
+    <!-- Footer -->
+    <div class="login-footer">
+      <div class="version-info">
+        <i class="pi pi-info-circle"></i>
+        <span>Versión 1.0 - Sistema de Inventario</span>
+      </div>
+    </div>
   </div>
 </div>

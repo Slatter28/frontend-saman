@@ -69,6 +69,30 @@
     align-items: center;
     gap: 1rem;
 
+    .bodega-info {
+      .bodega-badge {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--primary-50);
+        color: var(--primary-700);
+        padding: 0.375rem 0.75rem;
+        border-radius: 1rem;
+        border: 1px solid var(--primary-200);
+        font-size: 0.8rem;
+        font-weight: 500;
+
+        i {
+          font-size: 0.75rem;
+          color: var(--primary-600);
+        }
+
+        .bodega-name {
+          white-space: nowrap;
+        }
+      }
+    }
+
     .theme-toggle-btn {
       width: 2.5rem;
       height: 2.5rem;
@@ -211,9 +235,21 @@
     border-left-color: var(--surface-border);
     border-right-color: var(--surface-border);
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
-    
-    
+
+
     .header-right {
+      .bodega-info {
+        .bodega-badge {
+          background: var(--primary-900);
+          color: var(--primary-100);
+          border-color: var(--primary-700);
+
+          i {
+            color: var(--primary-200);
+          }
+        }
+      }
+
       .user-section {
         .user-menu-dropdown {
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
@@ -273,6 +309,21 @@
 
     .header-right {
       gap: 0.5rem;
+
+      .bodega-info {
+        .bodega-badge {
+          padding: 0.25rem 0.5rem;
+          font-size: 0.75rem;
+
+          .bodega-name {
+            display: none;
+          }
+
+          i {
+            font-size: 0.7rem;
+          }
+        }
+      }
 
       .user-section {
         .user-info {

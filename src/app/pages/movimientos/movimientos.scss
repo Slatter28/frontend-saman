@@ -28,26 +28,242 @@
     }
   }
   
-  // Toolbar Styles
-  .toolbar-custom {
-    ::ng-deep .p-toolbar {
-      background: var(--surface-ground);
-      border: 1px solid var(--surface-border);
-      border-radius: 6px;
-      padding: 1rem;
-      margin-bottom: 1.5rem;
+  // Toolbar Simple y Limpio
+  .simple-toolbar {
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    
+    .toolbar-row {
+      display: flex !important;
+      justify-content: space-around !important;
+      flex-wrap: wrap;
+      align-items: center;
+      width: 100%;
+      padding: 0 2rem;
+      
+      > * {
+        margin: 0 2rem !important;
+      }
+      
+      @media (max-width: 768px) {
+        flex-direction: column !important;
+        padding: 0;
+        
+        > * {
+          margin: 1rem 0 !important;
+        }
+      }
     }
     
-    .toolbar-start {
+    .action-group {
       display: flex;
-      gap: 0.75rem;
+      gap: 1rem;
+      justify-content: flex-start;
       align-items: center;
+      flex-wrap: wrap;
+    }
+
+  }
+  
+  // SplitButton Styles - Mejorados para mejor visibilidad
+  ::ng-deep {
+    // Aplicar estilos globalmente a todos los splitbuttons en esta página
+    .p-splitbutton {
+        min-width: 180px;
+        margin: 0 1.5rem !important;
+        
+        .p-splitbutton-defaultbutton {
+          padding: 0.875rem 1.25rem !important;
+          font-size: 1rem !important;
+          font-weight: 600 !important;
+          border-radius: 8px 0 0 8px !important;
+          min-width: 140px !important;
+          
+          .p-button-icon {
+            font-size: 1.1rem !important;
+            margin-right: 0.625rem !important;
+          }
+          
+          .p-button-label {
+            font-size: 1rem !important;
+            font-weight: 600 !important;
+            white-space: nowrap !important;
+          }
+        }
+        
+        .p-splitbutton-menubutton {
+          padding: 0.875rem 0.75rem !important;
+          border-radius: 0 8px 8px 0 !important;
+          
+          .p-button-icon {
+            font-size: 0.875rem !important;
+          }
+        }
+        
+        &:hover {
+          transform: translateY(-1px);
+          transition: all 0.2s ease;
+        }
+      }
+      
+      // Colores específicos para cada botón
+      .main-split-btn {
+        .p-splitbutton-defaultbutton {
+          background: var(--primary-color) !important;
+          border-color: var(--primary-color) !important;
+          color: white !important;
+          
+          &:hover {
+            background: var(--primary-600) !important;
+            border-color: var(--primary-600) !important;
+            box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3) !important;
+          }
+        }
+        
+        .p-splitbutton-menubutton {
+          background: var(--primary-color) !important;
+          border-color: var(--primary-color) !important;
+          color: white !important;
+          
+          &:hover {
+            background: var(--primary-600) !important;
+            border-color: var(--primary-600) !important;
+          }
+        }
+      }
+      
+      .operations-split-btn {
+        .p-splitbutton-defaultbutton {
+          background: #6c757d !important;
+          border-color: #6c757d !important;
+          color: white !important;
+          
+          &:hover {
+            background: #5a6268 !important;
+            border-color: #5a6268 !important;
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3) !important;
+          }
+        }
+        
+        .p-splitbutton-menubutton {
+          background: #6c757d !important;
+          border-color: #6c757d !important;
+          color: white !important;
+          
+          &:hover {
+            background: #5a6268 !important;
+            border-color: #5a6268 !important;
+          }
+        }
+      }
+      
+      .reports-split-btn {
+        .p-splitbutton-defaultbutton {
+          background: #17a2b8 !important;
+          border-color: #17a2b8 !important;
+          color: white !important;
+          
+          &:hover {
+            background: #138496 !important;
+            border-color: #138496 !important;
+            box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3) !important;
+          }
+        }
+        
+        .p-splitbutton-menubutton {
+          background: #17a2b8 !important;
+          border-color: #17a2b8 !important;
+          color: white !important;
+          
+          &:hover {
+            background: #138496 !important;
+            border-color: #138496 !important;
+          }
+        }
+      }
+      
+      // Responsive
+      @media (max-width: 768px) {
+        .p-splitbutton {
+          width: 100% !important;
+          min-width: unset !important;
+          
+          .p-splitbutton-defaultbutton {
+            min-width: unset !important;
+            flex: 1 !important;
+          }
+        }
+      }
     }
     
-    .toolbar-end {
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
+    // Menu dropdown styles
+    .p-menu {
+      border-radius: 8px !important;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12) !important;
+      border: 1px solid var(--surface-border) !important;
+      background: var(--surface-overlay) !important;
+      min-width: 200px !important;
+      
+      .p-menuitem-link {
+        padding: 0.75rem 1rem !important;
+        border-radius: 6px !important;
+        margin: 0.125rem !important;
+        color: var(--text-color) !important;
+        display: flex !important;
+        align-items: center !important;
+        transition: all 0.15s ease !important;
+        
+        &:hover, &:focus {
+          background: var(--surface-hover) !important;
+          color: var(--primary-color) !important;
+        }
+        
+        .p-menuitem-icon {
+          margin-right: 0.75rem !important;
+          color: var(--text-color-secondary) !important;
+          font-size: 0.9rem !important;
+        }
+        
+        .p-menuitem-text {
+          color: inherit !important;
+          font-size: 0.9rem !important;
+          font-weight: 500 !important;
+        }
+      }
+    }
+  }
+  
+  // Dark theme support
+  .my-app-dark {
+    .improved-toolbar {
+      background: var(--surface-card) !important;
+      border-color: var(--surface-border) !important;
+    }
+    
+    ::ng-deep .p-menu {
+      background: var(--surface-overlay) !important;
+      border-color: var(--surface-border) !important;
+      
+      .p-menuitem-link {
+        color: var(--text-color) !important;
+        
+        &:hover, &:focus {
+          background: var(--surface-hover) !important;
+          color: var(--primary-color) !important;
+        }
+        
+        .p-menuitem-icon {
+          color: var(--text-color-secondary) !important;
+        }
+        
+        .p-menuitem-text {
+          color: var(--text-color) !important;
+        }
+      }
     }
   }
   
@@ -311,7 +527,9 @@
   
   // Responsive Design
   @media (max-width: 768px) {
-    padding: 0.5rem;
+    .movimientos-container {
+      padding: 0.5rem;
+    }
     
     .page-header {
       h1 {
@@ -374,7 +592,7 @@
       gap: 0.25rem;
     }
   }
-}
+
 
 // AGREGAR estos estilos al final de movimientos.scss
 // REEMPLAZAR la sección de estilos del inventario en movimientos.scss con esta versión corregida:
@@ -1040,6 +1258,992 @@
     
     &:hover {
       box-shadow: 0 4px 12px rgba(255,255,255,0.1) !important;
+    }
+  }
+}
+
+// ============= ESTILOS PARA DIALOG DE EDICIÓN =============
+
+.edit-dialog-content {
+  .movimiento-info {
+    background: var(--surface-ground);
+    border: 1px solid var(--surface-border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+
+    h4 {
+      margin: 0 0 1rem 0;
+      color: var(--primary-color);
+      font-weight: 600;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      &::before {
+        content: "ℹ️";
+        font-size: 1.2rem;
+      }
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+
+      .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+
+        label {
+          font-weight: 600;
+          color: var(--text-color-secondary);
+          font-size: 0.85rem;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        span {
+          color: var(--text-color);
+          font-weight: 500;
+        }
+      }
+    }
+  }
+
+  .edit-form {
+    .field {
+      margin-bottom: 1.5rem;
+
+      label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+        font-weight: 600;
+        color: var(--text-color);
+        font-size: 0.95rem;
+
+        i {
+          color: var(--primary-color);
+          font-size: 0.9rem;
+        }
+      }
+
+      ::ng-deep .p-inputnumber {
+        width: 100%;
+
+        .p-inputnumber-input {
+          width: 100%;
+          padding: 0.75rem 1rem;
+          border-radius: 8px;
+          border: 2px solid var(--surface-border);
+          transition: all 0.3s ease;
+
+          &:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
+          }
+
+          &.ng-invalid.ng-touched {
+            border-color: var(--red-500);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+          }
+        }
+      }
+
+      textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        border: 2px solid var(--surface-border);
+        transition: all 0.3s ease;
+        font-family: inherit;
+        resize: vertical;
+        min-height: 80px;
+
+        &:focus {
+          border-color: var(--primary-color);
+          box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
+          outline: none;
+        }
+      }
+
+      .p-error {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        color: var(--red-500);
+
+        i {
+          font-size: 0.8rem;
+        }
+      }
+    }
+  }
+
+  ::ng-deep .dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--surface-border);
+
+    .p-button {
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      min-width: 120px;
+
+      &.p-button-outlined {
+        border: 2px solid var(--surface-border);
+        background: transparent;
+
+        &:hover {
+          background: var(--surface-hover);
+          border-color: var(--primary-color);
+        }
+      }
+
+      &:not(.p-button-outlined) {
+        box-shadow: 0 4px 12px rgba(var(--primary-color-rgb), 0.3);
+
+        &:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(var(--primary-color-rgb), 0.4);
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          transform: none;
+          box-shadow: none;
+        }
+      }
+    }
+  }
+}
+
+// Responsive adjustments para dialog de edición
+@media (max-width: 768px) {
+  .edit-dialog-content {
+    .movimiento-info {
+      padding: 1rem;
+
+      .info-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+    }
+
+    ::ng-deep .dialog-footer {
+      flex-direction: column;
+
+      .p-button {
+        width: 100%;
+      }
+    }
+  }
+}
+
+// Dark theme support para dialog de edición
+.my-app-dark {
+  .edit-dialog-content {
+    .movimiento-info {
+      background: rgba(255, 255, 255, 0.02);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .edit-form {
+      .field {
+        ::ng-deep .p-inputnumber {
+          .p-inputnumber-input {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: white;
+
+            &:focus {
+              background: rgba(255, 255, 255, 0.1);
+              border-color: var(--primary-color);
+            }
+          }
+        }
+
+        textarea {
+          background: rgba(255, 255, 255, 0.05);
+          border-color: rgba(255, 255, 255, 0.1);
+          color: white;
+
+          &:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary-color);
+          }
+
+          &::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+          }
+        }
+      }
+    }
+  }
+}
+
+// ============= ESTILOS PARA DIVISIÓN DE PRODUCTOS =============
+
+.division-dialog-content {
+  .division-info {
+    background: var(--surface-ground);
+    border: 1px solid var(--surface-border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border-left: 4px solid var(--primary-color);
+    
+    .info-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      
+      i {
+        color: var(--primary-color);
+        font-size: 1.2rem;
+      }
+      
+      h4 {
+        margin: 0;
+        color: var(--primary-color);
+        font-weight: 600;
+        font-size: 1.1rem;
+      }
+    }
+    
+    p {
+      margin: 0;
+      color: var(--text-color-secondary);
+      line-height: 1.5;
+    }
+  }
+  
+  .division-form {
+    .origen-section,
+    .destino-section {
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      
+      h5 {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0 0 1.5rem 0;
+        color: var(--text-color);
+        font-weight: 600;
+        font-size: 1rem;
+        
+        i {
+          color: var(--primary-color);
+        }
+      }
+    }
+    
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+    }
+    
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      
+      label {
+        font-weight: 600;
+        color: var(--text-color);
+        font-size: 0.9rem;
+        
+        .required {
+          color: var(--red-500);
+          margin-left: 2px;
+        }
+      }
+      
+      .p-error {
+        font-size: 0.8rem;
+        color: var(--red-500);
+        margin-top: 0.25rem;
+      }
+    }
+    
+    // Destino Section Specific Styles
+    .destino-section {
+      .destino-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        
+        h5 {
+          margin: 0;
+        }
+      }
+      
+      .productos-destino {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .producto-destino-item {
+        background: var(--surface-section);
+        border: 1px solid var(--surface-border);
+        border-radius: 8px;
+        padding: 1rem;
+        position: relative;
+        animation: slideIn 0.3s ease-out;
+        
+        .item-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 1rem;
+          
+          .item-number {
+            background: var(--primary-color);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            flex-shrink: 0;
+          }
+          
+          h6 {
+            margin: 0;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            flex: 1;
+            margin-left: 0.5rem;
+          }
+        }
+        
+        .item-form {
+          display: grid;
+          grid-template-columns: 2fr 1fr;
+          gap: 1rem;
+          
+          @media (max-width: 768px) {
+            grid-template-columns: 1fr;
+          }
+        }
+      }
+      
+      .no-productos-destino {
+        text-align: center;
+        padding: 2rem;
+        color: var(--text-color-secondary);
+        background: var(--surface-section);
+        border: 2px dashed var(--surface-border);
+        border-radius: 8px;
+        
+        i {
+          font-size: 2rem;
+          margin-bottom: 0.5rem;
+          color: var(--primary-color);
+        }
+        
+        p {
+          margin: 0;
+          font-size: 0.9rem;
+        }
+      }
+    }
+    
+    // Resumen Section
+    .division-resumen {
+      background: var(--surface-ground);
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      
+      h5 {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0 0 1rem 0;
+        color: var(--text-color);
+        font-weight: 600;
+        font-size: 1rem;
+        
+        i {
+          color: var(--primary-color);
+        }
+      }
+      
+      .resumen-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 1rem;
+        
+        @media (max-width: 768px) {
+          grid-template-columns: 1fr;
+        }
+        
+        .resumen-item {
+          text-align: center;
+          padding: 1rem;
+          background: var(--surface-card);
+          border-radius: 6px;
+          border: 1px solid var(--surface-border);
+          
+          label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-color-secondary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+          }
+          
+          .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+            
+            &.diferencia-ok {
+              color: var(--green-600);
+            }
+            
+            &.diferencia-falta {
+              color: var(--orange-600);
+            }
+            
+            &.diferencia-sobra {
+              color: var(--red-600);
+            }
+          }
+        }
+      }
+      
+      .division-alert {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem;
+        background: rgba(255, 152, 0, 0.1);
+        border: 1px solid var(--orange-300);
+        border-radius: 6px;
+        color: var(--orange-700);
+        
+        i {
+          font-size: 1.1rem;
+          color: var(--orange-500);
+        }
+        
+        .alert-text {
+          font-weight: 500;
+          font-size: 0.9rem;
+        }
+        
+        // Dark theme support
+        .my-app-dark & {
+          background: rgba(255, 152, 0, 0.2);
+          border-color: rgba(255, 152, 0, 0.3);
+          color: var(--orange-300);
+        }
+      }
+    }
+  }
+}
+
+// Producto option styles
+.producto-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  
+  .codigo {
+    background: var(--primary-100, rgba(var(--primary-rgb), 0.1));
+    color: var(--primary-700, var(--primary-color));
+    padding: 0.125rem 0.375rem;
+    border-radius: 4px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  
+  .descripcion {
+    color: var(--text-color);
+    font-size: 0.85rem;
+    line-height: 1.2;
+  }
+}
+
+// Animaciones para mejor UX
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ============= ESTILOS PARA COMBINACIÓN DE PRODUCTOS =============
+
+.combinacion-dialog-content {
+  .combinacion-info {
+    background: var(--surface-ground);
+    border: 1px solid var(--surface-border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border-left: 4px solid var(--teal-500);
+    
+    .info-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      
+      i {
+        color: var(--teal-500);
+        font-size: 1.2rem;
+      }
+      
+      h4 {
+        margin: 0;
+        color: var(--teal-500);
+        font-weight: 600;
+        font-size: 1.1rem;
+      }
+    }
+    
+    p {
+      margin: 0;
+      color: var(--text-color-secondary);
+      line-height: 1.5;
+    }
+  }
+  
+  .combinacion-form {
+    .ingredientes-section,
+    .combo-section {
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      
+      h5 {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0 0 1.5rem 0;
+        color: var(--text-color);
+        font-weight: 600;
+        font-size: 1rem;
+        
+        i {
+          &.pi-minus-circle {
+            color: var(--red-500);
+          }
+          &.pi-plus-circle {
+            color: var(--green-500);
+          }
+        }
+      }
+    }
+    
+    // Ingredientes Section Specific Styles
+    .ingredientes-section {
+      border-left: 4px solid var(--red-500);
+      
+      .ingredientes-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        
+        h5 {
+          margin: 0;
+        }
+      }
+      
+      .ingredientes-lista {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .ingrediente-item {
+        background: var(--surface-section);
+        border: 1px solid var(--surface-border);
+        border-radius: 8px;
+        padding: 1rem;
+        position: relative;
+        animation: slideIn 0.3s ease-out;
+        border-left: 3px solid var(--red-300);
+        
+        .item-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 1rem;
+          
+          .item-number {
+            background: var(--red-500);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            flex-shrink: 0;
+          }
+          
+          h6 {
+            margin: 0;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            flex: 1;
+            margin-left: 0.5rem;
+          }
+        }
+        
+        .item-form {
+          display: grid;
+          grid-template-columns: 2fr 1fr;
+          gap: 1rem;
+          
+          @media (max-width: 768px) {
+            grid-template-columns: 1fr;
+          }
+          
+          .form-field {
+            .cantidad-type {
+              display: block;
+              font-size: 0.75rem;
+              margin-top: 0.25rem;
+              font-weight: 600;
+              
+              &.egreso {
+                color: var(--red-600);
+              }
+            }
+          }
+        }
+      }
+      
+      .no-ingredientes {
+        text-align: center;
+        padding: 2rem;
+        color: var(--text-color-secondary);
+        background: var(--surface-section);
+        border: 2px dashed var(--surface-border);
+        border-radius: 8px;
+        
+        i {
+          font-size: 2rem;
+          margin-bottom: 0.5rem;
+          color: var(--red-400);
+        }
+        
+        p {
+          margin: 0;
+          font-size: 0.9rem;
+        }
+      }
+    }
+    
+    // Combo Section Specific Styles
+    .combo-section {
+      border-left: 4px solid var(--green-500);
+      
+      .cantidad-calculada {
+        background: var(--green-50);
+        border: 1px solid var(--green-200);
+        border-radius: 6px;
+        padding: 1rem;
+        text-align: center;
+        
+        .valor-calculado {
+          display: block;
+          font-size: 1.8rem;
+          font-weight: 700;
+          color: var(--green-600);
+          margin-bottom: 0.25rem;
+        }
+        
+        .cantidad-type {
+          font-size: 0.8rem;
+          font-weight: 600;
+          
+          &.ingreso {
+            color: var(--green-600);
+          }
+        }
+        
+        // Dark theme support
+        .my-app-dark & {
+          background: rgba(76, 175, 80, 0.1);
+          border-color: rgba(76, 175, 80, 0.3);
+          
+          .valor-calculado {
+            color: var(--green-400);
+          }
+          
+          .cantidad-type.ingreso {
+            color: var(--green-400);
+          }
+        }
+      }
+    }
+    
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+    }
+    
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      
+      label {
+        font-weight: 600;
+        color: var(--text-color);
+        font-size: 0.9rem;
+        
+        .required {
+          color: var(--red-500);
+          margin-left: 2px;
+        }
+      }
+      
+      .p-error {
+        font-size: 0.8rem;
+        color: var(--red-500);
+        margin-top: 0.25rem;
+      }
+      
+      .p-help {
+        font-size: 0.75rem;
+        color: var(--text-color-secondary);
+        margin-top: 0.25rem;
+        font-style: italic;
+      }
+    }
+    
+    // Resumen Section
+    .combinacion-resumen {
+      background: var(--surface-ground);
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      
+      h5 {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0 0 1rem 0;
+        color: var(--text-color);
+        font-weight: 600;
+        font-size: 1rem;
+        
+        i {
+          color: var(--teal-500);
+        }
+      }
+      
+      .resumen-seccion {
+        margin-bottom: 1.5rem;
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+        
+        h6 {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin: 0 0 0.75rem 0;
+          color: var(--text-color-secondary);
+          font-weight: 600;
+          font-size: 0.9rem;
+          padding-bottom: 0.5rem;
+          border-bottom: 1px solid var(--surface-border);
+          
+          i {
+            &.pi-arrow-down {
+              color: var(--red-500);
+            }
+            &.pi-arrow-up {
+              color: var(--green-500);
+            }
+          }
+        }
+        
+        .movimientos-lista {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+          
+          .movimiento-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: var(--surface-card);
+            border: 1px solid var(--surface-border);
+            border-radius: 6px;
+            
+            .producto-info {
+              color: var(--text-color);
+              font-size: 0.85rem;
+              flex: 1;
+            }
+            
+            .cantidad {
+              font-weight: 700;
+              font-size: 0.9rem;
+              padding: 0.25rem 0.5rem;
+              border-radius: 4px;
+              min-width: 60px;
+              text-align: center;
+            }
+            
+            &.egreso {
+              border-left: 3px solid var(--red-500);
+              
+              .cantidad {
+                background: var(--red-100);
+                color: var(--red-700);
+                
+                .my-app-dark & {
+                  background: rgba(244, 67, 54, 0.2);
+                  color: var(--red-300);
+                }
+              }
+            }
+            
+            &.ingreso {
+              border-left: 3px solid var(--green-500);
+              
+              .cantidad {
+                background: var(--green-100);
+                color: var(--green-700);
+                
+                .my-app-dark & {
+                  background: rgba(76, 175, 80, 0.2);
+                  color: var(--green-300);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Dark theme support para combinación
+.my-app-dark {
+  .combinacion-dialog-content {
+    .combinacion-info {
+      background: rgba(255, 255, 255, 0.02);
+      border-color: rgba(255, 255, 255, 0.1);
+      border-left-color: var(--teal-400);
+    }
+    
+    .ingredientes-section,
+    .combo-section {
+      background: rgba(255, 255, 255, 0.02);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .ingrediente-item {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.1);
+      border-left-color: rgba(244, 67, 54, 0.5);
+    }
+    
+    .combinacion-resumen {
+      background: rgba(255, 255, 255, 0.02);
+      border-color: rgba(255, 255, 255, 0.1);
+      
+      .movimiento-item {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.1);
+      }
+    }
+    
+    .no-ingredientes {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+}
+
+// Responsive adjustments para combinación
+@media (max-width: 768px) {
+  .combinacion-dialog-content {
+    .combinacion-form {
+      .ingredientes-section,
+      .combo-section {
+        padding: 1rem;
+      }
+      
+      .combinacion-resumen {
+        padding: 1rem;
+        
+        .movimientos-lista {
+          .movimiento-item {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.5rem;
+            
+            .cantidad {
+              text-align: left;
+            }
+          }
+        }
+      }
     }
   }
 }
